@@ -189,11 +189,10 @@ export async function deletePropertyAction(id: string) {
   return { success: true };
 }
 
-// Accion para crear un nuevo Asesor Inmobiliario
+// Accion para crear un nuevo Asesor Inmobiliario (solo perfil de contacto, sin acceso al panel)
 export async function createAgentAction(data: {
   name: string;
   email: string;
-  password?: string;
   phone: string;
   position?: string;
   instagram?: string;
@@ -203,7 +202,8 @@ export async function createAgentAction(data: {
   const user = await getCurrentUser();
   if (!user) throw new Error("No autorizado");
 
-  const passwordHash = await bcrypt.hash(data.password || "Asesor123*", 10);
+  // Los asesores son perfiles de contacto y no tienen credenciales de acceso al sistema
+  const passwordHash = await bcrypt.hash(crypto.randomUUID() + "-" + Date.now(), 10);
 
   await prisma.user.create({
     data: {

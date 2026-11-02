@@ -44,8 +44,9 @@ export async function loginUser(
     where: { email: email.toLowerCase().trim() },
   });
 
-  if (!user || !user.isActive) {
-    return { success: false, error: "Credenciales inválidas o usuario inactivo." };
+  // Solo usuarios con rol ADMIN pueden autenticarse en el panel
+  if (!user || !user.isActive || user.role !== "ADMIN") {
+    return { success: false, error: "Credenciales inválidas o acceso no autorizado." };
   }
 
   const isPasswordValid = await bcrypt.compare(plainPassword, user.passwordHash);

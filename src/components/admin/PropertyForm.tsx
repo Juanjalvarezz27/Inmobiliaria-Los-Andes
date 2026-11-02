@@ -599,7 +599,7 @@ export function PropertyForm({
             <option value="">-- Seleccionar Asesor --</option>
             {agents.map((agent) => (
               <option key={agent.id} value={agent.id}>
-                {agent.name} — {agent.position}
+                {agent.name}
               </option>
             ))}
           </select>

@@ -114,7 +114,6 @@ export default async function AdminPropertiesPage() {
                     {/* Asesor */}
                     <td className="py-4 px-6 text-xs text-text-secondary">
                       <span className="font-medium text-text-primary block">{p.agent.name}</span>
-                      <span>{p.agent.position}</span>
                     </td>
 
                     {/* Acciones */}

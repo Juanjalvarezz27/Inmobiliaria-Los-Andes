@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Power, Edit2, PlusCircle, Loader2 } from "lucide-react";
 import { toggleAgentStatusAction } from "@/app/admin/actions";
 import { AgentModal, AgentFormData } from "@/components/admin/AgentModal";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 
 interface AgentDetailActionsProps {
   agent: AgentFormData;
@@ -15,20 +16,17 @@ export function AgentDetailActions({ agent }: AgentDetailActionsProps) {
   const [isActive, setIsActive] = useState(agent.isActive);
   const [isLoading, setIsLoading] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const handleToggle = async () => {
-    const actionText = isActive ? "inactivar (pausar)" : "reactivar";
-    if (!confirm(`¿Estás seguro de que deseas ${actionText} a ${agent.name}?`)) {
-      return;
-    }
-
     setIsLoading(true);
     try {
       const res = await toggleAgentStatusAction(agent.id);
       setIsActive(res.isActive);
+      setShowConfirmModal(false);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Error al cambiar el estado del asesor.";
-      alert(message);
+      console.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -40,7 +38,7 @@ export function AgentDetailActions({ agent }: AgentDetailActionsProps) {
         {/* Accion para alternar el estado sin eliminar */}
         <button
           type="button"
-          onClick={handleToggle}
+          onClick={() => setShowConfirmModal(true)}
           disabled={isLoading}
           title={isActive ? "Pausar actividad del asesor" : "Reactivar asesor en el equipo"}
           className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-sm active:scale-95 border ${
@@ -76,6 +74,24 @@ export function AgentDetailActions({ agent }: AgentDetailActionsProps) {
           <span>Asignar Propiedad</span>
         </Link>
       </div>
+
+      {/* Modal de confirmacion de cambio de estado */}
+      <ConfirmModal
+        isOpen={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={handleToggle}
+        isLoading={isLoading}
+        variant={isActive ? "warning" : "info"}
+        title={isActive ? "Pausar Asesor Inmobiliario" : "Reactivar Asesor Inmobiliario"}
+        description={
+          isActive
+            ? `¿Estás seguro de que deseas pausar a ${agent.name}? Sus inmuebles asignados seguirán registrados, pero el asesor no figurará en estado activo.`
+            : `¿Estás seguro de que deseas reactivar a ${agent.name}? El asesor volverá a figurar como activo en el equipo.`
+        }
+        itemHighlight={agent.name}
+        confirmText={isActive ? "Pausar Asesor" : "Reactivar Asesor"}
+        cancelText="Volver"
+      />
 
       <AgentModal
         isOpen={showEditModal}

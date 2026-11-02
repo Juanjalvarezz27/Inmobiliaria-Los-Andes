@@ -220,7 +220,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                 </div>
                 <div>
                   <h3 className="text-lg font-black text-brand-primary">{property.agent.name}</h3>
-                  <p className="text-xs font-semibold text-text-secondary">{property.agent.position}</p>
+                  <p className="text-xs font-semibold text-text-secondary">Asesor Inmobiliario</p>
                 </div>
               </div>
 

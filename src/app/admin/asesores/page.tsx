@@ -48,6 +48,12 @@ export default async function AdminAgentsPage() {
     activePropertiesCount: agent.properties.filter(
       (p) => p.status === "AVAILABLE" || p.status === "RESERVED"
     ).length,
+    forSaleCount: agent.properties.filter(
+      (p) => p.operationType === "SALE" && (p.status === "AVAILABLE" || p.status === "RESERVED")
+    ).length,
+    forRentCount: agent.properties.filter(
+      (p) => p.operationType === "RENT" && (p.status === "AVAILABLE" || p.status === "RESERVED")
+    ).length,
     portfolioValue: agent.properties.reduce(
       (sum, p) => sum + Number(p.price || 0),
       0

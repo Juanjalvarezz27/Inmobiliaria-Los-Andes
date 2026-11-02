@@ -6,7 +6,6 @@ import Link from "next/link";
 import {
   UserPlus,
   Phone,
-  Mail,
   Edit2,
   Users,
   UserCheck,
@@ -17,10 +16,9 @@ import {
   ChevronRight,
   Loader2,
 } from "lucide-react";
-import { InstagramIcon } from "@/components/icons/InstagramIcon";
-import { formatCurrency } from "@/lib/utils/format";
 import { toggleAgentStatusAction } from "@/app/admin/actions";
 import { AgentModal, AgentFormData } from "@/components/admin/AgentModal";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 
 export interface AgentItem {
   id: string;
@@ -34,7 +32,9 @@ export interface AgentItem {
   createdAt?: string;
   propertiesCount: number;
   activePropertiesCount: number;
-  portfolioValue: number;
+  forSaleCount?: number;
+  forRentCount?: number;
+  portfolioValue?: number;
 }
 
 // Gestor interactivo enriquecido de asesores inmobiliarios con metricas y control de estado
@@ -44,6 +44,7 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
   const [showModal, setShowModal] = useState(false);
   const [editingAgent, setEditingAgent] = useState<AgentFormData | null>(null);
   const [loadingAgentId, setLoadingAgentId] = useState<string | null>(null);
+  const [agentToToggle, setAgentToToggle] = useState<AgentItem | null>(null);
 
   // Metricas globales para las tarjetas de resumen
   const totalAgents = agents.length;
@@ -56,7 +57,6 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
     const matchesSearch =
       agent.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       agent.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      agent.position.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (agent.phone && agent.phone.includes(searchQuery));
 
     const matchesStatus =
@@ -67,18 +67,15 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
     return matchesSearch && matchesStatus;
   });
 
-  const handleToggleStatus = async (agent: AgentItem) => {
-    const actionText = agent.isActive ? "inactivar (pausar)" : "reactivar";
-    if (!confirm(`¿Estás seguro de que deseas ${actionText} a ${agent.name}?`)) {
-      return;
-    }
-
-    setLoadingAgentId(agent.id);
+  const executeToggleStatus = async () => {
+    if (!agentToToggle) return;
+    setLoadingAgentId(agentToToggle.id);
     try {
-      await toggleAgentStatusAction(agent.id);
+      await toggleAgentStatusAction(agentToToggle.id);
+      setAgentToToggle(null);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Error al cambiar el estado del asesor.";
-      alert(message);
+      console.error(message);
     } finally {
       setLoadingAgentId(null);
     }
@@ -198,7 +195,7 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Buscar por nombre, correo o cargo..."
+            placeholder="Buscar por nombre o correo..."
             className="w-full text-xs sm:text-sm pl-10 pr-4 py-2.5 rounded-2xl border border-neutral-200 bg-neutral-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-accent transition-all"
           />
         </div>
@@ -270,147 +267,113 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
             return (
               <div
                 key={agent.id}
-                className={`bg-ui-surface rounded-3xl border transition-all flex flex-col justify-between overflow-hidden shadow-sm hover:shadow-md ${
+                className={`group relative bg-[#0e1713] text-white rounded-[32px] p-3.5 border transition-all duration-300 flex flex-col justify-between shadow-xl hover:shadow-2xl hover:border-emerald-500/30 hover:-translate-y-1 ${
                   agent.isActive
-                    ? "border-neutral-200/80"
-                    : "border-neutral-200 bg-neutral-50/50 opacity-90"
+                    ? "border-white/[0.08]"
+                    : "border-white/[0.04] opacity-80"
                 }`}
               >
-                <div className="p-6 space-y-5">
-                  {/* Fila superior: Avatar, Estado y Switch de Inactivar */}
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-brand-accent/20 bg-neutral-100 shadow-sm shrink-0">
-                      <Image
-                        src={
-                          agent.avatarUrl ||
-                          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80"
-                        }
-                        alt={agent.name}
-                        fill
-                        sizes="64px"
-                        className="object-cover"
-                      />
-                    </div>
+                <div>
+                  {/* Marco Superior de Retrato a Sangrado Completo (Full-Bleed Showcase) */}
+                  <div className="relative w-full h-72 rounded-[26px] overflow-hidden select-none bg-neutral-900 group/photo">
+                    {/* Fotografia de Retrato a Cobertura Total */}
+                    <Image
+                      src={
+                        agent.avatarUrl ||
+                        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80"
+                      }
+                      alt={agent.name}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 380px"
+                      className="object-cover object-top group-hover:scale-105 transition-transform duration-500 ease-out"
+                    />
 
-                    <div className="flex flex-col items-end gap-2">
+                    {/* Degradados sutiles para legibilidad de badges */}
+                    <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/70 via-black/30 to-transparent pointer-events-none" />
+                    <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#0e1713] via-[#0e1713]/70 to-transparent pointer-events-none" />
+
+                    {/* Barra Superior con Estado y Boton de Pausa */}
+                    <div className="relative z-20 w-full flex items-center justify-between p-3.5">
                       <span
-                        className={`text-[11px] font-bold px-3 py-1 rounded-full flex items-center gap-1.5 ${
+                        className={`text-[11px] font-bold px-3 py-1 rounded-full flex items-center gap-1.5 backdrop-blur-md border shadow-sm ${
                           agent.isActive
-                            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                            : "bg-neutral-100 text-neutral-600 border border-neutral-300"
+                            ? "bg-emerald-500/25 text-emerald-200 border-emerald-400/40"
+                            : "bg-black/60 text-neutral-300 border-white/20"
                         }`}
                       >
                         <span
                           className={`w-1.5 h-1.5 rounded-full ${
-                            agent.isActive ? "bg-emerald-500 animate-pulse" : "bg-neutral-400"
+                            agent.isActive ? "bg-emerald-400 animate-pulse" : "bg-neutral-400"
                           }`}
                         />
                         {agent.isActive ? "Activo" : "Inactivo"}
                       </span>
 
-                      {/* Boton rapido de activacion sin borrar */}
                       <button
                         type="button"
-                        onClick={() => handleToggleStatus(agent)}
+                        onClick={() => setAgentToToggle(agent)}
                         disabled={isToggling}
-                        title={agent.isActive ? "Inactivar asesor (pausar)" : "Reactivar asesor"}
-                        className={`inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-lg border transition-colors ${
-                          agent.isActive
-                            ? "text-neutral-500 hover:text-red-600 border-neutral-200 hover:bg-red-50"
-                            : "text-emerald-700 hover:text-emerald-800 border-emerald-200 bg-emerald-50 hover:bg-emerald-100"
-                        }`}
+                        title={agent.isActive ? "Pausar asesor" : "Reactivar asesor"}
+                        className="p-1.5 rounded-xl bg-black/50 hover:bg-black/70 border border-white/20 text-white/90 hover:text-white backdrop-blur-md transition-all active:scale-95"
                       >
                         {isToggling ? (
-                          <Loader2 className="w-3 h-3 animate-spin" />
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
                         ) : (
-                          <Power className="w-3 h-3" />
+                          <Power className="w-3.5 h-3.5" />
                         )}
-                        <span>{agent.isActive ? "Pausar" : "Reactivar"}</span>
                       </button>
                     </div>
-                  </div>
 
-                  {/* Nombre y Cargo */}
-                  <div>
-                    <h3 className="text-lg font-bold text-brand-primary font-heading leading-snug">
-                      {agent.name}
-                    </h3>
-                    <p className="text-xs font-semibold text-brand-accent mt-0.5">{agent.position}</p>
-                  </div>
-
-                  {/* Chips con Metricas del Asesor */}
-                  <div className="grid grid-cols-2 gap-2 p-2.5 bg-neutral-50 rounded-2xl border border-neutral-100 text-center">
-                    <div>
-                      <span className="text-xs font-bold text-brand-primary block">
-                        {agent.propertiesCount}
-                      </span>
-                      <span className="text-[10px] text-text-secondary font-medium block">
-                        Inmuebles a cargo
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-xs font-bold text-brand-accent block truncate">
-                        {formatCurrency(agent.portfolioValue)}
-                      </span>
-                      <span className="text-[10px] text-text-secondary font-medium block">
-                        Cartera activa
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Datos de Contacto */}
-                  <div className="space-y-2 text-xs text-text-secondary pt-2 border-t border-neutral-100">
-                    <div className="flex items-center gap-2 truncate">
-                      <Mail className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
-                      <a
-                        href={`mailto:${agent.email}`}
-                        className="truncate hover:text-brand-primary transition-colors"
+                    {/* Notch Curvo Invertido en la Base */}
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-10 pointer-events-none flex items-end justify-center">
+                      <svg
+                        viewBox="0 0 180 36"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="w-44 h-[36px] text-[#0e1713]"
                       >
-                        {agent.email}
-                      </a>
-                    </div>
-
-                    {agent.phone && (
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Phone className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                          <span className="font-semibold text-text-primary">{agent.phone}</span>
-                        </div>
-                        {whatsappUrl && (
-                          <a
-                            href={whatsappUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[10px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-2 py-0.5 rounded-md border border-emerald-200 transition-colors"
-                          >
-                            WhatsApp
-                          </a>
-                        )}
+                        <path
+                          d="M 0 36 C 16 36 20 18 32 6 C 38 0 46 0 54 0 L 126 0 C 134 0 142 0 148 6 C 160 18 164 36 180 36 Z"
+                          fill="currentColor"
+                        />
+                      </svg>
+                      <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 text-center pointer-events-auto">
+                        <span className="text-xs font-bold text-white font-heading tracking-wide block whitespace-nowrap">
+                          {agent.propertiesCount} {agent.propertiesCount === 1 ? "Inmueble" : "Inmuebles"}
+                        </span>
                       </div>
-                    )}
+                    </div>
+                  </div>
 
-                    {agent.instagram && (
-                      <div className="flex items-center gap-2">
-                        <InstagramIcon className="w-3.5 h-3.5 text-pink-600 shrink-0" />
+                  {/* Cuerpo de la Tarjeta: Minimalista y sin sobrecarga */}
+                  <div className="mt-3.5 px-1.5">
+                    <div className="flex items-center justify-between gap-3">
+                      <h3 className="text-lg font-bold text-white font-heading truncate leading-snug group-hover:text-emerald-300 transition-colors">
+                        {agent.name}
+                      </h3>
+
+                      {agent.phone && whatsappUrl && (
                         <a
-                          href={`https://instagram.com/${agent.instagram.replace("@", "")}`}
+                          href={whatsappUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="hover:text-brand-primary transition-colors truncate"
+                          title="Contactar por WhatsApp"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-xs font-bold transition-all active:scale-95 shadow-xs shrink-0"
                         >
-                          @{agent.instagram.replace("@", "")}
+                          <Phone className="w-3.5 h-3.5" />
+                          <span>WhatsApp</span>
                         </a>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
 
-                {/* Pie de Tarjeta con Navegacion a Detalle y Edicion */}
-                <div className="p-4 bg-neutral-50/80 border-t border-neutral-100 flex items-center justify-between">
+                {/* Pie de Tarjeta: Accion de Edicion y Link a Detalle */}
+                <div className="mt-4 pt-3 border-t border-white/[0.08] flex items-center justify-between px-1.5 text-xs">
                   <button
                     type="button"
                     onClick={() => openEditModal(agent)}
-                    className="text-xs font-bold text-text-secondary hover:text-brand-primary flex items-center gap-1.5 transition-colors"
+                    className="inline-flex items-center gap-1.5 font-semibold text-neutral-400 hover:text-white transition-colors py-1"
                   >
                     <Edit2 className="w-3.5 h-3.5" />
                     <span>Editar</span>
@@ -418,10 +381,10 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
 
                   <Link
                     href={`/admin/asesores/${agent.id}`}
-                    className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-primary hover:text-brand-accent transition-colors"
+                    className="inline-flex items-center gap-1 font-bold text-brand-accent hover:text-[#f26c3f] transition-colors py-1 group/btn"
                   >
-                    <span>Ver Perfil & Inmuebles</span>
-                    <ChevronRight className="w-3.5 h-3.5" />
+                    <span>Ver Perfil & Cartera</span>
+                    <ChevronRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
                   </Link>
                 </div>
               </div>
@@ -435,6 +398,34 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         agent={editingAgent}
+      />
+
+      {/* Modal Reutilizable de Confirmacion de Estado */}
+      <ConfirmModal
+        isOpen={Boolean(agentToToggle)}
+        onClose={() => setAgentToToggle(null)}
+        onConfirm={executeToggleStatus}
+        isLoading={Boolean(loadingAgentId)}
+        variant={agentToToggle?.isActive ? "warning" : "info"}
+        title={
+          agentToToggle?.isActive
+            ? "Pausar Asesor Inmobiliario"
+            : "Reactivar Asesor Inmobiliario"
+        }
+        description={
+          agentToToggle?.isActive
+            ? `¿Estás seguro de que deseas pausar a ${agentToToggle?.name}? Sus propiedades seguirán guardadas pero el asesor pasará a estado inactivo.`
+            : `¿Estás seguro de que deseas reactivar a ${agentToToggle?.name}? El asesor volverá a estar disponible en el equipo comercial activo.`
+        }
+        itemHighlight={
+          agentToToggle
+            ? `${agentToToggle.name} • ${agentToToggle.propertiesCount} ${
+                agentToToggle.propertiesCount === 1 ? "inmueble asignado" : "inmuebles asignados"
+              }`
+            : undefined
+        }
+        confirmText={agentToToggle?.isActive ? "Pausar Asesor" : "Reactivar Asesor"}
+        cancelText="Volver"
       />
     </div>
   );

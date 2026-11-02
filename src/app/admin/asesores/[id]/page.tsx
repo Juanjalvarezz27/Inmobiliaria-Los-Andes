@@ -117,8 +117,6 @@ export default async function AgentDetailPage({ params }: PageProps) {
                 </span>
               </div>
 
-              <p className="text-sm font-semibold text-brand-accent">{agent.position}</p>
-
               <div className="flex flex-wrap items-center gap-y-2 gap-x-4 text-xs text-text-secondary pt-1">
                 <span className="flex items-center gap-1.5">
                   <Calendar className="w-3.5 h-3.5 text-neutral-400" />

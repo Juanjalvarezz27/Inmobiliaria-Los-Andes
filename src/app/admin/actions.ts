@@ -6,6 +6,8 @@ import { generateSlug } from "@/lib/utils/slug";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
+import fs from "fs";
+import path from "path";
 import type { OperationType, PropertyType, PropertyStatus } from "@/generated/prisma/client";
 
 // Accion de inicio de sesion
@@ -193,7 +195,7 @@ export async function createAgentAction(data: {
   email: string;
   password?: string;
   phone: string;
-  position: string;
+  position?: string;
   instagram?: string;
   avatarUrl?: string;
   isActive: boolean;
@@ -230,7 +232,7 @@ export async function updateAgentAction(
     name: string;
     email: string;
     phone: string;
-    position: string;
+    position?: string;
     instagram?: string;
     avatarUrl?: string;
     isActive: boolean;
@@ -245,7 +247,7 @@ export async function updateAgentAction(
       name: data.name,
       email: data.email.toLowerCase().trim(),
       phone: data.phone,
-      position: data.position,
+      ...(data.position ? { position: data.position } : {}),
       instagram: data.instagram,
       avatarUrl: data.avatarUrl,
       isActive: data.isActive,
@@ -279,4 +281,35 @@ export async function toggleAgentStatusAction(id: string) {
   revalidatePath("/admin/propiedades/nueva");
 
   return { success: true, isActive: updated.isActive };
+}
+
+// Accion para subir fotografia de asesor al servidor
+export async function uploadAvatarAction(
+  formData: FormData
+): Promise<{ success: boolean; url?: string; error?: string }> {
+  const user = await getCurrentUser();
+  if (!user) throw new Error("No autorizado");
+
+  const file = formData.get("file") as File | null;
+  if (!file) return { success: false, error: "No se seleccionó ningún archivo." };
+
+  if (!file.type.startsWith("image/")) {
+    return { success: false, error: "El archivo debe ser una imagen válida (PNG, JPG, WEBP)." };
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    return { success: false, error: "La imagen no debe superar los 5MB." };
+  }
+
+  const bytes = await file.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+
+  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+  const uniqueName = `agent-${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`;
+  const uploadDir = path.join(process.cwd(), "public", "uploads", "agents");
+
+  await fs.promises.mkdir(uploadDir, { recursive: true });
+  await fs.promises.writeFile(path.join(uploadDir, uniqueName), buffer);
+
+  return { success: true, url: `/uploads/agents/${uniqueName}` };
 }

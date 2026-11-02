@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { Users } from "lucide-react";
 import { AgentManager, AgentItem } from "@/components/admin/AgentManager";
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 
 // Vista principal para la gestion de Asesores Inmobiliarios
 export default async function AdminAgentsPage() {
@@ -61,15 +62,13 @@ export default async function AdminAgentsPage() {
   }));
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3.5">
-        <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-brand-primary/10 border border-brand-primary/15 flex items-center justify-center text-brand-primary shrink-0 shadow-xs">
-          <Users className="w-6 h-6 text-brand-primary" />
-        </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-brand-primary tracking-tight font-heading">
-          Equipo de Asesores Inmobiliarios
-        </h1>
-      </div>
+    <div className="space-y-7">
+      <AdminPageHeader
+        icon={Users}
+        title="Equipo de"
+        titleHighlight="Asesores Inmobiliarios"
+        description="Supervisa la disponibilidad, rendimiento y carteras de captación asignadas al equipo de ventas."
+      />
 
       <AgentManager agents={serializedAgents} />
     </div>

@@ -1,9 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import Image from "next/image";
-import { PlusCircle, Edit3, ExternalLink } from "lucide-react";
+import { PlusCircle, Edit3, ExternalLink, Building2 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/format";
 import { DeletePropertyButton } from "@/components/admin/DeletePropertyButton";
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 
 // Vista de gestion y listado de propiedades
 export default async function AdminPropertiesPage() {
@@ -27,26 +28,22 @@ export default async function AdminPropertiesPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-7">
       {/* Cabecera */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-extrabold text-brand-primary tracking-tight font-heading">
-            Gestión de Inmuebles
-          </h1>
-          <p className="text-xs sm:text-sm text-text-secondary">
-            Administra, edita, publica o elimina propiedades del catálogo.
-          </p>
-        </div>
-
+      <AdminPageHeader
+        icon={Building2}
+        title="Gestión de"
+        titleHighlight="Inmuebles"
+        description="Administra, publica, edita o retira propiedades residenciales y comerciales del catálogo."
+      >
         <Link
           href="/admin/propiedades/nueva"
-          className="inline-flex items-center gap-2 bg-brand-accent hover:bg-[#c94b21] text-white text-sm font-bold px-4 py-2.5 rounded-xl shadow-md transition-all active:scale-95 shrink-0"
+          className="inline-flex items-center gap-2 bg-brand-accent hover:bg-[#c94b21] text-white text-sm font-bold px-5 py-2.5 rounded-xl shadow-md transition-all active:scale-95 shrink-0"
         >
           <PlusCircle className="w-4 h-4" />
           <span>Cargar Propiedad</span>
         </Link>
-      </div>
+      </AdminPageHeader>
 
       {/* Tabla de Propiedades */}
       <div className="bg-ui-surface rounded-2xl border border-neutral-200 shadow-sm overflow-hidden">

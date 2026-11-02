@@ -7,8 +7,10 @@ import {
   Tag,
   Key,
   ArrowRight,
+  LayoutDashboard,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/format";
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 
 // Pagina principal de metricas y resumen del panel administrativo
 export default async function AdminDashboardPage() {
@@ -28,24 +30,20 @@ export default async function AdminDashboardPage() {
   return (
     <div className="space-y-8">
       {/* Encabezado */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-brand-primary tracking-tight font-heading">
-            Panel de Control General
-          </h1>
-          <p className="text-sm text-text-secondary">
-            Resumen operativo y métricas del catálogo inmobiliario.
-          </p>
-        </div>
-
+      <AdminPageHeader
+        icon={LayoutDashboard}
+        title="Panel de"
+        titleHighlight="Control General"
+        description="Visión consolidada del catálogo inmobiliario, actividad comercial y rendimiento del inventario."
+      >
         <Link
           href="/admin/propiedades/nueva"
-          className="inline-flex items-center gap-2 bg-brand-accent hover:bg-[#c94b21] text-white text-sm font-bold px-4 py-2.5 rounded-xl shadow-md transition-all active:scale-95"
+          className="inline-flex items-center gap-2 bg-brand-accent hover:bg-[#c94b21] text-white text-sm font-bold px-5 py-2.5 rounded-xl shadow-md transition-all active:scale-95 shrink-0"
         >
           <PlusCircle className="w-4 h-4" />
           <span>Nueva Propiedad</span>
         </Link>
-      </div>
+      </AdminPageHeader>
 
       {/* Tarjetas de Metricas */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">

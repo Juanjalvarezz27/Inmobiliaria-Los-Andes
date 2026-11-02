@@ -102,86 +102,101 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
 
   return (
     <div className="space-y-6">
-      {/* Tarjetas de Metricas Ejecutivas del Equipo */}
+      {/* Tarjetas de Metricas Ejecutivas del Equipo con Relieve y Profundidad Volumetrica */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {/* Total Asesores */}
-        <div className="group relative bg-ui-surface p-6 rounded-3xl border border-neutral-200/80 shadow-sm hover:shadow-lg hover:border-brand-primary/30 transition-all duration-200 overflow-hidden">
-          <Users className="absolute -right-3 -bottom-3 w-20 h-20 text-brand-primary/[0.04] pointer-events-none group-hover:scale-110 transition-transform duration-300" />
-          
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-text-secondary">
-              Total Asesores
-            </span>
-            <div className="w-10 h-10 rounded-2xl bg-brand-primary text-white flex items-center justify-center shadow-md shadow-brand-primary/20 group-hover:scale-110 transition-transform">
-              <Users className="w-5 h-5" />
-            </div>
-          </div>
+        <div className="group relative bg-white p-5 sm:p-6 rounded-3xl border border-neutral-200/80 shadow-[0_4px_20px_-4px_rgba(26,59,38,0.06),0_2px_6px_-1px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,1)] hover:shadow-[0_12px_28px_-6px_rgba(26,59,38,0.14),inset_0_1px_0_rgba(255,255,255,1)] hover:-translate-y-0.5 hover:border-brand-primary/30 transition-[transform,box-shadow,border-color] duration-150 ease-out overflow-hidden">
+          {/* Luz ambiental cenital organica (reemplaza la linea dura por iluminacion ambiental difusa) */}
+          <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-brand-primary/[0.05] to-transparent pointer-events-none group-hover:from-brand-primary/[0.09] transition-colors duration-200" />
+          <div className="absolute -right-6 -top-6 w-32 h-32 bg-brand-primary/[0.05] rounded-full blur-xl pointer-events-none" />
+          <Users className="absolute -right-3 -bottom-3 w-24 h-24 text-brand-primary/[0.03] pointer-events-none" />
 
-          <div className="mt-4">
-            <span className="text-3xl sm:text-4xl font-extrabold text-brand-primary font-heading tracking-tight block">
-              {totalAgents}
-            </span>
+          <div className="flex items-start justify-between gap-3 relative z-10">
+            <div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-brand-primary/80 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-primary/70" />
+                Total Asesores
+              </span>
+              <span className="text-3xl sm:text-4xl lg:text-5xl font-black text-brand-primary font-heading tracking-tight block mt-1.5">
+                {totalAgents}
+              </span>
+            </div>
+
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#122b1c] via-[#1a3b26] to-[#0d1f14] text-white border border-emerald-500/25 flex items-center justify-center shadow-md shadow-brand-primary/20 group-hover:scale-105 transition-transform duration-150 shrink-0">
+              <Users className="w-6 h-6 text-white drop-shadow-sm" />
+            </div>
           </div>
         </div>
 
         {/* Asesores Activos */}
-        <div className="group relative bg-ui-surface p-6 rounded-3xl border border-neutral-200/80 shadow-sm hover:shadow-lg hover:border-emerald-300 transition-all duration-200 overflow-hidden">
-          <UserCheck className="absolute -right-3 -bottom-3 w-20 h-20 text-emerald-600/[0.04] pointer-events-none group-hover:scale-110 transition-transform duration-300" />
-          
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Asesores Activos
-            </span>
-            <div className="w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-600/20 group-hover:scale-110 transition-transform">
-              <UserCheck className="w-5 h-5" />
-            </div>
-          </div>
+        <div className="group relative bg-white p-5 sm:p-6 rounded-3xl border border-neutral-200/80 shadow-[0_4px_20px_-4px_rgba(5,150,105,0.08),0_2px_6px_-1px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,1)] hover:shadow-[0_12px_28px_-6px_rgba(5,150,105,0.16),inset_0_1px_0_rgba(255,255,255,1)] hover:-translate-y-0.5 hover:border-emerald-500/40 transition-[transform,box-shadow,border-color] duration-150 ease-out overflow-hidden">
+          {/* Luz ambiental cenital organica */}
+          <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-emerald-500/[0.07] to-transparent pointer-events-none group-hover:from-emerald-500/[0.12] transition-colors duration-200" />
+          <div className="absolute -right-6 -top-6 w-32 h-32 bg-emerald-500/[0.07] rounded-full blur-xl pointer-events-none" />
+          <UserCheck className="absolute -right-3 -bottom-3 w-24 h-24 text-emerald-600/[0.03] pointer-events-none" />
 
-          <div className="mt-4">
-            <span className="text-3xl sm:text-4xl font-extrabold text-emerald-600 font-heading tracking-tight block">
-              {activeAgents}
-            </span>
+          <div className="flex items-start justify-between gap-3 relative z-10">
+            <div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Asesores Activos
+              </span>
+              <span className="text-3xl sm:text-4xl lg:text-5xl font-black text-emerald-600 font-heading tracking-tight block mt-1.5">
+                {activeAgents}
+              </span>
+            </div>
+
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#059669] via-emerald-600 to-[#047857] text-white border border-emerald-400/35 flex items-center justify-center shadow-md shadow-emerald-600/25 group-hover:scale-105 transition-transform duration-150 shrink-0">
+              <UserCheck className="w-6 h-6 text-white drop-shadow-sm" />
+            </div>
           </div>
         </div>
 
-        {/* Asesores Inactivos */}
-        <div className="group relative bg-ui-surface p-6 rounded-3xl border border-neutral-200/80 shadow-sm hover:shadow-lg hover:border-neutral-300 transition-all duration-200 overflow-hidden">
-          <UserX className="absolute -right-3 -bottom-3 w-20 h-20 text-neutral-500/[0.04] pointer-events-none group-hover:scale-110 transition-transform duration-300" />
-          
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-text-secondary">
-              Asesores Inactivos
-            </span>
-            <div className="w-10 h-10 rounded-2xl bg-neutral-100 text-neutral-600 border border-neutral-200/60 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <UserX className="w-5 h-5" />
-            </div>
-          </div>
+        {/* Asesores Pausados */}
+        <div className="group relative bg-white p-5 sm:p-6 rounded-3xl border border-neutral-200/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05),0_2px_6px_-1px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,1)] hover:shadow-[0_12px_28px_-6px_rgba(0,0,0,0.10),inset_0_1px_0_rgba(255,255,255,1)] hover:-translate-y-0.5 hover:border-neutral-400/30 transition-[transform,box-shadow,border-color] duration-150 ease-out overflow-hidden">
+          {/* Luz ambiental cenital organica */}
+          <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-neutral-200/40 to-transparent pointer-events-none group-hover:from-neutral-300/50 transition-colors duration-200" />
+          <div className="absolute -right-6 -top-6 w-32 h-32 bg-neutral-400/[0.05] rounded-full blur-xl pointer-events-none" />
+          <UserX className="absolute -right-3 -bottom-3 w-24 h-24 text-neutral-500/[0.03] pointer-events-none" />
 
-          <div className="mt-4">
-            <span className="text-3xl sm:text-4xl font-extrabold text-neutral-500 font-heading tracking-tight block">
-              {inactiveAgents}
-            </span>
+          <div className="flex items-start justify-between gap-3 relative z-10">
+            <div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-500 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-neutral-400" />
+                Asesores Pausados
+              </span>
+              <span className="text-3xl sm:text-4xl lg:text-5xl font-black text-neutral-400 font-heading tracking-tight block mt-1.5">
+                {inactiveAgents}
+              </span>
+            </div>
+
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-neutral-100 via-neutral-200 to-neutral-300 text-neutral-600 border border-neutral-300/70 flex items-center justify-center shadow-sm shadow-neutral-400/15 group-hover:scale-105 transition-transform duration-150 shrink-0">
+              <UserX className="w-6 h-6 text-neutral-600" />
+            </div>
           </div>
         </div>
 
         {/* Inmuebles en Cartera */}
-        <div className="group relative bg-ui-surface p-6 rounded-3xl border border-neutral-200/80 shadow-sm hover:shadow-lg hover:border-brand-accent/30 transition-all duration-200 overflow-hidden">
-          <Home className="absolute -right-3 -bottom-3 w-20 h-20 text-brand-accent/[0.04] pointer-events-none group-hover:scale-110 transition-transform duration-300" />
-          
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-brand-accent">
-              Inmuebles en Cartera
-            </span>
-            <div className="w-10 h-10 rounded-2xl bg-brand-accent text-white flex items-center justify-center shadow-md shadow-brand-accent/20 group-hover:scale-110 transition-transform">
-              <Home className="w-5 h-5" />
-            </div>
-          </div>
+        <div className="group relative bg-white p-5 sm:p-6 rounded-3xl border border-neutral-200/80 shadow-[0_4px_20px_-4px_rgba(222,88,42,0.09),0_2px_6px_-1px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,1)] hover:shadow-[0_12px_28px_-6px_rgba(222,88,42,0.18),inset_0_1px_0_rgba(255,255,255,1)] hover:-translate-y-0.5 hover:border-brand-accent/40 transition-[transform,box-shadow,border-color] duration-150 ease-out overflow-hidden">
+          {/* Luz ambiental cenital organica */}
+          <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-brand-accent/[0.07] to-transparent pointer-events-none group-hover:from-brand-accent/[0.12] transition-colors duration-200" />
+          <div className="absolute -right-6 -top-6 w-32 h-32 bg-brand-accent/[0.08] rounded-full blur-xl pointer-events-none" />
+          <Home className="absolute -right-3 -bottom-3 w-24 h-24 text-brand-accent/[0.03] pointer-events-none" />
 
-          <div className="mt-4">
-            <span className="text-3xl sm:text-4xl font-extrabold text-brand-accent font-heading tracking-tight block">
-              {totalPropertiesAssigned}
-            </span>
+          <div className="flex items-start justify-between gap-3 relative z-10">
+            <div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-brand-accent flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-accent/70" />
+                Inmuebles en Cartera
+              </span>
+              <span className="text-3xl sm:text-4xl lg:text-5xl font-black text-brand-accent font-heading tracking-tight block mt-1.5">
+                {totalPropertiesAssigned}
+              </span>
+            </div>
+
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#e85d30] via-brand-accent to-[#c4441b] text-white border border-orange-300/35 flex items-center justify-center shadow-md shadow-brand-accent/25 group-hover:scale-105 transition-transform duration-150 shrink-0">
+              <Home className="w-6 h-6 text-white drop-shadow-sm" />
+            </div>
           </div>
         </div>
       </div>

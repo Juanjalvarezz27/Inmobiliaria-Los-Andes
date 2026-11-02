@@ -1,6 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
+
+const emptySubscribe = () => () => {};
 import Image from "next/image";
 import {
   X,
@@ -438,8 +441,10 @@ function AgentFormContent({
   );
 }
 
-// Modal contenedor principal
+// Modal contenedor principal con renderizado en portal raiz y z-index prioritario
 export function AgentModal({ isOpen, onClose, agent }: AgentModalProps) {
+  const isClient = useSyncExternalStore(emptySubscribe, () => true, () => false);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen) {
@@ -456,18 +461,19 @@ export function AgentModal({ isOpen, onClose, agent }: AgentModalProps) {
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !isClient) return null;
 
-  return (
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 overflow-y-auto"
+      className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-in fade-in duration-200"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
       <AgentFormContent key={agent?.id || "new"} agent={agent} onClose={onClose} />
-    </div>
+    </div>,
+    document.body
   );
 }

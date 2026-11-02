@@ -34,45 +34,45 @@ export function AgentDetailActions({ agent }: AgentDetailActionsProps) {
 
   return (
     <>
-      <div className="flex flex-wrap items-center gap-3">
-        {/* Accion para alternar el estado sin eliminar */}
+      <div className="flex flex-col gap-2 w-full sm:w-56 shrink-0 lg:border-l lg:border-emerald-500/20 lg:pl-6 justify-center">
+        {/* Asignar nueva propiedad (Accion Principal Terracota) */}
+        <Link
+          href={`/admin/propiedades/nueva?agentId=${agent.id}`}
+          className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#e85d30] via-brand-accent to-[#c4441b] hover:shadow-lg hover:shadow-brand-accent/30 hover:-translate-y-0.5 text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow-md shadow-brand-accent/20 transition-all active:scale-95"
+        >
+          <PlusCircle className="w-4 h-4 shrink-0" />
+          <span>Asignar Propiedad</span>
+        </Link>
+
+        {/* Abrir modal de edicion (Secundaria Solida Blanca de Alto Contraste) */}
+        <button
+          type="button"
+          onClick={() => setShowEditModal(true)}
+          className="w-full inline-flex items-center justify-center gap-2 bg-white hover:bg-neutral-100 text-brand-primary text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow-sm hover:shadow-md transition-all active:scale-95"
+        >
+          <Edit2 className="w-4 h-4 text-brand-accent shrink-0" />
+          <span>Editar Datos</span>
+        </button>
+
+        {/* Accion para alternar el estado (Inactivar / Reactivar Asesor) */}
         <button
           type="button"
           onClick={() => setShowConfirmModal(true)}
           disabled={isLoading}
           title={isActive ? "Pausar actividad del asesor" : "Reactivar asesor en el equipo"}
-          className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-sm active:scale-95 border ${
+          className={`w-full group inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-xs active:scale-95 border ${
             isActive
-              ? "bg-neutral-100 hover:bg-neutral-200 text-neutral-700 border-neutral-300"
-              : "bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600"
+              ? "bg-white/10 hover:bg-white/20 text-white border-white/20 hover:border-white/35 backdrop-blur-xs"
+              : "bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-500 shadow-md shadow-emerald-950/40"
           }`}
         >
           {isLoading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <Loader2 className="w-4 h-4 animate-spin shrink-0" />
           ) : (
-            <Power className="w-4 h-4" />
+            <Power className="w-4 h-4 shrink-0 text-white/80 group-hover:text-white transition-colors" />
           )}
           <span>{isActive ? "Inactivar Asesor" : "Reactivar Asesor"}</span>
         </button>
-
-        {/* Abrir modal de edicion */}
-        <button
-          type="button"
-          onClick={() => setShowEditModal(true)}
-          className="inline-flex items-center gap-2 bg-white hover:bg-neutral-50 text-brand-primary border border-neutral-300 text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow-sm transition-all active:scale-95"
-        >
-          <Edit2 className="w-4 h-4 text-brand-accent" />
-          <span>Editar Datos</span>
-        </button>
-
-        {/* Asignar nueva propiedad */}
-        <Link
-          href={`/admin/propiedades/nueva?agentId=${agent.id}`}
-          className="inline-flex items-center gap-2 bg-brand-accent hover:bg-[#c94b21] text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow-md transition-all active:scale-95"
-        >
-          <PlusCircle className="w-4 h-4" />
-          <span>Asignar Propiedad</span>
-        </Link>
       </div>
 
       {/* Modal de confirmacion de cambio de estado */}

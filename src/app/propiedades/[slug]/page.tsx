@@ -16,6 +16,7 @@ import {
   CheckCircle2,
   MessageCircle,
   ArrowLeft,
+  ExternalLink,
 } from "lucide-react";
 import { InstagramIcon } from "@/components/icons/InstagramIcon";
 
@@ -105,13 +106,32 @@ export default async function PropertyDetailPage({ params }: PageProps) {
               {property.title}
             </h1>
 
+            {/* Direccion escrita descriptiva */}
             <div className="flex items-center gap-2 text-text-secondary text-sm">
-              <MapPin className="w-4 h-4 text-brand-accent shrink-0" />
+              <MapPin className="w-4 h-4 text-neutral-400 shrink-0" />
               <span>
                 {property.sector ? `${property.sector}, ` : ""}
                 {property.city} • {property.address}
               </span>
             </div>
+
+            {property.googleMapsUrl && (
+              <div className="pt-2">
+                <a
+                  href={property.googleMapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 pl-1.5 pr-3 py-1 rounded-xl bg-neutral-50/80 hover:bg-white text-text-primary hover:text-brand-accent border border-neutral-200/80 hover:border-brand-accent/40 text-xs font-semibold shadow-2xs hover:shadow-xs transition-all duration-150 group/map self-start"
+                  title="Abrir ubicación en Google Maps"
+                >
+                  <span className="w-5 h-5 rounded-lg bg-white border border-neutral-200/70 flex items-center justify-center text-brand-accent shadow-2xs group-hover/map:border-brand-accent/30 group-hover/map:scale-105 transition-all shrink-0">
+                    <MapPin className="w-3 h-3 text-brand-accent" />
+                  </span>
+                  <span>Ver en Google Maps</span>
+                  <ExternalLink className="w-3 h-3 text-neutral-400 group-hover/map:text-brand-accent group-hover/map:translate-x-0.5 group-hover/map:-translate-y-0.5 transition-transform shrink-0 ml-0.5" />
+                </a>
+              </div>
+            )}
           </div>
 
           {/* Precio Destacado */}

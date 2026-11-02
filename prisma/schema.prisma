@@ -87,6 +87,7 @@ model Property {
   state            String          @default("Trujillo")
   latitude         Float?
   longitude        Float?
+  googleMapsUrl    String?
   amenities        String[]        @default([])
   agentId          String
   agent            User            @relation(fields: [agentId], references: [id], onDelete: Restrict)

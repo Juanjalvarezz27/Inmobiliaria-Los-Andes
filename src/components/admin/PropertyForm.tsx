@@ -21,10 +21,12 @@ export interface InitialPropertyData {
   propertyType?: PropertyType;
   status?: PropertyStatus;
   price?: number | string | { toString: () => string };
+  currency?: string;
   featured?: boolean;
   city?: string;
   sector?: string | null;
   address?: string;
+  googleMapsUrl?: string | null;
   bedrooms?: number | null;
   bathrooms?: number | null;
   parkingSpots?: number | null;
@@ -35,11 +37,14 @@ export interface InitialPropertyData {
   images?: { url: string; caption?: string | null; isMain: boolean }[];
 }
 
-interface PropertyFormProps {
+export interface PropertyFormProps {
   initialData?: InitialPropertyData;
   agents: AgentOption[];
   isEditing?: boolean;
   defaultAgentId?: string;
+  onSuccess?: () => void;
+  onCancel?: () => void;
+  hideHeader?: boolean;
 }
 
 // Formulario reactivo completo para crear o editar fichas de propiedades
@@ -48,6 +53,9 @@ export function PropertyForm({
   agents,
   isEditing = false,
   defaultAgentId,
+  onSuccess,
+  onCancel,
+  hideHeader = false,
 }: PropertyFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -64,6 +72,7 @@ export function PropertyForm({
   const [city, setCity] = useState(initialData?.city || "Trujillo Capital");
   const [sector, setSector] = useState(initialData?.sector || "");
   const [address, setAddress] = useState(initialData?.address || "");
+  const [googleMapsUrl, setGoogleMapsUrl] = useState(initialData?.googleMapsUrl || "");
 
   const [bedrooms, setBedrooms] = useState(initialData?.bedrooms !== undefined && initialData?.bedrooms !== null ? String(initialData.bedrooms) : "3");
   const [bathrooms, setBathrooms] = useState(initialData?.bathrooms !== undefined && initialData?.bathrooms !== null ? String(initialData.bathrooms) : "2");
@@ -166,6 +175,7 @@ export function PropertyForm({
         city,
         sector,
         address,
+        googleMapsUrl: googleMapsUrl.trim() || undefined,
         bedrooms: bedrooms ? parseInt(bedrooms, 10) : undefined,
         bathrooms: bathrooms ? parseInt(bathrooms, 10) : undefined,
         parkingSpots: parkingSpots ? parseInt(parkingSpots, 10) : undefined,
@@ -187,7 +197,13 @@ export function PropertyForm({
         await createPropertyAction(payload);
       }
 
-      router.push("/admin/propiedades");
+      setIsSubmitting(false);
+
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        router.push("/admin/propiedades");
+      }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Error al guardar el inmueble.";
       setError(message);
@@ -198,33 +214,35 @@ export function PropertyForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl pb-16">
       {/* Boton volver y Titulo */}
-      <div className="flex items-center justify-between gap-4 border-b border-neutral-200 pb-5">
-        <div className="flex items-center gap-3">
-          <Link
-            href="/admin/propiedades"
-            className="p-2 rounded-xl bg-ui-surface border border-neutral-200 text-text-secondary hover:text-brand-primary transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Link>
-          <div>
-            <h1 className="text-2xl font-black text-brand-primary">
-              {isEditing ? "Editar Ficha del Inmueble" : "Nueva Propiedad Inmobiliaria"}
-            </h1>
-            <p className="text-xs text-text-secondary">
-              Ingresa los datos técnicos, distribución y fotografías del inmueble.
-            </p>
+      {!hideHeader && (
+        <div className="flex items-center justify-between gap-4 border-b border-neutral-200 pb-5">
+          <div className="flex items-center gap-3">
+            <Link
+              href="/admin/propiedades"
+              className="p-2 rounded-xl bg-ui-surface border border-neutral-200 text-text-secondary hover:text-brand-primary transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Link>
+            <div>
+              <h1 className="text-2xl font-black text-brand-primary">
+                {isEditing ? "Editar Ficha del Inmueble" : "Nueva Propiedad Inmobiliaria"}
+              </h1>
+              <p className="text-xs text-text-secondary">
+                Ingresa los datos técnicos, distribución y fotografías del inmueble.
+              </p>
+            </div>
           </div>
-        </div>
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="inline-flex items-center gap-2 bg-brand-accent hover:bg-[#c94b21] text-white text-sm font-bold px-5 py-2.5 rounded-xl shadow-md transition-all active:scale-95 disabled:opacity-50"
-        >
-          <Save className="w-4 h-4" />
-          <span>{isSubmitting ? "Guardando..." : "Guardar Inmueble"}</span>
-        </button>
-      </div>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="inline-flex items-center gap-2 bg-brand-accent hover:bg-[#c94b21] text-white text-sm font-bold px-5 py-2.5 rounded-xl shadow-md transition-all active:scale-95 disabled:opacity-50"
+          >
+            <Save className="w-4 h-4" />
+            <span>{isSubmitting ? "Guardando..." : "Guardar Inmueble"}</span>
+          </button>
+        </div>
+      )}
 
       {error && (
         <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-semibold">
@@ -385,6 +403,27 @@ export function PropertyForm({
             onChange={(e) => setAddress(e.target.value)}
             className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent"
           />
+        </div>
+
+        <div>
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider">
+              Enlace a Google Maps
+            </label>
+            <span className="text-[11px] font-bold text-neutral-400 bg-neutral-100 px-2.5 py-0.5 rounded-full border border-neutral-200/80">
+              Opcional
+            </span>
+          </div>
+          <input
+            type="url"
+            placeholder="Ej. https://maps.app.goo.gl/... o https://maps.google.com/?q=..."
+            value={googleMapsUrl}
+            onChange={(e) => setGoogleMapsUrl(e.target.value)}
+            className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent"
+          />
+          <p className="text-[11px] text-text-secondary mt-1">
+            Si se proporciona este enlace, la tarjeta del inmueble mostrará el botón para abrir la ubicación en Google Maps.
+          </p>
         </div>
       </section>
 
@@ -610,7 +649,17 @@ export function PropertyForm({
       </section>
 
       {/* Boton Guardar Final */}
-      <div className="pt-4 flex justify-end">
+      <div className="pt-4 flex items-center justify-end gap-3">
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={isSubmitting}
+            className="px-6 py-3.5 rounded-2xl text-sm font-bold text-neutral-600 hover:bg-neutral-100 border border-neutral-200 transition-colors disabled:opacity-50"
+          >
+            Cancelar
+          </button>
+        )}
         <button
           type="submit"
           disabled={isSubmitting}

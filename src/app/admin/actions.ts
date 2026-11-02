@@ -55,6 +55,7 @@ export async function createPropertyAction(data: {
   address: string;
   city: string;
   sector?: string;
+  googleMapsUrl?: string | null;
   amenities: string[];
   agentId: string;
   images: { url: string; caption?: string; isMain: boolean; order: number }[];
@@ -86,6 +87,7 @@ export async function createPropertyAction(data: {
       address: data.address,
       city: data.city || "Trujillo Capital",
       sector: data.sector,
+      googleMapsUrl: data.googleMapsUrl ? data.googleMapsUrl.trim() : null,
       amenities: data.amenities || [],
       agentId: data.agentId,
       images: {
@@ -101,6 +103,10 @@ export async function createPropertyAction(data: {
 
   revalidatePath("/");
   revalidatePath("/admin/propiedades");
+  revalidatePath("/admin/asesores");
+  if (data.agentId) {
+    revalidatePath(`/admin/asesores/${data.agentId}`);
+  }
   return { success: true };
 }
 
@@ -125,6 +131,7 @@ export async function updatePropertyAction(
     address: string;
     city: string;
     sector?: string;
+    googleMapsUrl?: string | null;
     amenities: string[];
     agentId: string;
     images: { url: string; caption?: string; isMain: boolean; order: number }[];
@@ -157,6 +164,7 @@ export async function updatePropertyAction(
       address: data.address,
       city: data.city,
       sector: data.sector,
+      googleMapsUrl: data.googleMapsUrl ? data.googleMapsUrl.trim() : null,
       amenities: data.amenities,
       agentId: data.agentId,
       images: {
@@ -172,6 +180,10 @@ export async function updatePropertyAction(
 
   revalidatePath("/");
   revalidatePath("/admin/propiedades");
+  revalidatePath("/admin/asesores");
+  if (data.agentId) {
+    revalidatePath(`/admin/asesores/${data.agentId}`);
+  }
   return { success: true };
 }
 

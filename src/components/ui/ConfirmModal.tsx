@@ -1,7 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import { AlertTriangle, Trash2, HelpCircle, X, Loader2 } from "lucide-react";
+
+const emptySubscribe = () => () => {};
 
 export interface ConfirmModalProps {
   isOpen: boolean;
@@ -29,6 +32,8 @@ export function ConfirmModal({
   isLoading = false,
   itemHighlight,
 }: ConfirmModalProps) {
+  const isClient = useSyncExternalStore(emptySubscribe, () => true, () => false);
+
   // Cierre automatico al presionar tecla Escape
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -46,7 +51,7 @@ export function ConfirmModal({
     };
   }, [isOpen, isLoading, onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !isClient) return null;
 
   const variantStyles = {
     danger: {
@@ -69,11 +74,11 @@ export function ConfirmModal({
   const currentVariant = variantStyles[variant];
   const Icon = currentVariant.icon;
 
-  return (
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
       onClick={(e) => {
         if (e.target === e.currentTarget && !isLoading) onClose();
       }}
@@ -137,7 +142,8 @@ export function ConfirmModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

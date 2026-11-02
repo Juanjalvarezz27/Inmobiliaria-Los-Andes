@@ -18,6 +18,7 @@ export interface PropertyCardData {
   areaSquareMeters?: number | string | { toString: () => string } | null;
   city: string;
   sector?: string | null;
+  googleMapsUrl?: string | null;
   images: { url: string; caption?: string | null; isMain: boolean }[];
 }
 

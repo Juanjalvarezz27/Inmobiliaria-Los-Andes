@@ -78,6 +78,7 @@ async function main() {
       city: "Trujillo Capital",
       sector: "Urb. Vista Real, sector La Raya",
       address: "Avenida Principal de Vista Real, Manzana B, Casa 14",
+      googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=Urb+Vista+Real,+Trujillo,+Venezuela",
       amenities: [
         "Tanque de agua subterráneo 10.000L",
         "Termo calentador",
@@ -288,6 +289,7 @@ async function main() {
       city: "Trujillo Capital",
       sector: "Sector La Vega",
       address: "Urb. Don Carmelo, Casa 8",
+      googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=Sector+La+Vega,+Trujillo,+Venezuela",
       amenities: [
         "Semi-amoblado",
         "Tanque de agua con bomba",

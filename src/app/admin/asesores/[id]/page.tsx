@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { prisma } from "@/lib/prisma";
-import { formatCurrency, formatArea } from "@/lib/utils/format";
 import {
   ArrowLeft,
   Phone,
@@ -10,23 +9,19 @@ import {
   Home,
   Tag,
   Key,
-  DollarSign,
-  BedDouble,
-  Bath,
-  Car,
-  Maximize2,
-  ExternalLink,
-  Edit3,
-  Calendar,
 } from "lucide-react";
 import { InstagramIcon } from "@/components/icons/InstagramIcon";
 import { AgentDetailActions } from "./AgentDetailActions";
+import { AgentPropertiesGrid, SerializedProperty } from "@/components/admin/AgentPropertiesGrid";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-// Vista de detalle de un asesor inmobiliario con su cartera de propiedades
+// Vista de detalle de un asesor inmobiliario con su cartera de propiedades rediseñada con estetica premium
 export default async function AgentDetailPage({ params }: PageProps) {
   const { id } = await params;
 
@@ -48,14 +43,50 @@ export default async function AgentDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  // Calculo de metricas ejecutivas del asesor
+  // Consulta de todos los asesores para el selector de asignacion
+  const allAgents = await prisma.user.findMany({
+    where: { role: "AGENT", isActive: true },
+    select: { id: true, name: true, position: true },
+    orderBy: { name: "asc" },
+  });
+
+  // Calculo de metricas operativas reales del asesor
   const totalProperties = agent.properties.length;
   const forSaleCount = agent.properties.filter((p) => p.operationType === "SALE").length;
   const forRentCount = agent.properties.filter((p) => p.operationType === "RENT").length;
-  const portfolioValue = agent.properties.reduce(
-    (sum, p) => sum + Number(p.price || 0),
-    0
-  );
+
+  // Serializacion segura de propiedades para el componente cliente y modal
+  const serializedProperties: SerializedProperty[] = agent.properties.map((p) => ({
+    id: p.id,
+    title: p.title,
+    slug: p.slug,
+    description: p.description,
+    operationType: p.operationType,
+    propertyType: p.propertyType,
+    status: p.status,
+    price: Number(p.price),
+    currency: p.currency,
+    featured: p.featured,
+    bedrooms: p.bedrooms,
+    bathrooms: p.bathrooms,
+    parkingSpots: p.parkingSpots,
+    areaSquareMeters: p.areaSquareMeters ? Number(p.areaSquareMeters) : null,
+    lotSquareMeters: p.lotSquareMeters ? Number(p.lotSquareMeters) : null,
+    yearBuilt: p.yearBuilt,
+    city: p.city,
+    sector: p.sector,
+    address: p.address,
+    googleMapsUrl: p.googleMapsUrl,
+    amenities: p.amenities,
+    agentId: p.agentId,
+    images: p.images.map((img) => ({
+      id: img.id,
+      url: img.url,
+      caption: img.caption,
+      isMain: img.isMain,
+      order: img.order,
+    })),
+  }));
 
   // Formato para WhatsApp
   const cleanPhone = agent.phone ? agent.phone.replace(/[^0-9]/g, "") : null;
@@ -67,22 +98,27 @@ export default async function AgentDetailPage({ params }: PageProps) {
 
   return (
     <div className="space-y-8 pb-12">
-      {/* Navegacion y Breadcrumbs */}
+      {/* Navegacion y Retorno */}
       <div>
         <Link
           href="/admin/asesores"
-          className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-text-secondary hover:text-brand-accent transition-colors"
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-neutral-200/80 shadow-xs text-xs font-bold text-text-secondary hover:text-brand-primary hover:border-brand-primary/30 transition-all group"
         >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Volver al listado de Asesores</span>
+          <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
+          <span>Volver al Directorio de Asesores</span>
         </Link>
       </div>
 
-      {/* Cabecera de Perfil del Asesor */}
-      <div className="bg-ui-surface rounded-3xl border border-neutral-200/80 p-6 sm:p-8 shadow-sm">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-            <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-3xl overflow-hidden border-4 border-white shadow-lg bg-neutral-100 shrink-0">
+      {/* Tarjeta Ejecutiva Hero del Asesor con el verde corporativo de la marca */}
+      <div className="relative bg-gradient-to-br from-[#122b1c] via-brand-primary to-[#0e2115] text-white rounded-3xl border border-emerald-500/25 shadow-[0_16px_40px_-12px_rgba(18,43,28,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] p-6 sm:p-7 overflow-hidden">
+        {/* Sutil resalte de cabecera */}
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/30 to-transparent pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-6 sm:gap-8">
+          {/* Bloque Izquierdo: Avatar e Informacion */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-6 flex-1 min-w-0">
+            {/* Avatar enmarcado con aro de alto contraste */}
+            <div className="relative w-22 h-22 sm:w-24 sm:h-24 rounded-2xl overflow-hidden ring-4 ring-white/20 shadow-xl bg-neutral-900 shrink-0">
               <Image
                 src={
                   agent.avatarUrl ||
@@ -90,51 +126,75 @@ export default async function AgentDetailPage({ params }: PageProps) {
                 }
                 alt={agent.name}
                 fill
-                sizes="112px"
+                sizes="(max-width: 640px) 88px, 96px"
                 className="object-cover"
                 priority
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-3 flex-1 min-w-0">
+              {/* Nombre y Estado */}
               <div className="flex flex-wrap items-center gap-3">
-                <h1 className="text-2xl sm:text-3xl font-bold text-brand-primary font-heading tracking-tight">
+                <h1 className="text-2xl sm:text-3xl font-black text-white font-heading tracking-tight truncate">
                   {agent.name}
                 </h1>
                 <span
-                  className={`text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1.5 ${
+                  className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1.5 shrink-0 shadow-xs ${
                     agent.isActive
-                      ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                      : "bg-neutral-100 text-neutral-600 border border-neutral-300"
+                      ? "bg-emerald-500/20 text-emerald-200 border border-emerald-400/30"
+                      : "bg-white/10 text-neutral-300 border border-white/15"
                   }`}
                 >
                   <span
-                    className={`w-2 h-2 rounded-full ${
-                      agent.isActive ? "bg-emerald-500 animate-pulse" : "bg-neutral-400"
+                    className={`w-1.5 h-1.5 rounded-full ${
+                      agent.isActive ? "bg-emerald-400 animate-pulse" : "bg-neutral-400"
                     }`}
                   />
-                  {agent.isActive ? "Asesor Activo" : "Asesor Inactivo (Pausado)"}
+                  {agent.isActive ? "Asesor Activo" : "Asesor Pausado"}
                 </span>
               </div>
 
-              <div className="flex flex-wrap items-center gap-y-2 gap-x-4 text-xs text-text-secondary pt-1">
-                <span className="flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5 text-neutral-400" />
-                  Registrado el {new Date(agent.createdAt).toLocaleDateString("es-VE", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Mail className="w-3.5 h-3.5 text-neutral-400" />
-                  {agent.email}
-                </span>
+              {/* Canales de Contacto con solidez y contraste */}
+              <div className="flex flex-wrap items-center gap-2.5 pt-0.5">
+                {whatsappUrl && (
+                  <a
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#0e2115]/90 hover:bg-[#09170e] border border-emerald-500/30 hover:border-emerald-400 text-xs font-semibold text-white transition-all shadow-xs group"
+                    title="Chatear por WhatsApp"
+                  >
+                    <Phone className="w-3.5 h-3.5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                    <span>{agent.phone}</span>
+                  </a>
+                )}
+
+                <a
+                  href={`mailto:${agent.email}`}
+                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#0e2115]/90 hover:bg-[#09170e] border border-emerald-500/30 hover:border-emerald-400 text-xs font-semibold text-white transition-all shadow-xs group"
+                  title="Enviar correo electrónico"
+                >
+                  <Mail className="w-3.5 h-3.5 text-emerald-200 group-hover:scale-110 transition-transform" />
+                  <span>{agent.email}</span>
+                </a>
+
+                {agent.instagram && (
+                  <a
+                    href={`https://instagram.com/${agent.instagram.replace("@", "")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#0e2115]/90 hover:bg-[#09170e] border border-emerald-500/30 hover:border-pink-400 text-xs font-semibold text-white transition-all shadow-xs group"
+                    title="Ver perfil de Instagram"
+                  >
+                    <InstagramIcon className="w-3.5 h-3.5 text-pink-400 group-hover:scale-110 transition-transform" />
+                    <span>@{agent.instagram.replace("@", "")}</span>
+                  </a>
+                )}
               </div>
             </div>
           </div>
 
-          {/* Acciones de modificacion de perfil */}
+          {/* Bloque Derecho: Columna Vertical de Acciones (Uno debajo de otro con solidez) */}
           <AgentDetailActions
             agent={{
               id: agent.id,
@@ -148,278 +208,87 @@ export default async function AgentDetailPage({ params }: PageProps) {
             }}
           />
         </div>
-
-        {/* Canales de Contacto Directo */}
-        <div className="mt-6 pt-6 border-t border-neutral-100 flex flex-wrap items-center gap-3">
-          {whatsappUrl && (
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold px-3.5 py-2 rounded-xl transition-colors"
-            >
-              <Phone className="w-3.5 h-3.5 text-emerald-600" />
-              <span>WhatsApp: {agent.phone}</span>
-            </a>
-          )}
-
-          <a
-            href={`mailto:${agent.email}`}
-            className="inline-flex items-center gap-2 bg-neutral-50 hover:bg-neutral-100 text-neutral-700 border border-neutral-200 text-xs font-bold px-3.5 py-2 rounded-xl transition-colors"
-          >
-            <Mail className="w-3.5 h-3.5 text-neutral-500" />
-            <span>Enviar Correo</span>
-          </a>
-
-          {agent.instagram && (
-            <a
-              href={`https://instagram.com/${agent.instagram.replace("@", "")}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 text-xs font-bold px-3.5 py-2 rounded-xl transition-colors"
-            >
-              <InstagramIcon className="w-3.5 h-3.5 text-pink-600" />
-              <span>@{agent.instagram.replace("@", "")}</span>
-            </a>
-          )}
-        </div>
       </div>
 
-      {/* Tarjetas de Metricas Ejecutivas del Asesor */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      {/* Tarjetas de Metricas Ejecutivas del Asesor (3 Columnas Equilibradas) */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
         {/* Inmuebles Asignados */}
-        <div className="group relative bg-ui-surface p-6 rounded-3xl border border-neutral-200/80 shadow-sm hover:shadow-lg hover:border-brand-primary/30 transition-all duration-200 overflow-hidden">
-          <Home className="absolute -right-3 -bottom-3 w-20 h-20 text-brand-primary/[0.04] pointer-events-none group-hover:scale-110 transition-transform duration-300" />
+        <div className="group relative bg-white p-5 sm:p-6 rounded-3xl border border-neutral-200/80 shadow-[0_4px_20px_-4px_rgba(26,59,38,0.06),0_2px_6px_-1px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,1)] hover:shadow-[0_12px_28px_-6px_rgba(26,59,38,0.14),inset_0_1px_0_rgba(255,255,255,1)] hover:-translate-y-0.5 hover:border-brand-primary/30 transition-[transform,box-shadow,border-color] duration-150 ease-out overflow-hidden">
+          <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-brand-primary/[0.05] to-transparent pointer-events-none group-hover:from-brand-primary/[0.09] transition-colors duration-200" />
+          <div className="absolute -right-6 -top-6 w-32 h-32 bg-brand-primary/[0.05] rounded-full blur-xl pointer-events-none" />
+          <Home className="absolute -right-3 -bottom-3 w-24 h-24 text-brand-primary/[0.03] pointer-events-none" />
 
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-text-secondary">
-              Inmuebles Asignados
-            </span>
-            <div className="w-10 h-10 rounded-2xl bg-brand-primary text-white flex items-center justify-center shadow-md shadow-brand-primary/20 group-hover:scale-110 transition-transform">
-              <Home className="w-5 h-5" />
+          <div className="flex items-start justify-between gap-3 relative z-10">
+            <div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-brand-primary/80 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-primary/70" />
+                Inmuebles Asignados
+              </span>
+              <span className="text-3xl sm:text-4xl lg:text-5xl font-black text-brand-primary font-heading tracking-tight block mt-1.5">
+                {totalProperties}
+              </span>
             </div>
-          </div>
 
-          <div className="mt-4">
-            <span className="text-3xl sm:text-4xl font-extrabold text-brand-primary font-heading tracking-tight block">
-              {totalProperties}
-            </span>
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#122b1c] via-[#1a3b26] to-[#0d1f14] text-white border border-emerald-500/25 flex items-center justify-center shadow-md shadow-brand-primary/20 group-hover:scale-105 transition-transform duration-150 shrink-0">
+              <Home className="w-6 h-6 text-white drop-shadow-sm" />
+            </div>
           </div>
         </div>
 
         {/* Propiedades en Venta */}
-        <div className="group relative bg-ui-surface p-6 rounded-3xl border border-neutral-200/80 shadow-sm hover:shadow-lg hover:border-amber-300 transition-all duration-200 overflow-hidden">
-          <Tag className="absolute -right-3 -bottom-3 w-20 h-20 text-amber-600/[0.04] pointer-events-none group-hover:scale-110 transition-transform duration-300" />
+        <div className="group relative bg-white p-5 sm:p-6 rounded-3xl border border-neutral-200/80 shadow-[0_4px_20px_-4px_rgba(217,119,6,0.08),0_2px_6px_-1px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,1)] hover:shadow-[0_12px_28px_-6px_rgba(217,119,6,0.16),inset_0_1px_0_rgba(255,255,255,1)] hover:-translate-y-0.5 hover:border-amber-500/40 transition-[transform,box-shadow,border-color] duration-150 ease-out overflow-hidden">
+          <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-amber-500/[0.07] to-transparent pointer-events-none group-hover:from-amber-500/[0.12] transition-colors duration-200" />
+          <div className="absolute -right-6 -top-6 w-32 h-32 bg-amber-500/[0.07] rounded-full blur-xl pointer-events-none" />
+          <Tag className="absolute -right-3 -bottom-3 w-24 h-24 text-amber-600/[0.03] pointer-events-none" />
 
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-amber-800">
-              En Venta
-            </span>
-            <div className="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center shadow-md shadow-amber-500/20 group-hover:scale-110 transition-transform">
-              <Tag className="w-5 h-5" />
+          <div className="flex items-start justify-between gap-3 relative z-10">
+            <div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-amber-800 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                En Venta
+              </span>
+              <span className="text-3xl sm:text-4xl lg:text-5xl font-black text-amber-700 font-heading tracking-tight block mt-1.5">
+                {forSaleCount}
+              </span>
             </div>
-          </div>
 
-          <div className="mt-4">
-            <span className="text-3xl sm:text-4xl font-extrabold text-amber-800 font-heading tracking-tight block">
-              {forSaleCount}
-            </span>
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#d97706] via-amber-600 to-[#b45309] text-white border border-amber-300/35 flex items-center justify-center shadow-md shadow-amber-600/25 group-hover:scale-105 transition-transform duration-150 shrink-0">
+              <Tag className="w-6 h-6 text-white drop-shadow-sm" />
+            </div>
           </div>
         </div>
 
         {/* Propiedades en Alquiler */}
-        <div className="group relative bg-ui-surface p-6 rounded-3xl border border-neutral-200/80 shadow-sm hover:shadow-lg hover:border-blue-300 transition-all duration-200 overflow-hidden">
-          <Key className="absolute -right-3 -bottom-3 w-20 h-20 text-blue-600/[0.04] pointer-events-none group-hover:scale-110 transition-transform duration-300" />
+        <div className="group relative bg-white p-5 sm:p-6 rounded-3xl border border-neutral-200/80 shadow-[0_4px_20px_-4px_rgba(37,99,235,0.08),0_2px_6px_-1px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,1)] hover:shadow-[0_12px_28px_-6px_rgba(37,99,235,0.16),inset_0_1px_0_rgba(255,255,255,1)] hover:-translate-y-0.5 hover:border-blue-500/40 transition-[transform,box-shadow,border-color] duration-150 ease-out overflow-hidden">
+          <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-blue-500/[0.07] to-transparent pointer-events-none group-hover:from-blue-500/[0.12] transition-colors duration-200" />
+          <div className="absolute -right-6 -top-6 w-32 h-32 bg-blue-500/[0.07] rounded-full blur-xl pointer-events-none" />
+          <Key className="absolute -right-3 -bottom-3 w-24 h-24 text-blue-600/[0.03] pointer-events-none" />
 
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-blue-800">
-              En Alquiler
-            </span>
-            <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-md shadow-blue-600/20 group-hover:scale-110 transition-transform">
-              <Key className="w-5 h-5" />
+          <div className="flex items-start justify-between gap-3 relative z-10">
+            <div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-blue-800 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                En Alquiler
+              </span>
+              <span className="text-3xl sm:text-4xl lg:text-5xl font-black text-blue-700 font-heading tracking-tight block mt-1.5">
+                {forRentCount}
+              </span>
             </div>
-          </div>
 
-          <div className="mt-4">
-            <span className="text-3xl sm:text-4xl font-extrabold text-blue-800 font-heading tracking-tight block">
-              {forRentCount}
-            </span>
-          </div>
-        </div>
-
-        {/* Valor de Cartera */}
-        <div className="group relative bg-ui-surface p-6 rounded-3xl border border-neutral-200/80 shadow-sm hover:shadow-lg hover:border-brand-accent/30 transition-all duration-200 overflow-hidden">
-          <DollarSign className="absolute -right-3 -bottom-3 w-20 h-20 text-brand-accent/[0.04] pointer-events-none group-hover:scale-110 transition-transform duration-300" />
-
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-brand-accent">
-              Valor de Cartera
-            </span>
-            <div className="w-10 h-10 rounded-2xl bg-brand-accent text-white flex items-center justify-center shadow-md shadow-brand-accent/20 group-hover:scale-110 transition-transform">
-              <DollarSign className="w-5 h-5" />
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#2563eb] via-blue-600 to-[#1d4ed8] text-white border border-blue-300/35 flex items-center justify-center shadow-md shadow-blue-600/25 group-hover:scale-105 transition-transform duration-150 shrink-0">
+              <Key className="w-6 h-6 text-white drop-shadow-sm" />
             </div>
-          </div>
-
-          <div className="mt-4">
-            <span className="text-2xl sm:text-3xl font-extrabold text-brand-accent font-heading tracking-tight block truncate">
-              {formatCurrency(portfolioValue)}
-            </span>
           </div>
         </div>
       </div>
 
-      {/* Seccion de Cartera de Propiedades Asignadas */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-bold text-brand-primary font-heading">
-              Propiedades Asignadas a este Asesor ({totalProperties})
-            </h2>
-            <p className="text-xs text-text-secondary">
-              Inmuebles donde este asesor actúa como el contacto directo para los clientes.
-            </p>
-          </div>
-          <Link
-            href={`/admin/propiedades/nueva?agentId=${agent.id}`}
-            className="hidden sm:inline-flex items-center gap-2 text-xs font-bold text-brand-accent hover:underline"
-          >
-            <span>+ Publicar nueva propiedad con este asesor</span>
-          </Link>
-        </div>
+      {/* Cuadrícula interactiva de propiedades con modal de edición */}
+      <AgentPropertiesGrid
+        properties={serializedProperties}
+        agentId={agent.id}
+        agents={allAgents}
+      />
 
-        {totalProperties === 0 ? (
-          <div className="bg-ui-surface rounded-3xl border border-neutral-200/80 p-12 text-center space-y-4">
-            <div className="w-16 h-16 rounded-3xl bg-neutral-100 flex items-center justify-center mx-auto text-neutral-400">
-              <Home className="w-8 h-8" />
-            </div>
-            <div className="max-w-md mx-auto space-y-1">
-              <h3 className="text-base font-bold text-brand-primary font-heading">
-                Sin propiedades asignadas actualmente
-              </h3>
-              <p className="text-xs text-text-secondary leading-relaxed">
-                Este asesor no tiene inmuebles vinculados a su cartera comercial. Puedes publicar una nueva propiedad o reasignar una existente.
-              </p>
-            </div>
-            <Link
-              href={`/admin/propiedades/nueva?agentId=${agent.id}`}
-              className="inline-flex items-center gap-2 bg-brand-accent hover:bg-[#c94b21] text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md transition-all active:scale-95"
-            >
-              <span>Asignar Primera Propiedad</span>
-            </Link>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {agent.properties.map((property) => {
-              const coverImage = property.images[0]?.url || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80";
-
-              return (
-                <div
-                  key={property.id}
-                  className="bg-ui-surface rounded-3xl border border-neutral-200/80 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between group"
-                >
-                  <div>
-                    {/* Imagen de Portada y Badges */}
-                    <div className="relative aspect-[16/10] w-full overflow-hidden bg-neutral-100">
-                      <Image
-                        src={coverImage}
-                        alt={property.title}
-                        fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                      <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
-                        <span
-                          className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg text-white shadow-sm ${
-                            property.operationType === "SALE" ? "bg-brand-primary" : "bg-brand-accent"
-                          }`}
-                        >
-                          {property.operationType === "SALE" ? "Venta" : "Alquiler"}
-                        </span>
-                        <span
-                          className={`text-[10px] font-bold px-2 py-1 rounded-lg shadow-sm ${
-                            property.status === "AVAILABLE"
-                              ? "bg-emerald-600 text-white"
-                              : property.status === "SOLD"
-                              ? "bg-red-600 text-white"
-                              : property.status === "RENTED"
-                              ? "bg-blue-600 text-white"
-                              : "bg-neutral-600 text-white"
-                          }`}
-                        >
-                          {property.status === "AVAILABLE"
-                            ? "Disponible"
-                            : property.status === "SOLD"
-                            ? "Vendido"
-                            : property.status === "RENTED"
-                            ? "Alquilado"
-                            : property.status}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Informacion de la propiedad */}
-                    <div className="p-5 space-y-3">
-                      <div>
-                        <span className="text-xl font-extrabold text-brand-accent font-heading block">
-                          {formatCurrency(Number(property.price))}
-                        </span>
-                        <h3 className="font-bold text-text-primary text-sm line-clamp-2 mt-1">
-                          {property.title}
-                        </h3>
-                        <p className="text-xs text-text-secondary mt-0.5">
-                          {property.sector ? `${property.sector}, ` : ""}
-                          {property.city}
-                        </p>
-                      </div>
-
-                      {/* Iconos de distribucion */}
-                      <div className="grid grid-cols-4 gap-2 py-2.5 px-3 bg-neutral-50 rounded-2xl text-[11px] font-semibold text-text-secondary border border-neutral-100">
-                        <div className="flex items-center gap-1.5" title="Habitaciones">
-                          <BedDouble className="w-3.5 h-3.5 text-neutral-400" />
-                          <span>{property.bedrooms ?? "-"}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5" title="Baños">
-                          <Bath className="w-3.5 h-3.5 text-neutral-400" />
-                          <span>{property.bathrooms ?? "-"}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5" title="Estacionamientos">
-                          <Car className="w-3.5 h-3.5 text-neutral-400" />
-                          <span>{property.parkingSpots ?? "-"}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5" title="Área">
-                          <Maximize2 className="w-3.5 h-3.5 text-neutral-400" />
-                          <span className="truncate">{property.areaSquareMeters ? formatArea(property.areaSquareMeters) : "-"}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Acciones de la propiedad */}
-                  <div className="p-4 bg-neutral-50 border-t border-neutral-100 flex items-center justify-between">
-                    <Link
-                      href={`/propiedades/${property.slug}`}
-                      target="_blank"
-                      className="inline-flex items-center gap-1.5 text-xs font-bold text-text-secondary hover:text-brand-primary transition-colors"
-                    >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                      <span>Ver ficha pública</span>
-                    </Link>
-
-                    <Link
-                      href={`/admin/propiedades/${property.id}/editar`}
-                      className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-primary hover:text-brand-accent transition-colors"
-                    >
-                      <Edit3 className="w-3.5 h-3.5" />
-                      <span>Editar</span>
-                    </Link>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
     </div>
   );
 }
-

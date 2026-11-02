@@ -1,5 +1,6 @@
 import { getCurrentUser } from "@/lib/auth";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
+import { AdminMainContent } from "@/components/admin/AdminMainContent";
 
 export const dynamic = "force-dynamic";
 
@@ -20,10 +21,8 @@ export default async function AdminLayout({
     <div className="min-h-screen md:h-screen md:overflow-hidden bg-neutral-100 flex flex-col md:flex-row relative">
       <AdminSidebar user={user} />
 
-      {/* Contenedor principal de vistas con scroll independiente */}
-      <main className="flex-1 min-w-0 md:h-full md:overflow-y-auto p-6 sm:p-10 transition-all duration-300">
-        <div className="max-w-6xl mx-auto">{children}</div>
-      </main>
+      {/* Contenedor principal de vistas con scroll independiente y reset automatico al tope */}
+      <AdminMainContent>{children}</AdminMainContent>
     </div>
   );
 }

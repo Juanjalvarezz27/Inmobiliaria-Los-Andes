@@ -83,7 +83,7 @@ function AgentFormContent({
     <div className="bg-ui-surface w-full max-w-lg rounded-3xl border border-neutral-200 shadow-2xl overflow-hidden p-6 sm:p-8 space-y-6 my-8 animate-in fade-in zoom-in-95 duration-150">
       <div className="flex items-center justify-between border-b border-neutral-100 pb-4">
         <div>
-          <h2 className="text-xl font-black text-brand-primary font-heading">
+          <h2 className="text-xl font-bold text-brand-primary font-heading">
             {agent ? "Editar Datos del Asesor" : "Registrar Nuevo Asesor"}
           </h2>
           <p className="text-xs text-text-secondary mt-0.5">

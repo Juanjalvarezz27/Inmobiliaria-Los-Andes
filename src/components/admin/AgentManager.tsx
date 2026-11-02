@@ -112,7 +112,7 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
           <Users className="absolute -right-3 -bottom-3 w-20 h-20 text-brand-primary/[0.04] pointer-events-none group-hover:scale-110 transition-transform duration-300" />
           
           <div className="flex items-center justify-between">
-            <span className="text-xs font-black uppercase tracking-wider text-text-secondary">
+            <span className="text-xs font-bold uppercase tracking-wider text-text-secondary">
               Total Asesores
             </span>
             <div className="w-10 h-10 rounded-2xl bg-brand-primary text-white flex items-center justify-center shadow-md shadow-brand-primary/20 group-hover:scale-110 transition-transform">
@@ -121,7 +121,7 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
           </div>
 
           <div className="mt-4">
-            <span className="text-3xl sm:text-4xl font-black text-brand-primary font-heading tracking-tight block">
+            <span className="text-3xl sm:text-4xl font-extrabold text-brand-primary font-heading tracking-tight block">
               {totalAgents}
             </span>
           </div>
@@ -132,7 +132,7 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
           <UserCheck className="absolute -right-3 -bottom-3 w-20 h-20 text-emerald-600/[0.04] pointer-events-none group-hover:scale-110 transition-transform duration-300" />
           
           <div className="flex items-center justify-between">
-            <span className="text-xs font-black uppercase tracking-wider text-emerald-700 flex items-center gap-1.5">
+            <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               Asesores Activos
             </span>
@@ -142,7 +142,7 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
           </div>
 
           <div className="mt-4">
-            <span className="text-3xl sm:text-4xl font-black text-emerald-600 font-heading tracking-tight block">
+            <span className="text-3xl sm:text-4xl font-extrabold text-emerald-600 font-heading tracking-tight block">
               {activeAgents}
             </span>
           </div>
@@ -153,7 +153,7 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
           <UserX className="absolute -right-3 -bottom-3 w-20 h-20 text-neutral-500/[0.04] pointer-events-none group-hover:scale-110 transition-transform duration-300" />
           
           <div className="flex items-center justify-between">
-            <span className="text-xs font-black uppercase tracking-wider text-text-secondary">
+            <span className="text-xs font-bold uppercase tracking-wider text-text-secondary">
               Asesores Inactivos
             </span>
             <div className="w-10 h-10 rounded-2xl bg-neutral-100 text-neutral-600 border border-neutral-200/60 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -162,7 +162,7 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
           </div>
 
           <div className="mt-4">
-            <span className="text-3xl sm:text-4xl font-black text-neutral-500 font-heading tracking-tight block">
+            <span className="text-3xl sm:text-4xl font-extrabold text-neutral-500 font-heading tracking-tight block">
               {inactiveAgents}
             </span>
           </div>
@@ -173,7 +173,7 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
           <Home className="absolute -right-3 -bottom-3 w-20 h-20 text-brand-accent/[0.04] pointer-events-none group-hover:scale-110 transition-transform duration-300" />
           
           <div className="flex items-center justify-between">
-            <span className="text-xs font-black uppercase tracking-wider text-brand-accent">
+            <span className="text-xs font-bold uppercase tracking-wider text-brand-accent">
               Inmuebles en Cartera
             </span>
             <div className="w-10 h-10 rounded-2xl bg-brand-accent text-white flex items-center justify-center shadow-md shadow-brand-accent/20 group-hover:scale-110 transition-transform">
@@ -182,7 +182,7 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
           </div>
 
           <div className="mt-4">
-            <span className="text-3xl sm:text-4xl font-black text-brand-accent font-heading tracking-tight block">
+            <span className="text-3xl sm:text-4xl font-extrabold text-brand-accent font-heading tracking-tight block">
               {totalPropertiesAssigned}
             </span>
           </div>
@@ -332,7 +332,7 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
 
                   {/* Nombre y Cargo */}
                   <div>
-                    <h3 className="text-lg font-black text-brand-primary font-heading leading-snug">
+                    <h3 className="text-lg font-bold text-brand-primary font-heading leading-snug">
                       {agent.name}
                     </h3>
                     <p className="text-xs font-semibold text-brand-accent mt-0.5">{agent.position}</p>
@@ -341,7 +341,7 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
                   {/* Chips con Metricas del Asesor */}
                   <div className="grid grid-cols-2 gap-2 p-2.5 bg-neutral-50 rounded-2xl border border-neutral-100 text-center">
                     <div>
-                      <span className="text-xs font-black text-brand-primary block">
+                      <span className="text-xs font-bold text-brand-primary block">
                         {agent.propertiesCount}
                       </span>
                       <span className="text-[10px] text-text-secondary font-medium block">
@@ -349,7 +349,7 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
                       </span>
                     </div>
                     <div>
-                      <span className="text-xs font-black text-brand-accent block truncate">
+                      <span className="text-xs font-bold text-brand-accent block truncate">
                         {formatCurrency(agent.portfolioValue)}
                       </span>
                       <span className="text-[10px] text-text-secondary font-medium block">

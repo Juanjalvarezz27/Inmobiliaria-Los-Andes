@@ -20,7 +20,7 @@ export default function AdminLoginPage() {
               <Building2 className="w-6 h-6 text-brand-accent" />
             </div>
           </Link>
-          <h1 className="text-2xl font-black text-brand-primary tracking-tight">
+          <h1 className="text-2xl font-extrabold text-brand-primary tracking-tight font-heading">
             Acceso Administrativo
           </h1>
           <p className="text-xs text-text-secondary uppercase tracking-widest font-semibold">

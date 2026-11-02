@@ -30,7 +30,7 @@ export default async function AdminDashboardPage() {
       {/* Encabezado */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-brand-primary tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-brand-primary tracking-tight font-heading">
             Panel de Control General
           </h1>
           <p className="text-sm text-text-secondary">
@@ -57,7 +57,7 @@ export default async function AdminDashboardPage() {
             <span className="text-xs uppercase font-bold text-text-secondary tracking-wider block">
               Total Inmuebles
             </span>
-            <span className="text-2xl font-black text-brand-primary">{totalProperties}</span>
+            <span className="text-2xl font-extrabold text-brand-primary font-heading">{totalProperties}</span>
           </div>
         </div>
 
@@ -69,7 +69,7 @@ export default async function AdminDashboardPage() {
             <span className="text-xs uppercase font-bold text-text-secondary tracking-wider block">
               En Venta
             </span>
-            <span className="text-2xl font-black text-text-primary">{saleProperties}</span>
+            <span className="text-2xl font-extrabold text-text-primary font-heading">{saleProperties}</span>
           </div>
         </div>
 
@@ -81,7 +81,7 @@ export default async function AdminDashboardPage() {
             <span className="text-xs uppercase font-bold text-text-secondary tracking-wider block">
               En Alquiler
             </span>
-            <span className="text-2xl font-black text-text-primary">{rentProperties}</span>
+            <span className="text-2xl font-extrabold text-text-primary font-heading">{rentProperties}</span>
           </div>
         </div>
 
@@ -93,7 +93,7 @@ export default async function AdminDashboardPage() {
             <span className="text-xs uppercase font-bold text-text-secondary tracking-wider block">
               Asesores Activos
             </span>
-            <span className="text-2xl font-black text-text-primary">{totalAgents}</span>
+            <span className="text-2xl font-extrabold text-text-primary font-heading">{totalAgents}</span>
           </div>
         </div>
       </div>

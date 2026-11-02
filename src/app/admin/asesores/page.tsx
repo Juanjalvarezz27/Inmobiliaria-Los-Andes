@@ -60,7 +60,7 @@ export default async function AdminAgentsPage() {
         <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-brand-primary/10 border border-brand-primary/15 flex items-center justify-center text-brand-primary shrink-0 shadow-xs">
           <Users className="w-6 h-6 text-brand-primary" />
         </div>
-        <h1 className="text-2xl sm:text-3xl font-black text-brand-primary tracking-tight font-heading">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-brand-primary tracking-tight font-heading">
           Equipo de Asesores Inmobiliarios
         </h1>
       </div>

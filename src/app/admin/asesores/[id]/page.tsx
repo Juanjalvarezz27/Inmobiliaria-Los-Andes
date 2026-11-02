@@ -98,7 +98,7 @@ export default async function AgentDetailPage({ params }: PageProps) {
 
             <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-3">
-                <h1 className="text-2xl sm:text-3xl font-black text-brand-primary font-heading tracking-tight">
+                <h1 className="text-2xl sm:text-3xl font-bold text-brand-primary font-heading tracking-tight">
                   {agent.name}
                 </h1>
                 <span
@@ -194,7 +194,7 @@ export default async function AgentDetailPage({ params }: PageProps) {
           <Home className="absolute -right-3 -bottom-3 w-20 h-20 text-brand-primary/[0.04] pointer-events-none group-hover:scale-110 transition-transform duration-300" />
 
           <div className="flex items-center justify-between">
-            <span className="text-xs font-black uppercase tracking-wider text-text-secondary">
+            <span className="text-xs font-bold uppercase tracking-wider text-text-secondary">
               Inmuebles Asignados
             </span>
             <div className="w-10 h-10 rounded-2xl bg-brand-primary text-white flex items-center justify-center shadow-md shadow-brand-primary/20 group-hover:scale-110 transition-transform">
@@ -203,7 +203,7 @@ export default async function AgentDetailPage({ params }: PageProps) {
           </div>
 
           <div className="mt-4">
-            <span className="text-3xl sm:text-4xl font-black text-brand-primary font-heading tracking-tight block">
+            <span className="text-3xl sm:text-4xl font-extrabold text-brand-primary font-heading tracking-tight block">
               {totalProperties}
             </span>
           </div>
@@ -214,7 +214,7 @@ export default async function AgentDetailPage({ params }: PageProps) {
           <Tag className="absolute -right-3 -bottom-3 w-20 h-20 text-amber-600/[0.04] pointer-events-none group-hover:scale-110 transition-transform duration-300" />
 
           <div className="flex items-center justify-between">
-            <span className="text-xs font-black uppercase tracking-wider text-amber-800">
+            <span className="text-xs font-bold uppercase tracking-wider text-amber-800">
               En Venta
             </span>
             <div className="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center shadow-md shadow-amber-500/20 group-hover:scale-110 transition-transform">
@@ -223,7 +223,7 @@ export default async function AgentDetailPage({ params }: PageProps) {
           </div>
 
           <div className="mt-4">
-            <span className="text-3xl sm:text-4xl font-black text-amber-800 font-heading tracking-tight block">
+            <span className="text-3xl sm:text-4xl font-extrabold text-amber-800 font-heading tracking-tight block">
               {forSaleCount}
             </span>
           </div>
@@ -234,7 +234,7 @@ export default async function AgentDetailPage({ params }: PageProps) {
           <Key className="absolute -right-3 -bottom-3 w-20 h-20 text-blue-600/[0.04] pointer-events-none group-hover:scale-110 transition-transform duration-300" />
 
           <div className="flex items-center justify-between">
-            <span className="text-xs font-black uppercase tracking-wider text-blue-800">
+            <span className="text-xs font-bold uppercase tracking-wider text-blue-800">
               En Alquiler
             </span>
             <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-md shadow-blue-600/20 group-hover:scale-110 transition-transform">
@@ -243,7 +243,7 @@ export default async function AgentDetailPage({ params }: PageProps) {
           </div>
 
           <div className="mt-4">
-            <span className="text-3xl sm:text-4xl font-black text-blue-800 font-heading tracking-tight block">
+            <span className="text-3xl sm:text-4xl font-extrabold text-blue-800 font-heading tracking-tight block">
               {forRentCount}
             </span>
           </div>
@@ -254,7 +254,7 @@ export default async function AgentDetailPage({ params }: PageProps) {
           <DollarSign className="absolute -right-3 -bottom-3 w-20 h-20 text-brand-accent/[0.04] pointer-events-none group-hover:scale-110 transition-transform duration-300" />
 
           <div className="flex items-center justify-between">
-            <span className="text-xs font-black uppercase tracking-wider text-brand-accent">
+            <span className="text-xs font-bold uppercase tracking-wider text-brand-accent">
               Valor de Cartera
             </span>
             <div className="w-10 h-10 rounded-2xl bg-brand-accent text-white flex items-center justify-center shadow-md shadow-brand-accent/20 group-hover:scale-110 transition-transform">
@@ -263,7 +263,7 @@ export default async function AgentDetailPage({ params }: PageProps) {
           </div>
 
           <div className="mt-4">
-            <span className="text-2xl sm:text-3xl font-black text-brand-accent font-heading tracking-tight block truncate">
+            <span className="text-2xl sm:text-3xl font-extrabold text-brand-accent font-heading tracking-tight block truncate">
               {formatCurrency(portfolioValue)}
             </span>
           </div>
@@ -274,7 +274,7 @@ export default async function AgentDetailPage({ params }: PageProps) {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-black text-brand-primary font-heading">
+            <h2 className="text-xl font-bold text-brand-primary font-heading">
               Propiedades Asignadas a este Asesor ({totalProperties})
             </h2>
             <p className="text-xs text-text-secondary">
@@ -331,7 +331,7 @@ export default async function AgentDetailPage({ params }: PageProps) {
                       />
                       <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
                         <span
-                          className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg text-white shadow-sm ${
+                          className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg text-white shadow-sm ${
                             property.operationType === "SALE" ? "bg-brand-primary" : "bg-brand-accent"
                           }`}
                         >
@@ -362,7 +362,7 @@ export default async function AgentDetailPage({ params }: PageProps) {
                     {/* Informacion de la propiedad */}
                     <div className="p-5 space-y-3">
                       <div>
-                        <span className="text-xl font-black text-brand-accent font-heading block">
+                        <span className="text-xl font-extrabold text-brand-accent font-heading block">
                           {formatCurrency(Number(property.price))}
                         </span>
                         <h3 className="font-bold text-text-primary text-sm line-clamp-2 mt-1">

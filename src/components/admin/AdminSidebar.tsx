@@ -90,7 +90,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
 
           {!isCollapsed && (
             <div className="min-w-0 transition-opacity duration-200">
-              <span className="font-black text-sm block leading-tight text-white truncate font-heading tracking-tight">
+              <span className="font-bold text-sm block leading-tight text-white truncate font-heading tracking-tight">
                 Panel de Control
               </span>
               <span className="text-[10px] text-brand-accent font-extrabold tracking-widest uppercase block truncate mt-0.5">
@@ -179,7 +179,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
               
               <div className="flex items-center gap-1.5 mb-2">
                 <Zap className="w-3.5 h-3.5 text-brand-accent fill-brand-accent/20" strokeWidth={2.5} />
-                <span className="text-[10px] font-black uppercase tracking-wider text-brand-accent">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-brand-accent">
                   Acceso Rápido
                 </span>
               </div>

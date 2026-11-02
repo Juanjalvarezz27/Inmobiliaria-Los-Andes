@@ -255,3 +255,28 @@ export async function updateAgentAction(
   revalidatePath("/admin/asesores");
   return { success: true };
 }
+
+// Accion para alternar el estado activo o inactivo de un asesor
+export async function toggleAgentStatusAction(id: string) {
+  const user = await getCurrentUser();
+  if (!user) throw new Error("No autorizado");
+
+  const agent = await prisma.user.findUnique({
+    where: { id },
+    select: { id: true, isActive: true },
+  });
+
+  if (!agent) throw new Error("Asesor no encontrado");
+
+  const updated = await prisma.user.update({
+    where: { id },
+    data: { isActive: !agent.isActive },
+  });
+
+  revalidatePath("/admin/asesores");
+  revalidatePath(`/admin/asesores/${id}`);
+  revalidatePath("/admin/propiedades");
+  revalidatePath("/admin/propiedades/nueva");
+
+  return { success: true, isActive: updated.isActive };
+}

@@ -39,10 +39,16 @@ interface PropertyFormProps {
   initialData?: InitialPropertyData;
   agents: AgentOption[];
   isEditing?: boolean;
+  defaultAgentId?: string;
 }
 
 // Formulario reactivo completo para crear o editar fichas de propiedades
-export function PropertyForm({ initialData, agents, isEditing = false }: PropertyFormProps) {
+export function PropertyForm({
+  initialData,
+  agents,
+  isEditing = false,
+  defaultAgentId,
+}: PropertyFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -131,7 +137,9 @@ export function PropertyForm({ initialData, agents, isEditing = false }: Propert
   };
 
   // Asesor Asignado
-  const [agentId, setAgentId] = useState(initialData?.agentId || (agents[0]?.id || ""));
+  const [agentId, setAgentId] = useState(
+    initialData?.agentId || defaultAgentId || (agents[0]?.id || "")
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

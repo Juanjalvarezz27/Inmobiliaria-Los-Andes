@@ -2,11 +2,27 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { UserPlus, Phone, Mail, X, Edit2 } from "lucide-react";
+import Link from "next/link";
+import {
+  UserPlus,
+  Phone,
+  Mail,
+  Edit2,
+  Users,
+  UserCheck,
+  UserX,
+  Home,
+  Search,
+  Power,
+  ChevronRight,
+  Loader2,
+} from "lucide-react";
 import { InstagramIcon } from "@/components/icons/InstagramIcon";
-import { createAgentAction, updateAgentAction } from "@/app/admin/actions";
+import { formatCurrency } from "@/lib/utils/format";
+import { toggleAgentStatusAction } from "@/app/admin/actions";
+import { AgentModal, AgentFormData } from "@/components/admin/AgentModal";
 
-interface AgentItem {
+export interface AgentItem {
   id: string;
   name: string;
   email: string;
@@ -15,319 +31,411 @@ interface AgentItem {
   instagram: string | null;
   avatarUrl: string | null;
   isActive: boolean;
+  createdAt?: string;
+  propertiesCount: number;
+  activePropertiesCount: number;
+  portfolioValue: number;
 }
 
-// Gestor interactivo para crear y actualizar asesores inmobiliarios
+// Gestor interactivo enriquecido de asesores inmobiliarios con metricas y control de estado
 export function AgentManager({ agents }: { agents: AgentItem[] }) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"ALL" | "ACTIVE" | "INACTIVE">("ALL");
   const [showModal, setShowModal] = useState(false);
-  const [editingAgent, setEditingAgent] = useState<AgentItem | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editingAgent, setEditingAgent] = useState<AgentFormData | null>(null);
+  const [loadingAgentId, setLoadingAgentId] = useState<string | null>(null);
 
-  // Campos del formulario
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [phone, setPhone] = useState("");
-  const [position, setPosition] = useState("Asesor Inmobiliario");
-  const [instagram, setInstagram] = useState("");
-  const [avatarUrl, setAvatarUrl] = useState("");
-  const [isActive, setIsActive] = useState(true);
+  // Metricas globales para las tarjetas de resumen
+  const totalAgents = agents.length;
+  const activeAgents = agents.filter((a) => a.isActive).length;
+  const inactiveAgents = totalAgents - activeAgents;
+  const totalPropertiesAssigned = agents.reduce((sum, a) => sum + a.propertiesCount, 0);
+
+  // Filtrado reactivo en tiempo real
+  const filteredAgents = agents.filter((agent) => {
+    const matchesSearch =
+      agent.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      agent.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      agent.position.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (agent.phone && agent.phone.includes(searchQuery));
+
+    const matchesStatus =
+      statusFilter === "ALL" ||
+      (statusFilter === "ACTIVE" && agent.isActive) ||
+      (statusFilter === "INACTIVE" && !agent.isActive);
+
+    return matchesSearch && matchesStatus;
+  });
+
+  const handleToggleStatus = async (agent: AgentItem) => {
+    const actionText = agent.isActive ? "inactivar (pausar)" : "reactivar";
+    if (!confirm(`¿Estás seguro de que deseas ${actionText} a ${agent.name}?`)) {
+      return;
+    }
+
+    setLoadingAgentId(agent.id);
+    try {
+      await toggleAgentStatusAction(agent.id);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Error al cambiar el estado del asesor.";
+      alert(message);
+    } finally {
+      setLoadingAgentId(null);
+    }
+  };
 
   const openCreateModal = () => {
     setEditingAgent(null);
-    setName("");
-    setEmail("");
-    setPassword("");
-    setPhone("+58");
-    setPosition("Asesor Inmobiliario");
-    setInstagram("");
-    setAvatarUrl("https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80");
-    setIsActive(true);
     setShowModal(true);
   };
 
   const openEditModal = (agent: AgentItem) => {
-    setEditingAgent(agent);
-    setName(agent.name);
-    setEmail(agent.email);
-    setPassword("");
-    setPhone(agent.phone || "");
-    setPosition(agent.position);
-    setInstagram(agent.instagram || "");
-    setAvatarUrl(agent.avatarUrl || "");
-    setIsActive(agent.isActive);
+    setEditingAgent({
+      id: agent.id,
+      name: agent.name,
+      email: agent.email,
+      phone: agent.phone,
+      position: agent.position,
+      instagram: agent.instagram,
+      avatarUrl: agent.avatarUrl,
+      isActive: agent.isActive,
+    });
     setShowModal(true);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
-      if (editingAgent) {
-        await updateAgentAction(editingAgent.id, {
-          name,
-          email,
-          phone,
-          position,
-          instagram,
-          avatarUrl,
-          isActive,
-        });
-      } else {
-        await createAgentAction({
-          name,
-          email,
-          password,
-          phone,
-          position,
-          instagram,
-          avatarUrl,
-          isActive,
-        });
-      }
-      setShowModal(false);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Error al procesar el asesor.";
-      alert(message);
-    } finally {
-      setIsSubmitting(false);
-    }
   };
 
   return (
     <div className="space-y-6">
-      {/* Boton Agregar */}
-      <div className="flex justify-end">
-        <button
-          onClick={openCreateModal}
-          className="inline-flex items-center gap-2 bg-brand-accent hover:bg-[#c94b21] text-white text-sm font-bold px-4 py-2.5 rounded-xl shadow-md transition-all active:scale-95"
-        >
-          <UserPlus className="w-4 h-4" />
-          <span>Registrar Nuevo Asesor</span>
-        </button>
+      {/* Tarjetas de Metricas Ejecutivas del Equipo */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        {/* Total Asesores */}
+        <div className="group relative bg-ui-surface p-6 rounded-3xl border border-neutral-200/80 shadow-sm hover:shadow-lg hover:border-brand-primary/30 transition-all duration-200 overflow-hidden">
+          <Users className="absolute -right-3 -bottom-3 w-20 h-20 text-brand-primary/[0.04] pointer-events-none group-hover:scale-110 transition-transform duration-300" />
+          
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-black uppercase tracking-wider text-text-secondary">
+              Total Asesores
+            </span>
+            <div className="w-10 h-10 rounded-2xl bg-brand-primary text-white flex items-center justify-center shadow-md shadow-brand-primary/20 group-hover:scale-110 transition-transform">
+              <Users className="w-5 h-5" />
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <span className="text-3xl sm:text-4xl font-black text-brand-primary font-heading tracking-tight block">
+              {totalAgents}
+            </span>
+          </div>
+        </div>
+
+        {/* Asesores Activos */}
+        <div className="group relative bg-ui-surface p-6 rounded-3xl border border-neutral-200/80 shadow-sm hover:shadow-lg hover:border-emerald-300 transition-all duration-200 overflow-hidden">
+          <UserCheck className="absolute -right-3 -bottom-3 w-20 h-20 text-emerald-600/[0.04] pointer-events-none group-hover:scale-110 transition-transform duration-300" />
+          
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-black uppercase tracking-wider text-emerald-700 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Asesores Activos
+            </span>
+            <div className="w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-600/20 group-hover:scale-110 transition-transform">
+              <UserCheck className="w-5 h-5" />
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <span className="text-3xl sm:text-4xl font-black text-emerald-600 font-heading tracking-tight block">
+              {activeAgents}
+            </span>
+          </div>
+        </div>
+
+        {/* Asesores Inactivos */}
+        <div className="group relative bg-ui-surface p-6 rounded-3xl border border-neutral-200/80 shadow-sm hover:shadow-lg hover:border-neutral-300 transition-all duration-200 overflow-hidden">
+          <UserX className="absolute -right-3 -bottom-3 w-20 h-20 text-neutral-500/[0.04] pointer-events-none group-hover:scale-110 transition-transform duration-300" />
+          
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-black uppercase tracking-wider text-text-secondary">
+              Asesores Inactivos
+            </span>
+            <div className="w-10 h-10 rounded-2xl bg-neutral-100 text-neutral-600 border border-neutral-200/60 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <UserX className="w-5 h-5" />
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <span className="text-3xl sm:text-4xl font-black text-neutral-500 font-heading tracking-tight block">
+              {inactiveAgents}
+            </span>
+          </div>
+        </div>
+
+        {/* Inmuebles en Cartera */}
+        <div className="group relative bg-ui-surface p-6 rounded-3xl border border-neutral-200/80 shadow-sm hover:shadow-lg hover:border-brand-accent/30 transition-all duration-200 overflow-hidden">
+          <Home className="absolute -right-3 -bottom-3 w-20 h-20 text-brand-accent/[0.04] pointer-events-none group-hover:scale-110 transition-transform duration-300" />
+          
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-black uppercase tracking-wider text-brand-accent">
+              Inmuebles en Cartera
+            </span>
+            <div className="w-10 h-10 rounded-2xl bg-brand-accent text-white flex items-center justify-center shadow-md shadow-brand-accent/20 group-hover:scale-110 transition-transform">
+              <Home className="w-5 h-5" />
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <span className="text-3xl sm:text-4xl font-black text-brand-accent font-heading tracking-tight block">
+              {totalPropertiesAssigned}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Barra de Filtros, Busqueda y Accion Principal */}
+      <div className="bg-ui-surface p-4 sm:p-5 rounded-3xl border border-neutral-200/80 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
+        {/* Buscador */}
+        <div className="relative w-full md:w-96">
+          <Search className="w-4 h-4 absolute left-3.5 top-3 text-neutral-400" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Buscar por nombre, correo o cargo..."
+            className="w-full text-xs sm:text-sm pl-10 pr-4 py-2.5 rounded-2xl border border-neutral-200 bg-neutral-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-accent transition-all"
+          />
+        </div>
+
+        <div className="flex flex-wrap items-center justify-between w-full md:w-auto gap-3">
+          {/* Pestanas de Estado */}
+          <div className="flex items-center bg-neutral-100 p-1 rounded-2xl text-xs font-bold">
+            <button
+              onClick={() => setStatusFilter("ALL")}
+              className={`px-3 py-1.5 rounded-xl transition-all ${
+                statusFilter === "ALL"
+                  ? "bg-white text-brand-primary shadow-xs"
+                  : "text-text-secondary hover:text-text-primary"
+              }`}
+            >
+              Todos ({totalAgents})
+            </button>
+            <button
+              onClick={() => setStatusFilter("ACTIVE")}
+              className={`px-3 py-1.5 rounded-xl transition-all ${
+                statusFilter === "ACTIVE"
+                  ? "bg-white text-emerald-700 shadow-xs"
+                  : "text-text-secondary hover:text-text-primary"
+              }`}
+            >
+              Activos ({activeAgents})
+            </button>
+            <button
+              onClick={() => setStatusFilter("INACTIVE")}
+              className={`px-3 py-1.5 rounded-xl transition-all ${
+                statusFilter === "INACTIVE"
+                  ? "bg-white text-neutral-700 shadow-xs"
+                  : "text-text-secondary hover:text-text-primary"
+              }`}
+            >
+              Inactivos ({inactiveAgents})
+            </button>
+          </div>
+
+          {/* Boton Agregar */}
+          <button
+            onClick={openCreateModal}
+            className="inline-flex items-center gap-2 bg-brand-accent hover:bg-[#c94b21] text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-2xl shadow-md transition-all active:scale-95"
+          >
+            <UserPlus className="w-4 h-4" />
+            <span>Registrar Nuevo Asesor</span>
+          </button>
+        </div>
       </div>
 
       {/* Grid de Tarjetas de Asesores */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {agents.map((agent) => (
-          <div
-            key={agent.id}
-            className="bg-ui-surface p-6 rounded-3xl border border-neutral-200 shadow-sm flex flex-col justify-between space-y-5"
-          >
-            <div className="space-y-4">
-              <div className="flex items-start justify-between">
-                <div className="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-brand-accent/20 bg-neutral-100 shadow-sm">
-                  <Image
-                    src={agent.avatarUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80"}
-                    alt={agent.name}
-                    fill
-                    sizes="64px"
-                    className="object-cover"
-                  />
-                </div>
-                <span
-                  className={`text-[11px] font-bold px-3 py-1 rounded-full ${
-                    agent.isActive
-                      ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                      : "bg-red-50 text-red-600 border border-red-200"
-                  }`}
-                >
-                  {agent.isActive ? "Activo" : "Inactivo"}
-                </span>
-              </div>
+      {filteredAgents.length === 0 ? (
+        <div className="bg-ui-surface rounded-3xl border border-neutral-200/80 p-12 text-center space-y-3">
+          <Users className="w-10 h-10 text-neutral-300 mx-auto" />
+          <h3 className="text-base font-bold text-brand-primary font-heading">
+            No se encontraron asesores
+          </h3>
+          <p className="text-xs text-text-secondary max-w-sm mx-auto">
+            No hay asesores que coincidan con el criterio de búsqueda o filtro seleccionado.
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredAgents.map((agent) => {
+            const cleanPhone = agent.phone ? agent.phone.replace(/[^0-9]/g, "") : null;
+            const whatsappUrl = cleanPhone ? `https://wa.me/${cleanPhone}` : null;
+            const isToggling = loadingAgentId === agent.id;
 
-              <div>
-                <h3 className="text-base font-black text-brand-primary">{agent.name}</h3>
-                <p className="text-xs font-semibold text-text-secondary">{agent.position}</p>
-              </div>
-
-              <div className="space-y-2 text-xs text-text-secondary pt-2 border-t border-neutral-100">
-                <div className="flex items-center gap-2">
-                  <Mail className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
-                  <span className="truncate">{agent.email}</span>
-                </div>
-                {agent.phone && (
-                  <div className="flex items-center gap-2">
-                    <Phone className="w-3.5 h-3.5 text-green-600 shrink-0" />
-                    <span className="font-semibold text-text-primary">{agent.phone}</span>
-                  </div>
-                )}
-                {agent.instagram && (
-                  <div className="flex items-center gap-2">
-                    <InstagramIcon className="w-3.5 h-3.5 text-pink-600 shrink-0" />
-                    <span>@{agent.instagram.replace("@", "")}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="pt-4 border-t border-neutral-100 flex justify-end">
-              <button
-                onClick={() => openEditModal(agent)}
-                className="text-xs font-bold text-brand-primary hover:text-brand-accent flex items-center gap-1.5 transition-colors"
+            return (
+              <div
+                key={agent.id}
+                className={`bg-ui-surface rounded-3xl border transition-all flex flex-col justify-between overflow-hidden shadow-sm hover:shadow-md ${
+                  agent.isActive
+                    ? "border-neutral-200/80"
+                    : "border-neutral-200 bg-neutral-50/50 opacity-90"
+                }`}
               >
-                <Edit2 className="w-3.5 h-3.5" />
-                <span>Editar Asesor</span>
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+                <div className="p-6 space-y-5">
+                  {/* Fila superior: Avatar, Estado y Switch de Inactivar */}
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-brand-accent/20 bg-neutral-100 shadow-sm shrink-0">
+                      <Image
+                        src={
+                          agent.avatarUrl ||
+                          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80"
+                        }
+                        alt={agent.name}
+                        fill
+                        sizes="64px"
+                        className="object-cover"
+                      />
+                    </div>
 
-      {/* Modal de Creacion / Edicion */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-ui-surface w-full max-w-lg rounded-3xl border border-neutral-200 shadow-2xl overflow-hidden p-6 sm:p-8 space-y-6">
-            <div className="flex items-center justify-between border-b border-neutral-100 pb-4">
-              <h2 className="text-lg font-black text-brand-primary">
-                {editingAgent ? "Editar Asesor Inmobiliario" : "Registrar Asesor Inmobiliario"}
-              </h2>
-              <button
-                onClick={() => setShowModal(false)}
-                className="p-1 rounded-lg text-neutral-400 hover:text-neutral-700"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+                    <div className="flex flex-col items-end gap-2">
+                      <span
+                        className={`text-[11px] font-bold px-3 py-1 rounded-full flex items-center gap-1.5 ${
+                          agent.isActive
+                            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                            : "bg-neutral-100 text-neutral-600 border border-neutral-300"
+                        }`}
+                      >
+                        <span
+                          className={`w-1.5 h-1.5 rounded-full ${
+                            agent.isActive ? "bg-emerald-500 animate-pulse" : "bg-neutral-400"
+                          }`}
+                        />
+                        {agent.isActive ? "Activo" : "Inactivo"}
+                      </span>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-1">
-                  Nombre Completo *
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Ej. Carlos Mendoza"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent"
-                />
-              </div>
+                      {/* Boton rapido de activacion sin borrar */}
+                      <button
+                        type="button"
+                        onClick={() => handleToggleStatus(agent)}
+                        disabled={isToggling}
+                        title={agent.isActive ? "Inactivar asesor (pausar)" : "Reactivar asesor"}
+                        className={`inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-lg border transition-colors ${
+                          agent.isActive
+                            ? "text-neutral-500 hover:text-red-600 border-neutral-200 hover:bg-red-50"
+                            : "text-emerald-700 hover:text-emerald-800 border-emerald-200 bg-emerald-50 hover:bg-emerald-100"
+                        }`}
+                      >
+                        {isToggling ? (
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                        ) : (
+                          <Power className="w-3 h-3" />
+                        )}
+                        <span>{agent.isActive ? "Pausar" : "Reactivar"}</span>
+                      </button>
+                    </div>
+                  </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-1">
-                    Correo Electrónico *
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    placeholder="carlos@inmobiliarialosandes.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent"
-                  />
-                </div>
-
-                {!editingAgent && (
+                  {/* Nombre y Cargo */}
                   <div>
-                    <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-1">
-                      Contraseña *
-                    </label>
-                    <input
-                      type="password"
-                      required
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent"
-                    />
+                    <h3 className="text-lg font-black text-brand-primary font-heading leading-snug">
+                      {agent.name}
+                    </h3>
+                    <p className="text-xs font-semibold text-brand-accent mt-0.5">{agent.position}</p>
                   </div>
-                )}
-              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-1">
-                    Teléfono (WhatsApp internacional) *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Ej. +584125550101"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-brand-accent"
-                  />
+                  {/* Chips con Metricas del Asesor */}
+                  <div className="grid grid-cols-2 gap-2 p-2.5 bg-neutral-50 rounded-2xl border border-neutral-100 text-center">
+                    <div>
+                      <span className="text-xs font-black text-brand-primary block">
+                        {agent.propertiesCount}
+                      </span>
+                      <span className="text-[10px] text-text-secondary font-medium block">
+                        Inmuebles a cargo
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-xs font-black text-brand-accent block truncate">
+                        {formatCurrency(agent.portfolioValue)}
+                      </span>
+                      <span className="text-[10px] text-text-secondary font-medium block">
+                        Cartera activa
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Datos de Contacto */}
+                  <div className="space-y-2 text-xs text-text-secondary pt-2 border-t border-neutral-100">
+                    <div className="flex items-center gap-2 truncate">
+                      <Mail className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
+                      <a
+                        href={`mailto:${agent.email}`}
+                        className="truncate hover:text-brand-primary transition-colors"
+                      >
+                        {agent.email}
+                      </a>
+                    </div>
+
+                    {agent.phone && (
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Phone className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                          <span className="font-semibold text-text-primary">{agent.phone}</span>
+                        </div>
+                        {whatsappUrl && (
+                          <a
+                            href={whatsappUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[10px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-2 py-0.5 rounded-md border border-emerald-200 transition-colors"
+                          >
+                            WhatsApp
+                          </a>
+                        )}
+                      </div>
+                    )}
+
+                    {agent.instagram && (
+                      <div className="flex items-center gap-2">
+                        <InstagramIcon className="w-3.5 h-3.5 text-pink-600 shrink-0" />
+                        <a
+                          href={`https://instagram.com/${agent.instagram.replace("@", "")}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:text-brand-primary transition-colors truncate"
+                        >
+                          @{agent.instagram.replace("@", "")}
+                        </a>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-1">
-                    Cargo o Especialidad *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Ej. Asesor Inmobiliario Senior"
-                    value={position}
-                    onChange={(e) => setPosition(e.target.value)}
-                    className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent"
-                  />
+                {/* Pie de Tarjeta con Navegacion a Detalle y Edicion */}
+                <div className="p-4 bg-neutral-50/80 border-t border-neutral-100 flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={() => openEditModal(agent)}
+                    className="text-xs font-bold text-text-secondary hover:text-brand-primary flex items-center gap-1.5 transition-colors"
+                  >
+                    <Edit2 className="w-3.5 h-3.5" />
+                    <span>Editar</span>
+                  </button>
+
+                  <Link
+                    href={`/admin/asesores/${agent.id}`}
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-primary hover:text-brand-accent transition-colors"
+                  >
+                    <span>Ver Perfil & Inmuebles</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </Link>
                 </div>
               </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-1">
-                    Usuario de Instagram
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="carlos.losandes"
-                    value={instagram}
-                    onChange={(e) => setInstagram(e.target.value)}
-                    className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-1">
-                    URL Foto de Perfil
-                  </label>
-                  <input
-                    type="url"
-                    placeholder="https://images.unsplash.com/..."
-                    value={avatarUrl}
-                    onChange={(e) => setAvatarUrl(e.target.value)}
-                    className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent"
-                  />
-                </div>
-              </div>
-
-              <div className="pt-2">
-                <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-text-primary">
-                  <input
-                    type="checkbox"
-                    checked={isActive}
-                    onChange={(e) => setIsActive(e.target.checked)}
-                    className="w-4 h-4 text-brand-accent rounded focus:ring-brand-accent"
-                  />
-                  <span>Asesor Activo (Disponible para asignación de inmuebles)</span>
-                </label>
-              </div>
-
-              <div className="pt-4 flex justify-end gap-3 border-t border-neutral-100">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="px-4 py-2.5 rounded-xl border border-neutral-200 text-xs font-bold text-text-secondary hover:bg-neutral-50"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="px-5 py-2.5 rounded-xl bg-brand-accent hover:bg-[#c94b21] text-white text-xs font-bold transition-all shadow-md disabled:opacity-50"
-                >
-                  {isSubmitting ? "Guardando..." : "Guardar Asesor"}
-                </button>
-              </div>
-            </form>
-          </div>
+            );
+          })}
         </div>
       )}
+
+      {/* Modal Reutilizable de Creacion / Edicion */}
+      <AgentModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        agent={editingAgent}
+      />
     </div>
   );
 }

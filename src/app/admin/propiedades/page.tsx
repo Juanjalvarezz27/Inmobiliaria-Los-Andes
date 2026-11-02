@@ -5,7 +5,7 @@ import { PlusCircle, Edit3, ExternalLink } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/format";
 import { DeletePropertyButton } from "@/components/admin/DeletePropertyButton";
 
-// Vista de gestion y listado CRUD de propiedades
+// Vista de gestion y listado de propiedades
 export default async function AdminPropertiesPage() {
   const properties = await prisma.property.findMany({
     orderBy: { createdAt: "desc" },

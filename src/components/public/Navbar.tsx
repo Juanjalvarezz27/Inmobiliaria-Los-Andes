@@ -12,7 +12,7 @@ export function Navbar() {
             <Building2 className="w-6 h-6 text-brand-accent" />
           </div>
           <div>
-            <span className="text-xl font-bold tracking-tight block leading-tight">
+            <span className="text-xl font-bold tracking-tight block leading-tight font-heading">
               {COMPANY_CONFIG.tradeName}
             </span>
             <span className="text-xs text-white/70 tracking-wider uppercase block">

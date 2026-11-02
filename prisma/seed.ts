@@ -17,7 +17,7 @@ async function main() {
   const admin = await prisma.user.create({
     data: {
       email: "admin@inmobiliarialosandes.com",
-      name: "Administrador General",
+      name: "Administrador",
       passwordHash,
       role: "ADMIN",
       position: "Director de Operaciones",

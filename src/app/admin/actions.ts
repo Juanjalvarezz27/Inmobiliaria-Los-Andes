@@ -283,6 +283,56 @@ export async function updateAgentAction(
   return { success: true };
 }
 
+// Accion para transferir cartera de inmuebles entre asesores
+export async function transferPropertiesAction(params: {
+  sourceAgentId: string;
+  targetAgentId: string;
+  propertyIds?: string[];
+}) {
+  const user = await getCurrentUser();
+  if (!user) throw new Error("No autorizado");
+
+  const { sourceAgentId, targetAgentId, propertyIds } = params;
+
+  if (sourceAgentId === targetAgentId) {
+    throw new Error("El asesor de origen y destino no pueden ser el mismo.");
+  }
+
+  // Verificar existencia del asesor receptor
+  const targetAgent = await prisma.user.findUnique({
+    where: { id: targetAgentId },
+    select: { id: true, name: true, role: true, isActive: true },
+  });
+
+  if (!targetAgent || targetAgent.role !== "AGENT") {
+    throw new Error("El asesor destino seleccionado no es válido.");
+  }
+
+  // Construir condicion de actualizacion
+  const whereClause: { agentId: string; id?: { in: string[] } } = {
+    agentId: sourceAgentId,
+  };
+
+  if (propertyIds && propertyIds.length > 0) {
+    whereClause.id = { in: propertyIds };
+  }
+
+  const result = await prisma.property.updateMany({
+    where: whereClause,
+    data: {
+      agentId: targetAgentId,
+    },
+  });
+
+  revalidatePath("/admin/asesores");
+  revalidatePath(`/admin/asesores/${sourceAgentId}`);
+  revalidatePath(`/admin/asesores/${targetAgentId}`);
+  revalidatePath("/admin/propiedades");
+  revalidatePath("/admin");
+
+  return { success: true, count: result.count };
+}
+
 // Accion para alternar el estado activo o inactivo de un asesor
 export async function toggleAgentStatusAction(id: string) {
   const user = await getCurrentUser();

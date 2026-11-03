@@ -1,10 +1,13 @@
 import { prisma } from "@/lib/prisma";
+import { requireAuth } from "@/lib/auth";
 import { Users } from "lucide-react";
 import { AgentManager, AgentItem } from "@/components/admin/AgentManager";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 
 // Vista principal para la gestion de Asesores Inmobiliarios
 export default async function AdminAgentsPage() {
+  await requireAuth();
+
   const agents = await prisma.user.findMany({
     where: { role: "AGENT" },
     orderBy: { createdAt: "desc" },
@@ -26,9 +29,18 @@ export default async function AdminAgentsPage() {
       properties: {
         select: {
           id: true,
+          title: true,
           price: true,
+          currency: true,
           status: true,
           operationType: true,
+          city: true,
+          sector: true,
+          images: {
+            orderBy: { order: "asc" },
+            take: 1,
+            select: { url: true },
+          },
         },
       },
     },
@@ -59,6 +71,17 @@ export default async function AdminAgentsPage() {
       (sum, p) => sum + Number(p.price || 0),
       0
     ),
+    propertiesList: agent.properties.map((p) => ({
+      id: p.id,
+      title: p.title,
+      price: Number(p.price),
+      currency: p.currency,
+      status: p.status,
+      operationType: p.operationType,
+      city: p.city,
+      sector: p.sector,
+      coverImage: p.images[0]?.url || null,
+    })),
   }));
 
   return (

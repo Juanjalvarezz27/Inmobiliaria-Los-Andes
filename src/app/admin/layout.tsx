@@ -1,20 +1,29 @@
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminMainContent } from "@/components/admin/AdminMainContent";
 
 export const dynamic = "force-dynamic";
 
-// Layout principal para el panel administrativo privado
+// Layout principal para el panel administrativo privado con proteccion estricta de rutas
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const user = await getCurrentUser();
+  const headerList = await headers();
+  const pathname = headerList.get("x-pathname") || "";
 
-  // Si no hay usuario autenticado (ej. en la ruta de login), renderiza solo el contenido
-  if (!user) {
+  // Si es la ruta publica de login, renderiza el formulario standalone
+  if (pathname === "/admin/login") {
     return <>{children}</>;
+  }
+
+  // En cualquier otra ruta administrativa, exige autenticacion estricta o redirige
+  const user = await getCurrentUser();
+  if (!user) {
+    redirect("/admin/login");
   }
 
   return (

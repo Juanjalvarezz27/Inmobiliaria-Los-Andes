@@ -2,25 +2,31 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Power, Edit2, PlusCircle, Loader2 } from "lucide-react";
+import { Power, Edit2, PlusCircle, Loader2, ArrowRightLeft } from "lucide-react";
 import { toggleAgentStatusAction } from "@/app/admin/actions";
 import { AgentModal, AgentFormData } from "@/components/admin/AgentModal";
 import { PropertyModal, AgentOption } from "@/components/admin/PropertyModal";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import {
+  TransferPropertiesModal,
+  TransferableProperty,
+} from "@/components/admin/TransferPropertiesModal";
 
 interface AgentDetailActionsProps {
   agent: AgentFormData;
   agents: AgentOption[];
+  properties?: TransferableProperty[];
 }
 
 // Botones de accion y cambio de estado para la vista de detalle del asesor
-export function AgentDetailActions({ agent, agents }: AgentDetailActionsProps) {
+export function AgentDetailActions({ agent, agents, properties = [] }: AgentDetailActionsProps) {
   const router = useRouter();
   const [isActive, setIsActive] = useState(agent.isActive);
   const [isLoading, setIsLoading] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showPropertyModal, setShowPropertyModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showTransferModal, setShowTransferModal] = useState(false);
 
   const handleToggle = async () => {
     setIsLoading(true);
@@ -53,11 +59,24 @@ export function AgentDetailActions({ agent, agents }: AgentDetailActionsProps) {
         <button
           type="button"
           onClick={() => setShowEditModal(true)}
-          className="w-full inline-flex items-center justify-center gap-2 bg-white hover:bg-neutral-100 text-brand-primary text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow-sm hover:shadow-md transition-all active:scale-95"
+          className="w-full inline-flex items-center justify-center gap-2 bg-white hover:bg-neutral-100 text-brand-primary text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow-sm hover:shadow-md transition-all active:scale-95 cursor-pointer"
         >
           <Edit2 className="w-4 h-4 text-brand-accent shrink-0" />
           <span>Editar Datos</span>
         </button>
+
+        {/* Accion para transferir cartera a otro asesor */}
+        {properties.length > 0 && (
+          <button
+            type="button"
+            onClick={() => setShowTransferModal(true)}
+            className="w-full inline-flex items-center justify-center gap-2 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow-xs transition-all active:scale-95 cursor-pointer"
+            title="Transferir cartera a otro asesor"
+          >
+            <ArrowRightLeft className="w-4 h-4 text-amber-400 shrink-0" />
+            <span>Transferir Cartera ({properties.length})</span>
+          </button>
+        )}
 
         {/* Accion para alternar el estado (Inactivar / Reactivar Asesor) */}
         <button
@@ -115,6 +134,26 @@ export function AgentDetailActions({ agent, agents }: AgentDetailActionsProps) {
           router.refresh();
         }}
       />
+
+      {/* Modal para transferir cartera a otro asesor */}
+      {showTransferModal && (
+        <TransferPropertiesModal
+          isOpen={showTransferModal}
+          onClose={() => setShowTransferModal(false)}
+          sourceAgent={{
+            id: agent.id,
+            name: agent.name,
+            position: agent.position,
+            avatarUrl: agent.avatarUrl,
+          }}
+          properties={properties}
+          availableAgents={agents}
+          onSuccess={() => {
+            setShowTransferModal(false);
+            router.refresh();
+          }}
+        />
+      )}
     </>
   );
 }

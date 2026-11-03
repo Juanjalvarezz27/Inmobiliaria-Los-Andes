@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { requireAuth } from "@/lib/auth";
 import Link from "next/link";
 import {
   Home,
@@ -14,6 +15,8 @@ import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 
 // Pagina principal de metricas y resumen del panel administrativo
 export default async function AdminDashboardPage() {
+  await requireAuth();
+
   const [totalProperties, saleProperties, rentProperties, totalAgents, recentProperties] =
     await Promise.all([
       prisma.property.count(),
@@ -37,7 +40,7 @@ export default async function AdminDashboardPage() {
         description="Visión consolidada del catálogo inmobiliario, actividad comercial y rendimiento del inventario."
       >
         <Link
-          href="/admin/propiedades/nueva"
+          href="/admin/propiedades?nuevo=true"
           className="inline-flex items-center gap-2 bg-brand-accent hover:bg-[#c94b21] text-white text-sm font-bold px-5 py-2.5 rounded-xl shadow-md transition-all active:scale-95 shrink-0"
         >
           <PlusCircle className="w-4 h-4" />

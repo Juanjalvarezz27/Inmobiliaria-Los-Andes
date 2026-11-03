@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { prisma } from "@/lib/prisma";
+import { requireAuth } from "@/lib/auth";
 import {
   ArrowLeft,
   Phone,
@@ -23,6 +24,7 @@ interface PageProps {
 
 // Vista de detalle de un asesor inmobiliario con su cartera de propiedades rediseñada con estetica premium
 export default async function AgentDetailPage({ params }: PageProps) {
+  await requireAuth();
   const { id } = await params;
 
   const agent = await prisma.user.findUnique({
@@ -208,6 +210,17 @@ export default async function AgentDetailPage({ params }: PageProps) {
               isActive: agent.isActive,
             }}
             agents={allAgents}
+            properties={serializedProperties.map((p) => ({
+              id: p.id,
+              title: p.title,
+              price: p.price,
+              currency: p.currency,
+              status: p.status,
+              operationType: p.operationType,
+              city: p.city,
+              sector: p.sector,
+              coverImage: p.images[0]?.url || null,
+            }))}
           />
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { requireAuth } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import { PropertyForm } from "@/components/admin/PropertyForm";
 
@@ -10,6 +11,7 @@ interface PageProps {
 
 // Pagina para editar una propiedad existente
 export default async function EditPropertyPage({ params }: PageProps) {
+  await requireAuth();
   const { id } = await params;
 
   const [property, agents] = await Promise.all([

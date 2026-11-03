@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { formatCurrency, formatArea } from "@/lib/utils/format";
 import { PropertyModal, AgentOption } from "./PropertyModal";
+import { Pagination } from "@/components/admin/Pagination";
 import type { InitialPropertyData } from "./PropertyForm";
 import type { OperationType, PropertyType, PropertyStatus } from "@/generated/prisma/client";
 
@@ -68,6 +69,18 @@ export function AgentPropertiesGrid({
   const router = useRouter();
   const [selectedProperty, setSelectedProperty] = useState<InitialPropertyData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Paginacion de inmuebles del asesor (6 propiedades por pagina)
+  const [currentPage, setCurrentPage] = useState(1);
+  const PROPERTIES_PER_PAGE = 6;
+
+  const totalPages = Math.max(1, Math.ceil(properties.length / PROPERTIES_PER_PAGE));
+
+  // Inmuebles visibles en la pagina actual
+  const paginatedProperties = useMemo(() => {
+    const start = (currentPage - 1) * PROPERTIES_PER_PAGE;
+    return properties.slice(start, start + PROPERTIES_PER_PAGE);
+  }, [properties, currentPage]);
 
   const handleEdit = (property: SerializedProperty) => {
     setSelectedProperty({
@@ -157,7 +170,7 @@ export function AgentPropertiesGrid({
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {properties.map((property) => {
+            {paginatedProperties.map((property) => {
               const coverImage =
                 property.images[0]?.url ||
                 "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80";
@@ -349,6 +362,21 @@ export function AgentPropertiesGrid({
               );
             })}
           </div>
+        )}
+
+        {/* Paginacion ejecutiva de propiedades del asesor */}
+        {properties.length > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={properties.length}
+            itemsPerPage={PROPERTIES_PER_PAGE}
+            itemLabel="inmuebles asignados"
+            onPageChange={(page) => {
+              setCurrentPage(page);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+          />
         )}
       </div>
 

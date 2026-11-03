@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -15,10 +15,17 @@ import {
   Power,
   ChevronRight,
   Loader2,
+  ArrowRightLeft,
 } from "lucide-react";
 import { toggleAgentStatusAction } from "@/app/admin/actions";
 import { AgentModal, AgentFormData } from "@/components/admin/AgentModal";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { Pagination } from "@/components/admin/Pagination";
+import {
+  TransferPropertiesModal,
+  TransferableProperty,
+  TransferAgentOption,
+} from "@/components/admin/TransferPropertiesModal";
 
 export interface AgentItem {
   id: string;
@@ -35,6 +42,7 @@ export interface AgentItem {
   forSaleCount?: number;
   forRentCount?: number;
   portfolioValue?: number;
+  propertiesList?: TransferableProperty[];
 }
 
 // Gestor interactivo enriquecido de asesores inmobiliarios con metricas y control de estado
@@ -45,6 +53,19 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
   const [editingAgent, setEditingAgent] = useState<AgentFormData | null>(null);
   const [loadingAgentId, setLoadingAgentId] = useState<string | null>(null);
   const [agentToToggle, setAgentToToggle] = useState<AgentItem | null>(null);
+  const [agentToTransfer, setAgentToTransfer] = useState<AgentItem | null>(null);
+
+  // Lista de asesores activos disponibles como destino de transferencia
+  const availableAgentsForTransfer: TransferAgentOption[] = useMemo(() => {
+    return agents
+      .filter((a) => a.isActive)
+      .map((a) => ({
+        id: a.id,
+        name: a.name,
+        position: a.position,
+        avatarUrl: a.avatarUrl,
+      }));
+  }, [agents]);
 
   // Metricas globales para las tarjetas de resumen
   const totalAgents = agents.length;
@@ -66,6 +87,23 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
 
     return matchesSearch && matchesStatus;
   });
+
+  // Paginacion reactiva de asesores (6 tarjetas por pagina)
+  const [currentPage, setCurrentPage] = useState(1);
+  const AGENTS_PER_PAGE = 6;
+
+  // Reset de pagina al aplicar filtros de busqueda o estado
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, statusFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredAgents.length / AGENTS_PER_PAGE));
+
+  // Asesores correspondientes a la pagina activa
+  const paginatedAgents = useMemo(() => {
+    const start = (currentPage - 1) * AGENTS_PER_PAGE;
+    return filteredAgents.slice(start, start + AGENTS_PER_PAGE);
+  }, [filteredAgents, currentPage]);
 
   const executeToggleStatus = async () => {
     if (!agentToToggle) return;
@@ -274,7 +312,7 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredAgents.map((agent) => {
+          {paginatedAgents.map((agent) => {
             const cleanPhone = agent.phone ? agent.phone.replace(/[^0-9]/g, "") : null;
             const whatsappUrl = cleanPhone ? `https://wa.me/${cleanPhone}` : null;
             const isToggling = loadingAgentId === agent.id;
@@ -383,16 +421,30 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
                   </div>
                 </div>
 
-                {/* Pie de Tarjeta: Accion de Edicion y Link a Detalle */}
-                <div className="mt-4 pt-3 border-t border-white/[0.08] flex items-center justify-between px-1.5 text-xs">
-                  <button
-                    type="button"
-                    onClick={() => openEditModal(agent)}
-                    className="inline-flex items-center gap-1.5 font-semibold text-neutral-400 hover:text-white transition-colors py-1"
-                  >
-                    <Edit2 className="w-3.5 h-3.5" />
-                    <span>Editar</span>
-                  </button>
+                {/* Pie de Tarjeta: Accion de Edicion, Transferencia y Link a Detalle */}
+                <div className="mt-4 pt-3 border-t border-white/[0.08] flex items-center justify-between px-1.5 text-xs flex-wrap gap-2">
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => openEditModal(agent)}
+                      className="inline-flex items-center gap-1.5 font-semibold text-neutral-400 hover:text-white transition-colors py-1 cursor-pointer"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                      <span>Editar</span>
+                    </button>
+
+                    {agent.propertiesCount > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setAgentToTransfer(agent)}
+                        className="inline-flex items-center gap-1 font-semibold text-amber-400 hover:text-amber-300 transition-colors py-1 cursor-pointer"
+                        title="Transferir cartera de inmuebles a otro asesor"
+                      >
+                        <ArrowRightLeft className="w-3.5 h-3.5" />
+                        <span>Transferir ({agent.propertiesCount})</span>
+                      </button>
+                    )}
+                  </div>
 
                   <Link
                     href={`/admin/asesores/${agent.id}`}
@@ -406,6 +458,21 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
             );
           })}
         </div>
+      )}
+
+      {/* Paginacion ejecutiva de asesores */}
+      {filteredAgents.length > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={filteredAgents.length}
+          itemsPerPage={AGENTS_PER_PAGE}
+          itemLabel="asesores"
+          onPageChange={(page) => {
+            setCurrentPage(page);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+        />
       )}
 
       {/* Modal Reutilizable de Creacion / Edicion */}
@@ -442,6 +509,23 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
         confirmText={agentToToggle?.isActive ? "Pausar Asesor" : "Reactivar Asesor"}
         cancelText="Volver"
       />
+
+      {/* Modal Reutilizable de Transferencia de Cartera Inmobiliaria */}
+      {agentToTransfer && (
+        <TransferPropertiesModal
+          isOpen={Boolean(agentToTransfer)}
+          onClose={() => setAgentToTransfer(null)}
+          sourceAgent={{
+            id: agentToTransfer.id,
+            name: agentToTransfer.name,
+            position: agentToTransfer.position,
+            avatarUrl: agentToTransfer.avatarUrl,
+          }}
+          properties={agentToTransfer.propertiesList || []}
+          availableAgents={availableAgentsForTransfer}
+          onSuccess={() => setAgentToTransfer(null)}
+        />
+      )}
     </div>
   );
 }

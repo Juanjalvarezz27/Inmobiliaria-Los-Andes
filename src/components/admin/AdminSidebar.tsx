@@ -192,7 +192,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
               </p>
 
               <Link
-                href="/admin/propiedades/nueva"
+                href="/admin/propiedades?nuevo=true"
                 className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-brand-accent hover:bg-[#c94b21] hover:scale-[1.02] text-white text-xs font-bold shadow-md shadow-brand-accent/30 transition-all active:scale-95"
               >
                 <PlusCircle strokeWidth={2.5} className="w-3.5 h-3.5" />
@@ -206,7 +206,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
         {isCollapsed && (
           <div className="pt-2 flex justify-center">
             <Link
-              href="/admin/propiedades/nueva"
+              href="/admin/propiedades?nuevo=true"
               title="Cargar Nuevo Inmueble"
               className="w-10 h-10 rounded-2xl bg-brand-accent hover:bg-[#c94b21] text-white flex items-center justify-center shadow-md shadow-brand-accent/30 transition-transform hover:scale-110 active:scale-95"
             >

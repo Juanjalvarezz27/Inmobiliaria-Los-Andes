@@ -71,6 +71,7 @@ model Property {
   description      String          @db.Text
   operationType    OperationType
   propertyType     PropertyType
+  customPropertyType String?
   status           PropertyStatus  @default(AVAILABLE)
   price            Decimal         @db.Decimal(12, 2)
   currency         String          @default("USD")

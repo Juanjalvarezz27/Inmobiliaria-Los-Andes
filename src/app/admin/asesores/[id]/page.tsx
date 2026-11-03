@@ -46,7 +46,7 @@ export default async function AgentDetailPage({ params }: PageProps) {
   // Consulta de todos los asesores para el selector de asignacion
   const allAgents = await prisma.user.findMany({
     where: { role: "AGENT", isActive: true },
-    select: { id: true, name: true, position: true },
+    select: { id: true, name: true, position: true, avatarUrl: true },
     orderBy: { name: "asc" },
   });
 
@@ -63,6 +63,7 @@ export default async function AgentDetailPage({ params }: PageProps) {
     description: p.description,
     operationType: p.operationType,
     propertyType: p.propertyType,
+    customPropertyType: p.customPropertyType,
     status: p.status,
     price: Number(p.price),
     currency: p.currency,
@@ -206,6 +207,7 @@ export default async function AgentDetailPage({ params }: PageProps) {
               avatarUrl: agent.avatarUrl,
               isActive: agent.isActive,
             }}
+            agents={allAgents}
           />
         </div>
       </div>

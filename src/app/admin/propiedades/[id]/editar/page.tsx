@@ -19,7 +19,7 @@ export default async function EditPropertyPage({ params }: PageProps) {
     }),
     prisma.user.findMany({
       where: { isActive: true },
-      select: { id: true, name: true, position: true },
+      select: { id: true, name: true, position: true, avatarUrl: true },
       orderBy: { name: "asc" },
     }),
   ]);

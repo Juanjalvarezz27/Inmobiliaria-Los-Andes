@@ -27,6 +27,7 @@ export interface SerializedProperty {
   description: string;
   operationType: OperationType;
   propertyType: PropertyType;
+  customPropertyType?: string | null;
   status: PropertyStatus;
   price: number;
   currency: string;
@@ -74,6 +75,7 @@ export function AgentPropertiesGrid({
       title: property.title,
       operationType: property.operationType,
       propertyType: property.propertyType,
+      customPropertyType: property.customPropertyType,
       status: property.status,
       price: property.price,
       currency: property.currency,

@@ -11,6 +11,7 @@ export interface AgentOption {
   id: string;
   name: string;
   position: string;
+  avatarUrl?: string | null;
 }
 
 interface PropertyModalProps {
@@ -62,16 +63,16 @@ export function PropertyModal({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="relative w-full max-w-4xl bg-ui-surface rounded-3xl shadow-2xl border border-neutral-200 overflow-hidden flex flex-col max-h-[92vh] animate-in zoom-in-95 duration-200 my-auto">
-        {/* Cabecera solida verde con acento esmeralda */}
-        <div className="bg-gradient-to-r from-[#122b1c] via-[#1a3b26] to-[#0e2115] text-white p-5 sm:p-6 flex items-center justify-between shrink-0 border-b border-emerald-500/20">
+      <div className="relative w-full max-w-4xl bg-brand-primary rounded-3xl shadow-2xl shadow-black/50 overflow-hidden flex flex-col max-h-[92vh] border-0 animate-in fade-in zoom-in-95 duration-200 my-auto">
+        {/* Cabecera solida verde de marca */}
+        <div className="bg-gradient-to-r from-[#122b1c] via-[#1a3b26] to-[#0e2115] text-white p-5 sm:p-6 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3.5 min-w-0">
             <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-emerald-400 border border-white/10 shrink-0">
               {isEditing ? <Edit3 className="w-5 h-5 text-brand-accent" /> : <Building2 className="w-5 h-5 text-emerald-400" />}
             </div>
             <div className="min-w-0">
               <h2 className="text-lg sm:text-xl font-black text-white font-heading tracking-tight truncate">
-                {isEditing ? "Editar Ficha de Inmueble" : "Nueva Propiedad"}
+                {isEditing ? "Editar Ficha de Inmueble" : "Registrar Nuevo Inmueble"}
               </h2>
               <p className="text-xs text-white/70 truncate">
                 {property?.title || "Completa los datos técnicos y fotografías de la propiedad."}
@@ -89,8 +90,8 @@ export function PropertyModal({
           </button>
         </div>
 
-        {/* Cuerpo desplazable con el formulario completo */}
-        <div className="flex-1 overflow-y-auto p-5 sm:p-8 overscroll-contain bg-neutral-50/50">
+        {/* Cuerpo desplazable con el formulario integrado directamente */}
+        <div className="flex-1 overflow-y-auto p-6 sm:p-8 overscroll-contain bg-white">
           <PropertyForm
             key={property?.id || "new-property"}
             initialData={property || undefined}

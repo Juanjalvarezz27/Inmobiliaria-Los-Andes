@@ -64,6 +64,11 @@ export default async function PropertyDetailPage({ params }: PageProps) {
     OTHER: "Inmueble",
   };
 
+  const propertyTypeLabel =
+    property.propertyType === "OTHER" && property.customPropertyType
+      ? property.customPropertyType
+      : propertyTypeNameMap[property.propertyType] || property.propertyType;
+
   return (
     <div className="min-h-screen flex flex-col bg-ui-background">
       <Navbar />
@@ -88,7 +93,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                 {property.operationType === "SALE" ? "En Venta" : "En Alquiler"}
               </span>
               <span className="bg-brand-primary text-white text-xs font-semibold px-3 py-1 rounded-full">
-                {propertyTypeNameMap[property.propertyType] || property.propertyType}
+                {propertyTypeLabel}
               </span>
               {property.status === "SOLD" && (
                 <span className="bg-neutral-900 text-white text-xs font-bold uppercase px-3 py-1 rounded-full">

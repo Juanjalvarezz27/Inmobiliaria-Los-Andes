@@ -1,21 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Power, Edit2, PlusCircle, Loader2 } from "lucide-react";
 import { toggleAgentStatusAction } from "@/app/admin/actions";
 import { AgentModal, AgentFormData } from "@/components/admin/AgentModal";
+import { PropertyModal, AgentOption } from "@/components/admin/PropertyModal";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 
 interface AgentDetailActionsProps {
   agent: AgentFormData;
+  agents: AgentOption[];
 }
 
 // Botones de accion y cambio de estado para la vista de detalle del asesor
-export function AgentDetailActions({ agent }: AgentDetailActionsProps) {
+export function AgentDetailActions({ agent, agents }: AgentDetailActionsProps) {
+  const router = useRouter();
   const [isActive, setIsActive] = useState(agent.isActive);
   const [isLoading, setIsLoading] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showPropertyModal, setShowPropertyModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const handleToggle = async () => {
@@ -35,14 +39,15 @@ export function AgentDetailActions({ agent }: AgentDetailActionsProps) {
   return (
     <>
       <div className="flex flex-col gap-2 w-full sm:w-56 shrink-0 lg:border-l lg:border-emerald-500/20 lg:pl-6 justify-center">
-        {/* Asignar nueva propiedad (Accion Principal Terracota) */}
-        <Link
-          href={`/admin/propiedades/nueva?agentId=${agent.id}`}
-          className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#e85d30] via-brand-accent to-[#c4441b] hover:shadow-lg hover:shadow-brand-accent/30 hover:-translate-y-0.5 text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow-md shadow-brand-accent/20 transition-all active:scale-95"
+        {/* Asignar nueva propiedad mediante modal integrado */}
+        <button
+          type="button"
+          onClick={() => setShowPropertyModal(true)}
+          className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#e85d30] via-brand-accent to-[#c4441b] hover:shadow-lg hover:shadow-brand-accent/30 hover:-translate-y-0.5 text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow-md shadow-brand-accent/20 transition-all active:scale-95 cursor-pointer"
         >
           <PlusCircle className="w-4 h-4 shrink-0" />
           <span>Asignar Propiedad</span>
-        </Link>
+        </button>
 
         {/* Abrir modal de edicion (Secundaria Solida Blanca de Alto Contraste) */}
         <button
@@ -97,6 +102,18 @@ export function AgentDetailActions({ agent }: AgentDetailActionsProps) {
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
         agent={{ ...agent, isActive }}
+      />
+
+      {/* Modal para registrar y asignar una propiedad a este asesor */}
+      <PropertyModal
+        isOpen={showPropertyModal}
+        onClose={() => setShowPropertyModal(false)}
+        agents={agents}
+        defaultAgentId={agent.id}
+        onSuccess={() => {
+          setShowPropertyModal(false);
+          router.refresh();
+        }}
       />
     </>
   );

@@ -42,6 +42,7 @@ export async function createPropertyAction(data: {
   description: string;
   operationType: OperationType;
   propertyType: PropertyType;
+  customPropertyType?: string | null;
   status: PropertyStatus;
   price: number;
   currency?: string;
@@ -63,6 +64,10 @@ export async function createPropertyAction(data: {
   const user = await getCurrentUser();
   if (!user) throw new Error("No autorizado");
 
+  if (data.images && data.images.length > 8) {
+    throw new Error("No se permiten más de 8 fotografías por propiedad.");
+  }
+
   const baseSlug = generateSlug(data.title);
   const uniqueSuffix = Math.random().toString(36).substring(2, 6);
   const slug = `${baseSlug}-${uniqueSuffix}`;
@@ -74,6 +79,7 @@ export async function createPropertyAction(data: {
       description: data.description,
       operationType: data.operationType,
       propertyType: data.propertyType,
+      customPropertyType: data.propertyType === "OTHER" ? data.customPropertyType?.trim() || null : null,
       status: data.status || "AVAILABLE",
       price: data.price,
       currency: data.currency || "USD",
@@ -118,6 +124,7 @@ export async function updatePropertyAction(
     description: string;
     operationType: OperationType;
     propertyType: PropertyType;
+    customPropertyType?: string | null;
     status: PropertyStatus;
     price: number;
     currency?: string;
@@ -140,6 +147,10 @@ export async function updatePropertyAction(
   const user = await getCurrentUser();
   if (!user) throw new Error("No autorizado");
 
+  if (data.images && data.images.length > 8) {
+    throw new Error("No se permiten más de 8 fotografías por propiedad.");
+  }
+
   await prisma.propertyImage.deleteMany({
     where: { propertyId: id },
   });
@@ -151,6 +162,7 @@ export async function updatePropertyAction(
       description: data.description,
       operationType: data.operationType,
       propertyType: data.propertyType,
+      customPropertyType: data.propertyType === "OTHER" ? data.customPropertyType?.trim() || null : null,
       status: data.status,
       price: data.price,
       currency: data.currency || "USD",
@@ -324,4 +336,35 @@ export async function uploadAvatarAction(
   await fs.promises.writeFile(path.join(uploadDir, uniqueName), buffer);
 
   return { success: true, url: `/uploads/agents/${uniqueName}` };
+}
+
+// Accion para subir fotografia de inmueble al servidor
+export async function uploadPropertyImageAction(
+  formData: FormData
+): Promise<{ success: boolean; url?: string; error?: string }> {
+  const user = await getCurrentUser();
+  if (!user) throw new Error("No autorizado");
+
+  const file = formData.get("file") as File | null;
+  if (!file) return { success: false, error: "No se seleccionó ningún archivo." };
+
+  if (!file.type.startsWith("image/")) {
+    return { success: false, error: "El archivo debe ser una imagen válida (PNG, JPG, WEBP)." };
+  }
+
+  if (file.size > 15 * 1024 * 1024) {
+    return { success: false, error: "La imagen no debe superar los 15MB." };
+  }
+
+  const bytes = await file.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+
+  const ext = file.name.split(".").pop()?.toLowerCase() || "webp";
+  const uniqueName = `prop-${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`;
+  const uploadDir = path.join(process.cwd(), "public", "uploads", "properties");
+
+  await fs.promises.mkdir(uploadDir, { recursive: true });
+  await fs.promises.writeFile(path.join(uploadDir, uniqueName), buffer);
+
+  return { success: true, url: `/uploads/properties/${uniqueName}` };
 }

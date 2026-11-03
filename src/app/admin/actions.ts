@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
 import fs from "fs";
 import path from "path";
+import { uploadToUploadThing } from "@/lib/uploadthing";
 import type { OperationType, PropertyType, PropertyStatus } from "@/generated/prisma/client";
 
 // Accion de inicio de sesion
@@ -307,7 +308,7 @@ export async function toggleAgentStatusAction(id: string) {
   return { success: true, isActive: updated.isActive };
 }
 
-// Accion para subir fotografia de asesor al servidor
+// Accion para subir fotografia de asesor al CDN de UploadThing
 export async function uploadAvatarAction(
   formData: FormData
 ): Promise<{ success: boolean; url?: string; error?: string }> {
@@ -325,20 +326,11 @@ export async function uploadAvatarAction(
     return { success: false, error: "La imagen no debe superar los 5MB." };
   }
 
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-
-  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-  const uniqueName = `agent-${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`;
-  const uploadDir = path.join(process.cwd(), "public", "uploads", "agents");
-
-  await fs.promises.mkdir(uploadDir, { recursive: true });
-  await fs.promises.writeFile(path.join(uploadDir, uniqueName), buffer);
-
-  return { success: true, url: `/uploads/agents/${uniqueName}` };
+  // Envio directo a UploadThing (cuenta de asesores)
+  return await uploadToUploadThing(file, "agent");
 }
 
-// Accion para subir fotografia de inmueble al servidor
+// Accion para subir fotografia de inmueble al CDN de UploadThing
 export async function uploadPropertyImageAction(
   formData: FormData
 ): Promise<{ success: boolean; url?: string; error?: string }> {
@@ -356,15 +348,6 @@ export async function uploadPropertyImageAction(
     return { success: false, error: "La imagen no debe superar los 15MB." };
   }
 
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-
-  const ext = file.name.split(".").pop()?.toLowerCase() || "webp";
-  const uniqueName = `prop-${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`;
-  const uploadDir = path.join(process.cwd(), "public", "uploads", "properties");
-
-  await fs.promises.mkdir(uploadDir, { recursive: true });
-  await fs.promises.writeFile(path.join(uploadDir, uniqueName), buffer);
-
-  return { success: true, url: `/uploads/properties/${uniqueName}` };
+  // Envio balanceado entre cuentas de UploadThing con failover automatico
+  return await uploadToUploadThing(file, "property");
 }

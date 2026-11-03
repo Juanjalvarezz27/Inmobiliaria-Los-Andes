@@ -64,6 +64,7 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
         name: a.name,
         position: a.position,
         avatarUrl: a.avatarUrl,
+        propertiesCount: a.propertiesCount,
       }));
   }, [agents]);
 
@@ -362,19 +363,34 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
                         {agent.isActive ? "Activo" : "Inactivo"}
                       </span>
 
-                      <button
-                        type="button"
-                        onClick={() => setAgentToToggle(agent)}
-                        disabled={isToggling}
-                        title={agent.isActive ? "Pausar asesor" : "Reactivar asesor"}
-                        className="p-1.5 rounded-xl bg-black/50 hover:bg-black/70 border border-white/20 text-white/90 hover:text-white backdrop-blur-md transition-all active:scale-95"
-                      >
-                        {isToggling ? (
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        ) : (
-                          <Power className="w-3.5 h-3.5" />
+                      <div className="flex items-center gap-1.5">
+                        {/* Boton para transferir cartera comercial si tiene inmuebles asignados */}
+                        {agent.propertiesCount > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => setAgentToTransfer(agent)}
+                            title={`Transferir cartera comercial (${agent.propertiesCount} inmuebles)`}
+                            className="p-1.5 rounded-xl bg-black/50 hover:bg-amber-600/80 border border-white/20 hover:border-amber-400/50 text-white/90 hover:text-white backdrop-blur-md transition-all active:scale-95 cursor-pointer shadow-xs"
+                          >
+                            <ArrowRightLeft className="w-3.5 h-3.5 text-amber-300" />
+                          </button>
                         )}
-                      </button>
+
+                        {/* Boton para pausar o reactivar asesor */}
+                        <button
+                          type="button"
+                          onClick={() => setAgentToToggle(agent)}
+                          disabled={isToggling}
+                          title={agent.isActive ? "Pausar asesor" : "Reactivar asesor"}
+                          className="p-1.5 rounded-xl bg-black/50 hover:bg-black/70 border border-white/20 text-white/90 hover:text-white backdrop-blur-md transition-all active:scale-95 cursor-pointer"
+                        >
+                          {isToggling ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <Power className="w-3.5 h-3.5" />
+                          )}
+                        </button>
+                      </div>
                     </div>
 
                     {/* Notch Curvo Invertido en la Base */}
@@ -421,30 +437,16 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
                   </div>
                 </div>
 
-                {/* Pie de Tarjeta: Accion de Edicion, Transferencia y Link a Detalle */}
-                <div className="mt-4 pt-3 border-t border-white/[0.08] flex items-center justify-between px-1.5 text-xs flex-wrap gap-2">
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() => openEditModal(agent)}
-                      className="inline-flex items-center gap-1.5 font-semibold text-neutral-400 hover:text-white transition-colors py-1 cursor-pointer"
-                    >
-                      <Edit2 className="w-3.5 h-3.5" />
-                      <span>Editar</span>
-                    </button>
-
-                    {agent.propertiesCount > 0 && (
-                      <button
-                        type="button"
-                        onClick={() => setAgentToTransfer(agent)}
-                        className="inline-flex items-center gap-1 font-semibold text-amber-400 hover:text-amber-300 transition-colors py-1 cursor-pointer"
-                        title="Transferir cartera de inmuebles a otro asesor"
-                      >
-                        <ArrowRightLeft className="w-3.5 h-3.5" />
-                        <span>Transferir ({agent.propertiesCount})</span>
-                      </button>
-                    )}
-                  </div>
+                {/* Pie de Tarjeta: Accion de Edicion y Link a Detalle */}
+                <div className="mt-4 pt-3 border-t border-white/[0.08] flex items-center justify-between px-1.5 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => openEditModal(agent)}
+                    className="inline-flex items-center gap-1.5 font-semibold text-neutral-400 hover:text-white transition-colors py-1 cursor-pointer"
+                  >
+                    <Edit2 className="w-3.5 h-3.5" />
+                    <span>Editar</span>
+                  </button>
 
                   <Link
                     href={`/admin/asesores/${agent.id}`}

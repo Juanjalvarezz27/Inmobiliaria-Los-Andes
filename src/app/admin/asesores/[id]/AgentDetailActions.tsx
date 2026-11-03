@@ -14,7 +14,7 @@ import {
 
 interface AgentDetailActionsProps {
   agent: AgentFormData;
-  agents: AgentOption[];
+  agents: (AgentOption & { propertiesCount?: number })[];
   properties?: TransferableProperty[];
 }
 

@@ -45,10 +45,18 @@ export default async function AgentDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  // Consulta de todos los asesores para el selector de asignacion
+  // Consulta de todos los asesores para el selector de asignacion y transferencia
   const allAgents = await prisma.user.findMany({
     where: { role: "AGENT", isActive: true },
-    select: { id: true, name: true, position: true, avatarUrl: true },
+    select: {
+      id: true,
+      name: true,
+      position: true,
+      avatarUrl: true,
+      _count: {
+        select: { properties: true },
+      },
+    },
     orderBy: { name: "asc" },
   });
 
@@ -209,7 +217,13 @@ export default async function AgentDetailPage({ params }: PageProps) {
               avatarUrl: agent.avatarUrl,
               isActive: agent.isActive,
             }}
-            agents={allAgents}
+            agents={allAgents.map((a) => ({
+              id: a.id,
+              name: a.name,
+              position: a.position,
+              avatarUrl: a.avatarUrl,
+              propertiesCount: a._count.properties,
+            }))}
             properties={serializedProperties.map((p) => ({
               id: p.id,
               title: p.title,

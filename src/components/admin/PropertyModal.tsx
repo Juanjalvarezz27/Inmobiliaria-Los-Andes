@@ -58,12 +58,12 @@ export function PropertyModal({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-in fade-in duration-200"
+      className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-in fade-in duration-100"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="relative w-full max-w-4xl bg-brand-primary rounded-3xl shadow-2xl shadow-black/50 overflow-hidden flex flex-col max-h-[92vh] border-0 animate-in fade-in zoom-in-95 duration-200 my-auto">
+      <div className="relative w-full max-w-4xl bg-brand-primary rounded-3xl shadow-2xl shadow-black/50 overflow-hidden flex flex-col max-h-[92vh] border-0 animate-in fade-in zoom-in-[0.98] duration-100 ease-out transform-gpu my-auto">
         {/* Cabecera solida verde de marca */}
         <div className="bg-gradient-to-r from-[#122b1c] via-[#1a3b26] to-[#0e2115] text-white p-5 sm:p-6 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3.5 min-w-0">

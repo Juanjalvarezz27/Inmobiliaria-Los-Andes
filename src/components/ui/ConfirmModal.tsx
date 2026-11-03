@@ -78,12 +78,12 @@ export function ConfirmModal({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 animate-in fade-in duration-100"
       onClick={(e) => {
         if (e.target === e.currentTarget && !isLoading) onClose();
       }}
     >
-      <div className="relative w-full max-w-md bg-white rounded-3xl border border-neutral-100 shadow-2xl p-6 sm:p-7 space-y-5 animate-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-md bg-white rounded-3xl border border-neutral-100 shadow-2xl p-6 sm:p-7 space-y-5 animate-in zoom-in-[0.98] duration-100 ease-out transform-gpu">
         {/* Cabecera del modal: Icono tematico y boton cerrar */}
         <div className="flex items-start justify-between gap-4">
           <div

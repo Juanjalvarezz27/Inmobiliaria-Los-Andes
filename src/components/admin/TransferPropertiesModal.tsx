@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import Image from "next/image";
+import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowRightLeft,
@@ -15,9 +14,9 @@ import {
   Square,
   User,
   ShieldAlert,
+  RotateCcw,
 } from "lucide-react";
 import { transferPropertiesAction } from "@/app/admin/actions";
-import { CustomSelect, CustomSelectOption } from "@/components/admin/CustomSelect";
 import { formatCurrency } from "@/lib/utils/format";
 
 export interface TransferableProperty {
@@ -37,6 +36,7 @@ export interface TransferAgentOption {
   name: string;
   position?: string | null;
   avatarUrl?: string | null;
+  propertiesCount?: number;
 }
 
 interface TransferPropertiesModalProps {
@@ -53,7 +53,17 @@ interface TransferPropertiesModalProps {
   onSuccess?: () => void;
 }
 
-// Modal interactivo para reasignar y transferir cartera inmobiliaria entre asesores
+// Generador de iniciales en texto plano sin sobrecargar imagenes en el DOM
+function getInitials(name: string): string {
+  if (!name) return "AS";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  }
+  return name.substring(0, 2).toUpperCase();
+}
+
+// Modal ultra-ligero para transferir cartera comercial entre asesores sin carga de imagenes
 export function TransferPropertiesModal({
   isOpen,
   onClose,
@@ -64,31 +74,40 @@ export function TransferPropertiesModal({
 }: TransferPropertiesModalProps) {
   const router = useRouter();
   const [targetAgentId, setTargetAgentId] = useState<string>("");
-  const [transferMode, setTransferMode] = useState<"ALL" | "SELECTED">("ALL");
+  // Ningun modo seleccionado por defecto
+  const [transferMode, setTransferMode] = useState<"ALL" | "SELECTED" | null>(null);
   const [selectedPropertyIds, setSelectedPropertyIds] = useState<string[]>([]);
+  const [agentSearchQuery, setAgentSearchQuery] = useState("");
   const [propertySearchQuery, setPropertySearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Opciones de asesores de destino excluyendo al asesor de origen
-  const targetAgentOptions: CustomSelectOption[] = useMemo(() => {
-    return availableAgents
-      .filter((agent) => agent.id !== sourceAgent.id)
-      .map((agent) => ({
-        value: agent.id,
-        label: agent.name,
-        description: agent.position || "Asesor Inmobiliario",
-        icon: agent.avatarUrl ? (
-          <div className="relative w-6 h-6 rounded-full overflow-hidden shrink-0 border border-neutral-200">
-            <Image src={agent.avatarUrl} alt="" fill sizes="24px" className="object-cover" />
-          </div>
-        ) : (
-          <div className="w-6 h-6 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center shrink-0">
-            <User className="w-3.5 h-3.5 text-neutral-500" />
-          </div>
-        ),
-      }));
-  }, [availableAgents, sourceAgent.id]);
+  // Cierre inmediato con tecla Escape
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !isLoading) {
+        onClose();
+      }
+    };
+    if (isOpen) {
+      window.addEventListener("keydown", handleKeyDown);
+    }
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, isLoading, onClose]);
+
+  // Filtro de asesores receptores: NO muestra opciones predefinidas si el buscador esta vacio
+  const filteredTargetAgents = useMemo(() => {
+    if (!agentSearchQuery.trim()) return [];
+    const others = availableAgents.filter((agent) => agent.id !== sourceAgent.id);
+    const q = agentSearchQuery.toLowerCase().trim();
+    return others.filter((a) => a.name.toLowerCase().includes(q));
+  }, [availableAgents, sourceAgent.id, agentSearchQuery]);
+
+  // Asesor destino seleccionado actualmente
+  const targetAgent = useMemo(
+    () => availableAgents.find((a) => a.id === targetAgentId),
+    [availableAgents, targetAgentId]
+  );
 
   // Filtrado de propiedades por busqueda local
   const filteredProperties = useMemo(() => {
@@ -104,7 +123,7 @@ export function TransferPropertiesModal({
 
   if (!isOpen) return null;
 
-  // Toggle de seleccion individual
+  // Toggle de seleccion individual de propiedad
   const toggleSelectProperty = (id: string) => {
     setSelectedPropertyIds((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
@@ -124,16 +143,30 @@ export function TransferPropertiesModal({
 
   // Cantidad efectiva a transferir
   const countToTransfer =
-    transferMode === "ALL" ? properties.length : selectedPropertyIds.length;
+    transferMode === "ALL"
+      ? properties.length
+      : transferMode === "SELECTED"
+      ? selectedPropertyIds.length
+      : 0;
 
-  const targetAgent = availableAgents.find((a) => a.id === targetAgentId);
+  // Validacion de boton de accion
+  const canSubmit =
+    Boolean(targetAgentId) &&
+    transferMode !== null &&
+    (transferMode === "ALL" || (transferMode === "SELECTED" && selectedPropertyIds.length > 0)) &&
+    !isLoading;
 
   // Ejecucion de la transferencia en base de datos
   const handleTransfer = async () => {
     setErrorMessage(null);
 
     if (!targetAgentId) {
-      setErrorMessage("Por favor selecciona el asesor que recibirá las propiedades.");
+      setErrorMessage("Por favor busca y selecciona el asesor que recibirá las propiedades.");
+      return;
+    }
+
+    if (!transferMode) {
+      setErrorMessage("Por favor selecciona qué inmuebles deseas transferir.");
       return;
     }
 
@@ -165,13 +198,18 @@ export function TransferPropertiesModal({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-neutral-950/65 backdrop-blur-xs animate-in fade-in duration-200"
+      onClick={(e) => {
+        if (e.target === e.currentTarget && !isLoading) {
+          onClose();
+        }
+      }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 animate-in fade-in duration-100"
     >
-      <div className="bg-white rounded-3xl border border-neutral-200 shadow-2xl w-full max-w-2xl max-h-[92vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+      <div className="bg-white rounded-3xl border border-neutral-200 shadow-2xl w-full max-w-2xl max-h-[92vh] flex flex-col overflow-hidden animate-in zoom-in-[0.98] duration-100 ease-out transform-gpu">
         {/* Encabezado del Modal */}
         <div className="p-5 sm:p-6 border-b border-neutral-100 flex items-center justify-between bg-gradient-to-r from-orange-50/60 to-transparent">
           <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-2xl bg-brand-accent/10 border border-brand-accent/20 flex items-center justify-center text-brand-accent shrink-0">
+            <div className="w-10 h-10 rounded-2xl bg-brand-accent/10 border border-brand-accent/20 flex items-center justify-center text-brand-accent shrink-0">
               <ArrowRightLeft className="w-5 h-5" />
             </div>
             <div>
@@ -179,7 +217,7 @@ export function TransferPropertiesModal({
                 Transferir Cartera de Inmuebles
               </h2>
               <p className="text-xs text-text-secondary">
-                Reasigna inmuebles de un asesor a otro de forma masiva o selectiva.
+                Reasigna la titularidad comercial entre miembros del equipo.
               </p>
             </div>
           </div>
@@ -196,7 +234,7 @@ export function TransferPropertiesModal({
         </div>
 
         {/* Cuerpo del Modal con Scroll */}
-        <div className="p-5 sm:p-6 overflow-y-auto space-y-6 flex-1">
+        <div className="p-5 sm:p-6 overflow-y-auto space-y-5 flex-1">
           {/* Mensaje de error si ocurre alguno */}
           {errorMessage && (
             <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 flex items-start gap-2.5 text-xs text-red-700">
@@ -205,79 +243,183 @@ export function TransferPropertiesModal({
             </div>
           )}
 
-          {/* Comparativa visual: Asesor Origen y Asesor Destino */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
-            {/* Asesor Origen (Fijo) */}
-            <div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-200/80 space-y-2">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-text-secondary block">
-                Asesor de Origen (Actual)
+          {/* Bloques de Asesores dispuestos uno debajo del otro de forma independiente */}
+          <div className="space-y-3.5">
+            {/* 1. ASESOR DE ORIGEN (ACTUAL) */}
+            <div className="p-4 rounded-2xl bg-neutral-50/90 border border-neutral-200/90 space-y-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-text-secondary block">
+                1. Asesor de Origen (Actual)
               </span>
-              <div className="flex items-center gap-3">
-                <div className="relative w-11 h-11 rounded-full overflow-hidden bg-neutral-200 shrink-0 border border-neutral-300">
-                  {sourceAgent.avatarUrl ? (
-                    <Image
-                      src={sourceAgent.avatarUrl}
-                      alt={sourceAgent.name}
-                      fill
-                      sizes="44px"
-                      className="object-cover"
-                    />
-                  ) : (
-                    <User className="w-5 h-5 m-auto text-neutral-500" />
-                  )}
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 rounded-xl bg-brand-primary/10 text-brand-primary font-bold text-xs flex items-center justify-center shrink-0 border border-brand-primary/20 shadow-2xs">
+                    {getInitials(sourceAgent.name)}
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="font-extrabold text-sm text-text-primary truncate">{sourceAgent.name}</h3>
+                  </div>
                 </div>
-                <div className="min-w-0">
-                  <h3 className="font-extrabold text-sm text-text-primary truncate">{sourceAgent.name}</h3>
-                  <p className="text-xs text-text-secondary truncate">
-                    {sourceAgent.position || "Asesor Inmobiliario"}
-                  </p>
-                  <span className="inline-block mt-1 text-[11px] font-bold text-brand-accent">
-                    {properties.length} inmuebles en cartera
+
+                <div className="text-right shrink-0">
+                  <span className="text-xs font-bold text-brand-accent block">
+                    {properties.length} {properties.length === 1 ? "inmueble" : "inmuebles"}
                   </span>
+                  {countToTransfer > 0 && (
+                    <span className="text-[10px] text-text-secondary block">
+                      Quedará con {properties.length - countToTransfer}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
 
-            {/* Asesor Destino (Selector) */}
-            <div className="p-4 rounded-2xl bg-orange-50/40 border border-brand-accent/20 space-y-2">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-brand-accent block">
-                Nuevo Asesor Receptor (Destino)
-              </span>
-              <CustomSelect
-                value={targetAgentId}
-                onChange={(val) => setTargetAgentId(val)}
-                options={targetAgentOptions}
-                placeholder="Seleccionar asesor receptor..."
-                searchable
-                searchPlaceholder="Buscar por nombre o cargo..."
-                emptySearchMessage="No hay otros asesores disponibles"
-                size="sm"
-                dropdownClassName="w-full sm:w-80 shadow-2xl"
-              />
+            {/* 2. ASESOR RECEPTOR (DESTINO) CON BUSCADOR DINÁMICO */}
+            <div
+              className={`p-4 rounded-2xl border transition-all space-y-2.5 ${
+                targetAgent
+                  ? "bg-emerald-50/40 border-emerald-300 ring-2 ring-emerald-500/20"
+                  : "bg-orange-50/30 border-neutral-200/90"
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span
+                  className={`text-[10px] font-bold uppercase tracking-wider block ${
+                    targetAgent ? "text-emerald-800" : "text-brand-accent"
+                  }`}
+                >
+                  2. Asesor Receptor (Destino)
+                </span>
+
+                {targetAgent && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTargetAgentId("");
+                      setAgentSearchQuery("");
+                    }}
+                    className="text-[11px] font-extrabold text-brand-accent hover:underline inline-flex items-center gap-1 cursor-pointer"
+                    title="Buscar otro asesor"
+                  >
+                    <RotateCcw className="w-3 h-3" />
+                    <span>Cambiar asesor</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Si ya hay un asesor seleccionado: Tarjeta limpia con sus datos */}
+              {targetAgent ? (
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center justify-center shrink-0 border border-emerald-300 shadow-2xs">
+                      {getInitials(targetAgent.name)}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <h3 className="font-extrabold text-sm text-text-primary truncate">{targetAgent.name}</h3>
+                        <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="text-right shrink-0">
+                    <span className="text-xs font-bold text-emerald-700 block">
+                      {targetAgent.propertiesCount ?? 0} actuales
+                    </span>
+                    {countToTransfer > 0 && (
+                      <span className="text-[10px] font-extrabold text-emerald-800 block">
+                        ➔ Tendrá {(targetAgent.propertiesCount ?? 0) + countToTransfer} (+{countToTransfer})
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                /* Si no hay asesor seleccionado: Buscador puro sin opciones predefinidas */
+                <div className="space-y-2">
+                  <div className="relative">
+                    <Search className="w-3.5 h-3.5 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      type="text"
+                      value={agentSearchQuery}
+                      onChange={(e) => setAgentSearchQuery(e.target.value)}
+                      placeholder="Escribe el nombre del asesor para buscar..."
+                      className="w-full pl-9 pr-3 py-2 bg-white border border-neutral-200 rounded-xl text-xs font-semibold text-text-primary placeholder:text-neutral-400 focus:outline-none focus:border-brand-accent focus:ring-1 focus:ring-brand-accent/20 transition-all shadow-2xs"
+                      autoFocus
+                    />
+                  </div>
+
+                  {/* Resultados de búsqueda (Solo aparecen al escribir) */}
+                  {!agentSearchQuery.trim() ? (
+                    <p className="text-[11px] text-text-secondary px-1">
+                      Comienza a escribir para buscar al asesor que recibirá los inmuebles.
+                    </p>
+                  ) : filteredTargetAgents.length === 0 ? (
+                    <div className="py-3 px-3 text-center text-xs text-text-secondary bg-white rounded-xl border border-neutral-200/80">
+                      No se encontró ningún asesor que coincida con &quot;{agentSearchQuery}&quot;.
+                    </div>
+                  ) : (
+                    <div className="max-h-40 overflow-y-auto space-y-1 pr-0.5 border border-neutral-200/80 rounded-xl p-1 bg-white">
+                      {filteredTargetAgents.map((candidate) => (
+                        <button
+                          key={candidate.id}
+                          type="button"
+                          onClick={() => {
+                            setTargetAgentId(candidate.id);
+                            setAgentSearchQuery("");
+                          }}
+                          className="w-full p-2.5 rounded-lg bg-neutral-50/60 hover:bg-orange-50/80 border border-transparent hover:border-brand-accent/40 flex items-center justify-between gap-2.5 transition-all cursor-pointer text-left group"
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <div className="w-7 h-7 rounded-lg bg-brand-primary/10 text-brand-primary flex items-center justify-center font-bold text-[11px] shrink-0 border border-brand-primary/20">
+                              {getInitials(candidate.name)}
+                            </div>
+                            <div className="min-w-0 truncate">
+                              <span className="font-bold text-xs text-text-primary group-hover:text-brand-accent block truncate">
+                                {candidate.name}
+                              </span>
+                            </div>
+                          </div>
+
+                          <span className="text-[10px] font-bold text-neutral-500 bg-neutral-200/70 px-2 py-0.5 rounded-md shrink-0">
+                            {candidate.propertiesCount ?? 0} inm. actuales
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Selector de Modo de Transferencia */}
+          {/* Selector de Modo de Transferencia (Ninguno seleccionado por defecto) */}
           <div className="space-y-3">
-            <span className="text-xs font-bold text-text-primary block">
-              ¿Qué inmuebles deseas transferir?
-            </span>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-text-primary block">
+                ¿Qué inmuebles deseas transferir? <span className="text-red-500">*</span>
+              </span>
+              {transferMode === null && (
+                <span className="text-[11px] font-bold text-brand-accent">
+                  (Elige una opción)
+                </span>
+              )}
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {/* Opcion: Toda la cartera */}
+              {/* Opcion 1: Toda la cartera completa */}
               <button
                 type="button"
                 onClick={() => setTransferMode("ALL")}
-                className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex items-start gap-3 ${
+                className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex items-start gap-3 ${
                   transferMode === "ALL"
-                    ? "bg-brand-primary/5 border-brand-primary ring-2 ring-brand-primary/20"
-                    : "bg-white border-neutral-200 hover:border-neutral-300"
+                    ? "bg-brand-primary/5 border-brand-primary ring-2 ring-brand-primary/20 shadow-xs"
+                    : "bg-white border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50/50"
                 }`}
               >
                 <div
-                  className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 mt-0.5 ${
+                  className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
                     transferMode === "ALL"
                       ? "border-brand-primary bg-brand-primary text-white"
-                      : "border-neutral-300"
+                      : "border-neutral-300 bg-white"
                   }`}
                 >
                   {transferMode === "ALL" && <Check className="w-3 h-3" />}
@@ -287,26 +429,26 @@ export function TransferPropertiesModal({
                     Toda la cartera completa
                   </h4>
                   <p className="text-xs text-text-secondary mt-0.5">
-                    Transfiere todos los {properties.length} inmuebles asignados a este asesor de una sola vez.
+                    Transfiere todos los {properties.length} inmuebles asignados a este asesor.
                   </p>
                 </div>
               </button>
 
-              {/* Opcion: Inmuebles seleccionados */}
+              {/* Opcion 2: Inmuebles seleccionados */}
               <button
                 type="button"
                 onClick={() => setTransferMode("SELECTED")}
-                className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex items-start gap-3 ${
+                className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex items-start gap-3 ${
                   transferMode === "SELECTED"
-                    ? "bg-brand-primary/5 border-brand-primary ring-2 ring-brand-primary/20"
-                    : "bg-white border-neutral-200 hover:border-neutral-300"
+                    ? "bg-brand-primary/5 border-brand-primary ring-2 ring-brand-primary/20 shadow-xs"
+                    : "bg-white border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50/50"
                 }`}
               >
                 <div
-                  className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 mt-0.5 ${
+                  className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
                     transferMode === "SELECTED"
                       ? "border-brand-primary bg-brand-primary text-white"
-                      : "border-neutral-300"
+                      : "border-neutral-300 bg-white"
                   }`}
                 >
                   {transferMode === "SELECTED" && <Check className="w-3 h-3" />}
@@ -316,20 +458,20 @@ export function TransferPropertiesModal({
                     Seleccionar específicos
                   </h4>
                   <p className="text-xs text-text-secondary mt-0.5">
-                    Elige individualmente cuáles inmuebles transferir y cuáles conservar.
+                    Elige individualmente cuáles inmuebles transferir con casillas.
                   </p>
                 </div>
               </button>
             </div>
           </div>
 
-          {/* Lista interactiva con checkboxes si se eligio modo especifico */}
+          {/* Lista interactiva con checkboxes sin sobrecarga de imagenes */}
           {transferMode === "SELECTED" && (
-            <div className="space-y-3 pt-2">
+            <div className="space-y-3 pt-1 animate-in fade-in duration-100">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                 {/* Buscador interno de propiedades */}
                 <div className="relative flex-1">
-                  <Search className="w-3.5 h-3.5 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Search className="w-3.5 h-3.5 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="text"
                     value={propertySearchQuery}
@@ -341,12 +483,16 @@ export function TransferPropertiesModal({
 
                 {/* Botones rapidos de seleccion */}
                 <div className="flex items-center gap-2 text-xs shrink-0">
+                  <span className="font-bold text-brand-primary">
+                    {selectedPropertyIds.length} seleccionados
+                  </span>
+                  <span className="text-neutral-300">•</span>
                   <button
                     type="button"
                     onClick={handleSelectAll}
                     className="text-brand-accent hover:underline font-bold cursor-pointer"
                   >
-                    Seleccionar todos
+                    Todos
                   </button>
                   <span className="text-neutral-300">•</span>
                   <button
@@ -354,7 +500,7 @@ export function TransferPropertiesModal({
                     onClick={handleDeselectAll}
                     className="text-text-secondary hover:text-text-primary font-semibold cursor-pointer"
                   >
-                    Limpiar
+                    Ninguno
                   </button>
                 </div>
               </div>
@@ -390,13 +536,9 @@ export function TransferPropertiesModal({
                             {isSelected ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}
                           </div>
 
-                          {/* Imagen Miniatura */}
-                          <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-neutral-100 shrink-0 border border-neutral-200">
-                            {prop.coverImage ? (
-                              <Image src={prop.coverImage} alt="" fill sizes="48px" className="object-cover" />
-                            ) : (
-                              <Building2 className="w-5 h-5 m-auto text-neutral-400" />
-                            )}
+                          {/* Icono de Inmueble en lugar de imagen pesada */}
+                          <div className="w-8 h-8 rounded-lg bg-orange-50 text-brand-accent flex items-center justify-center shrink-0 border border-orange-100/80">
+                            <Building2 className="w-4 h-4" />
                           </div>
 
                           {/* Datos del Inmueble */}
@@ -428,22 +570,30 @@ export function TransferPropertiesModal({
           )}
 
           {/* Aviso informativo de confirmacion */}
-          <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200/70 flex items-start gap-2.5 text-xs text-amber-900">
-            <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-            <p>
-              Al confirmar, los <strong>{countToTransfer} inmuebles</strong> pasarán inmediatamente a estar a nombre de{" "}
-              <strong>{targetAgent?.name || "el asesor seleccionado"}</strong>. Los enlaces públicos y los datos de contacto se actualizarán al instante.
-            </p>
-          </div>
+          {targetAgent && transferMode !== null && countToTransfer > 0 && (
+            <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200/70 flex items-start gap-2.5 text-xs text-amber-900 animate-in fade-in duration-100">
+              <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <p>
+                Al confirmar, <strong>{countToTransfer} inmuebles</strong> pasarán inmediatamente a la cartera de{" "}
+                <strong>{targetAgent.name}</strong>. En la web pública y en el panel administrativo se actualizará el contacto de forma instantánea.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Pie de Accion del Modal */}
         <div className="p-4 sm:p-5 border-t border-neutral-100 bg-neutral-50 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="text-xs text-text-secondary font-semibold text-center sm:text-left">
-            Total a transferir:{" "}
-            <span className="font-extrabold text-brand-primary">
-              {countToTransfer} de {properties.length} inmuebles
-            </span>
+            {transferMode === null ? (
+              <span className="text-neutral-500">Paso 1: Busca al asesor receptor y elige modalidad</span>
+            ) : (
+              <>
+                Total a transferir:{" "}
+                <span className="font-extrabold text-brand-primary">
+                  {countToTransfer} de {properties.length} inmuebles
+                </span>
+              </>
+            )}
           </div>
 
           <div className="flex items-center gap-2.5 w-full sm:w-auto">
@@ -458,7 +608,7 @@ export function TransferPropertiesModal({
             <button
               type="button"
               onClick={handleTransfer}
-              disabled={isLoading || !targetAgentId || countToTransfer === 0}
+              disabled={!canSubmit}
               className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-gradient-to-r from-brand-accent to-[#c94b21] hover:shadow-lg hover:shadow-brand-accent/25 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-md transition-all active:scale-95 disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
             >
               {isLoading ? (
@@ -466,10 +616,16 @@ export function TransferPropertiesModal({
                   <Loader2 className="w-4 h-4 animate-spin" />
                   <span>Transfiriendo...</span>
                 </>
+              ) : !targetAgentId ? (
+                <span>Busca Asesor Receptor</span>
+              ) : transferMode === null ? (
+                <span>Elige Modalidad</span>
+              ) : transferMode === "SELECTED" && selectedPropertyIds.length === 0 ? (
+                <span>Selecciona Inmuebles</span>
               ) : (
                 <>
                   <ArrowRightLeft className="w-4 h-4" />
-                  <span>Transferir {countToTransfer} Inmuebles</span>
+                  <span>Confirmar Transferencia ({countToTransfer})</span>
                 </>
               )}
             </button>
@@ -479,4 +635,3 @@ export function TransferPropertiesModal({
     </div>
   );
 }
-

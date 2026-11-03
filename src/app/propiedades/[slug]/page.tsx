@@ -73,7 +73,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
     <div className="min-h-screen flex flex-col bg-ui-background">
       <Navbar />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-28 sm:pt-34 pb-16 space-y-8">
         {/* Enlace de regreso */}
         <div>
           <Link

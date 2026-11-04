@@ -119,16 +119,25 @@ export default async function HomePage({ searchParams }: PageProps) {
     propertiesCount: a._count.properties,
   }));
 
+  // Fotografias reales de propiedades para el carrusel de fondo del Hero
+  const heroBackgroundSlides = properties
+    .filter((p) => p.images.length > 0)
+    .map((p) => ({
+      url: p.images[0].url,
+      caption: p.title,
+    }))
+    .slice(0, 5);
+
   return (
     <div className="min-h-screen flex flex-col bg-[#f8faf8]">
       {/* Navegacion Superior */}
       <Navbar />
 
-      {/* Hero Principal con Buscador */}
-      <HeroSearch />
+      {/* Hero Principal con Buscador y Fondo Dinamico */}
+      <HeroSearch slides={heroBackgroundSlides} />
 
       {/* Seccion Principal del Catalogo */}
-      <main id="catalogo" className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-8">
+      <main id="catalogo" className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-8">
         {/* Cabecera del Catalogo */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-neutral-200/80 pb-6">
           <div className="space-y-1">
@@ -137,7 +146,7 @@ export default async function HomePage({ searchParams }: PageProps) {
               <span>Inventario Disponible</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-black text-brand-primary font-heading tracking-tight">
-              Catálogo de Inmuebles en Trujillo
+              Catálogo de Inmuebles Disponibles
             </h2>
             <p className="text-xs sm:text-sm text-text-secondary">
               Propiedades verificadas con asesoría personalizada y trámites al día.

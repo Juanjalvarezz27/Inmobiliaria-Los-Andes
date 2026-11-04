@@ -20,6 +20,15 @@ export function CatalogFilterBar({ totalResults }: CatalogFilterBarProps) {
   const hasActiveFilters =
     currentOperation !== "ALL" || currentType !== "ALL" || Boolean(currentQuery) || currentSort !== "recientes";
 
+  const scrollToCatalog = () => {
+    setTimeout(() => {
+      const catalog = document.getElementById("catalogo");
+      if (catalog) {
+        catalog.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 100);
+  };
+
   const updateParam = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
     if (value === "ALL" || value === "recientes" || !value) {
@@ -31,10 +40,12 @@ export function CatalogFilterBar({ totalResults }: CatalogFilterBarProps) {
     params.set("page", "1");
     const query = params.toString();
     router.push(`/${query ? `?${query}` : ""}#catalogo`);
+    scrollToCatalog();
   };
 
   const handleResetFilters = () => {
     router.push("/#catalogo");
+    scrollToCatalog();
   };
 
   const propertyTypeButtons = [

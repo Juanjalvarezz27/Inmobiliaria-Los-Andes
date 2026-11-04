@@ -99,6 +99,7 @@ export function HeroSearch({ slides }: HeroSearchProps) {
     if (searchParams.toString()) {
       router.push("/#catalogo");
     }
+    scrollToCatalog();
   };
 
   // Control del desplegable personalizado de Tipo de Inmueble
@@ -129,6 +130,16 @@ export function HeroSearch({ slides }: HeroSearchProps) {
 
     const queryString = params.toString();
     router.push(`/${queryString ? `?${queryString}` : ""}#catalogo`);
+    scrollToCatalog();
+  };
+
+  const scrollToCatalog = () => {
+    setTimeout(() => {
+      const catalog = document.getElementById("catalogo");
+      if (catalog) {
+        catalog.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 100);
   };
 
   return (
@@ -148,7 +159,7 @@ export function HeroSearch({ slides }: HeroSearchProps) {
                 src={slide.url}
                 alt={slide.caption || "Inmueble de lujo"}
                 fill
-                priority={idx === 0}
+                preload={idx === 0}
                 sizes="100vw"
                 className={`object-cover transform transition-transform duration-[7000ms] ease-out will-change-transform ${
                   isActive ? "scale-110 translate-x-1 -translate-y-1" : "scale-100 translate-x-0 translate-y-0"

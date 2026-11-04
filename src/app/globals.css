@@ -7,19 +7,71 @@
   --color-ui-surface: #ffffff;
   --color-text-primary: #1f2937;
   --color-text-secondary: #6b7280;
-  --font-sans: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-heading: var(--font-plus-jakarta), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --color-font-sans: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --color-font-heading: var(--font-plus-jakarta), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 body {
   background-color: var(--color-ui-background);
   color: var(--color-text-primary);
-  font-family: var(--font-sans);
+  font-family: var(--color-font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-heading);
+/* Desplazamiento suave hacia anclas (secciones con id) */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--color-font-heading);
   letter-spacing: -0.025em;
+}
+
+/* ============================================================
+   Animaciones del banner del catalogo (franja naranja)
+   ============================================================ */
+
+@keyframes brand-gradient-x {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes brand-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-brand-gradient {
+  background-size: 200% 200%;
+  animation: brand-gradient-x 22s ease-in-out infinite;
+}
+
+.animate-brand-fade-up {
+  animation: brand-fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-brand-gradient,
+  .animate-brand-fade-up {
+    animation: none;
+  }
 }

@@ -2,13 +2,13 @@ import { prisma } from "@/lib/prisma";
 import { Navbar } from "@/components/public/Navbar";
 import { Footer } from "@/components/public/Footer";
 import { HeroSearch } from "@/components/public/HeroSearch";
-import { CatalogFilterBar } from "@/components/public/CatalogFilterBar";
 import { PropertyCard, type PropertyCardData } from "@/components/public/PropertyCard";
+import { CatalogBanner } from "@/components/public/CatalogBanner";
 import { FeaturedAgentsSection, type FeaturedAgentData } from "@/components/public/FeaturedAgentsSection";
 import { TrustSection } from "@/components/public/TrustSection";
 import { FloatingWhatsApp } from "@/components/public/FloatingWhatsApp";
 import { PublicPagination } from "@/components/public/PublicPagination";
-import { Sparkles, FilterX } from "lucide-react";
+import { FilterX } from "lucide-react";
 import Link from "next/link";
 import type { Prisma, OperationType, PropertyType } from "@/generated/prisma/client";
 
@@ -70,8 +70,9 @@ export default async function HomePage({ searchParams }: PageProps) {
   }
 
   // Consultas concurrentes en base de datos
-  const [totalPropertiesCount, properties, activeAgents] = await Promise.all([
+  const [totalPropertiesCount, totalAgentsCount, properties, activeAgents] = await Promise.all([
     prisma.property.count({ where: whereClause }),
+    prisma.user.count({ where: { role: "AGENT", isActive: true } }),
     prisma.property.findMany({
       where: whereClause,
       include: {
@@ -136,87 +137,74 @@ export default async function HomePage({ searchParams }: PageProps) {
       {/* Hero Principal con Buscador y Fondo Dinamico */}
       <HeroSearch slides={heroBackgroundSlides} />
 
+      {/* Franja destacada del catalogo (ancho completo) */}
+      <CatalogBanner totalProperties={totalPropertiesCount} totalAgents={totalAgentsCount} />
+
       {/* Seccion Principal del Catalogo */}
-      <main id="catalogo" className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-8">
-        {/* Cabecera del Catalogo */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-neutral-200/80 pb-6">
-          <div className="space-y-1">
-            <div className="inline-flex items-center gap-2 text-brand-accent text-xs font-bold uppercase tracking-wider">
-              <Sparkles className="w-4 h-4" />
-              <span>Inventario Disponible</span>
+      <main className="relative z-10 flex-1 w-full">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-8">
+          {/* Grilla de Propiedades o Estado Vacio */}
+          {properties.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+                {properties.map((property, index) => (
+                  <PropertyCard
+                    key={property.id}
+                    eager={index === 0}
+                    property={{
+                      id: property.id,
+                      title: property.title,
+                      slug: property.slug,
+                      operationType: property.operationType as "SALE" | "RENT",
+                      propertyType: property.propertyType,
+                      customPropertyType: property.customPropertyType,
+                      status: property.status as PropertyCardData["status"],
+                      price: property.price.toString(),
+                      currency: property.currency,
+                      bedrooms: property.bedrooms,
+                      bathrooms: property.bathrooms,
+                      parkingSpots: property.parkingSpots,
+                      areaSquareMeters: property.areaSquareMeters?.toString(),
+                      city: property.city,
+                      sector: property.sector,
+                      images: property.images,
+                      agent: property.agent,
+                    }}
+                  />
+                ))}
+              </div>
+
+              {/* Paginacion Paginada Dinamica */}
+              <PublicPagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={totalPropertiesCount}
+                itemsPerPage={PAGE_SIZE}
+              />
+            </>
+          ) : (
+            /* Estado Vacio cuando no hay coincidencias */
+            <div className="bg-white p-12 sm:p-16 rounded-3xl border border-neutral-200 text-center max-w-lg mx-auto space-y-4 shadow-sm">
+              <div className="w-16 h-16 mx-auto rounded-2xl bg-orange-50 text-brand-accent flex items-center justify-center border border-orange-100">
+                <FilterX className="w-8 h-8" />
+              </div>
+              <h3 className="text-lg font-black text-brand-primary font-heading">
+                No se encontraron inmuebles
+              </h3>
+              <p className="text-xs sm:text-sm text-text-secondary leading-relaxed">
+                No encontramos propiedades que coincidan exactamente con tu criterio de búsqueda. Prueba modificando los filtros o restableciendo los valores.
+              </p>
+              <div className="pt-2">
+                <Link
+                  href="/#catalogo"
+                  className="inline-flex items-center justify-center px-6 py-2.5 bg-brand-primary hover:bg-[#122b1c] text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95"
+                >
+                  Ver todos los inmuebles
+                </Link>
+              </div>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black text-brand-primary font-heading tracking-tight">
-              Catálogo de Inmuebles Disponibles
-            </h2>
-            <p className="text-xs sm:text-sm text-text-secondary">
-              Propiedades verificadas con asesoría personalizada y trámites al día.
-            </p>
-          </div>
+          )}
         </div>
-
-        {/* Barra de Filtros Interactiva y Ordenamiento */}
-        <CatalogFilterBar totalResults={totalPropertiesCount} />
-
-        {/* Grilla de Propiedades o Estado Vacio */}
-        {properties.length > 0 ? (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
-              {properties.map((property) => (
-                <PropertyCard
-                  key={property.id}
-                  property={{
-                    id: property.id,
-                    title: property.title,
-                    slug: property.slug,
-                    operationType: property.operationType as "SALE" | "RENT",
-                    propertyType: property.propertyType,
-                    customPropertyType: property.customPropertyType,
-                    status: property.status as PropertyCardData["status"],
-                    price: property.price.toString(),
-                    currency: property.currency,
-                    bedrooms: property.bedrooms,
-                    bathrooms: property.bathrooms,
-                    parkingSpots: property.parkingSpots,
-                    areaSquareMeters: property.areaSquareMeters?.toString(),
-                    city: property.city,
-                    sector: property.sector,
-                    images: property.images,
-                    agent: property.agent,
-                  }}
-                />
-              ))}
-            </div>
-
-            {/* Paginacion Paginada Dinamica */}
-            <PublicPagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalItems={totalPropertiesCount}
-              itemsPerPage={PAGE_SIZE}
-            />
-          </>
-        ) : (
-          /* Estado Vacio cuando no hay coincidencias */
-          <div className="bg-white p-12 sm:p-16 rounded-3xl border border-neutral-200 text-center max-w-lg mx-auto space-y-4 shadow-sm">
-            <div className="w-16 h-16 mx-auto rounded-2xl bg-orange-50 text-brand-accent flex items-center justify-center border border-orange-100">
-              <FilterX className="w-8 h-8" />
-            </div>
-            <h3 className="text-lg font-black text-brand-primary font-heading">
-              No se encontraron inmuebles
-            </h3>
-            <p className="text-xs sm:text-sm text-text-secondary leading-relaxed">
-              No encontramos propiedades que coincidan exactamente con tu criterio de búsqueda. Prueba modificando los filtros o restableciendo los valores.
-            </p>
-            <div className="pt-2">
-              <Link
-                href="/#catalogo"
-                className="inline-flex items-center justify-center px-6 py-2.5 bg-brand-primary hover:bg-[#122b1c] text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95"
-              >
-                Ver todos los inmuebles
-              </Link>
-            </div>
-          </div>
-        )}
       </main>
 
       {/* Seccion Destacada de Asesores Inmobiliarios */}

@@ -59,7 +59,14 @@ function getInitials(name: string): string {
 }
 
 // Tarjeta ejecutiva de propiedad para el catalogo publico con contacto directo por WhatsApp
-export function PropertyCard({ property }: { property: PropertyCardData }) {
+export function PropertyCard({
+  property,
+  eager = false,
+}: {
+  property: PropertyCardData;
+  // Carga inmediata para la primera tarjeta visible cerca del pliegue
+  eager?: boolean;
+}) {
   const mainImage =
     property.images.find((img) => img.isMain)?.url ||
     property.images[0]?.url ||
@@ -91,6 +98,7 @@ export function PropertyCard({ property }: { property: PropertyCardData }) {
           src={mainImage}
           alt={property.title}
           fill
+          loading={eager ? "eager" : "lazy"}
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className={`object-cover group-hover:scale-105 transition-transform duration-700 ease-out ${
             isSoldOrRented ? "grayscale opacity-80" : ""

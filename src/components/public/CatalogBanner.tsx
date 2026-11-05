@@ -1,4 +1,5 @@
 import { Building2, Users } from "lucide-react";
+import { AnimatedCount } from "./AnimatedCount";
 import { CatalogBannerDecor } from "./CatalogBannerDecor";
 
 interface CatalogBannerProps {
@@ -6,45 +7,30 @@ interface CatalogBannerProps {
   totalAgents: number;
 }
 
-// Franja institucional a todo el ancho que separa el hero del catalogo
-// y resume el inventario disponible con estadisticas animadas.
+// Franja institucional con estilo tipográfico monumental: 2 elementos por métrica (Concepto e Icono unificados + Cifra)
 export function CatalogBanner({ totalProperties, totalAgents }: CatalogBannerProps) {
-  const formatNumber = (value: number) => value.toLocaleString("es-VE");
-
-  const stats = [
-    {
-      icon: Building2,
-      value: formatNumber(totalProperties),
-      label: "Inmuebles disponibles",
-    },
-    {
-      icon: Users,
-      value: formatNumber(totalAgents),
-      label: "Asesores expertos",
-    },
-  ];
-
   return (
     <section
       id="catalogo"
-      className="relative isolate w-full overflow-hidden border-y border-white/15 bg-gradient-to-br from-[#f07038] via-brand-accent to-[#9c2f0c] animate-brand-gradient text-white"
+      className="relative isolate w-full overflow-hidden border-y border-neutral-200/90 bg-gradient-to-br from-[#faf7f3] via-[#faede4] to-[#f6f1ec] text-neutral-900"
     >
-      {/* Decoracion de fondo (resplandores y brillo) sincronizada con el scroll */}
+      {/* Fondo interactivo al scroll con destellos cálidos de luz naranja */}
       <CatalogBannerDecor />
 
-      <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
-        <div className="grid items-center gap-10 lg:grid-cols-[1.55fr_1fr] lg:gap-14">
-          {/* Bloque de titulo */}
+      <div className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+        <div className="grid items-center gap-10 lg:grid-cols-[1.25fr_1fr] lg:gap-14">
+          {/* Bloque de título institucional limpio */}
           <div className="animate-brand-fade-up text-center lg:text-left">
-            <h2 className="text-3xl font-black leading-[1.05] tracking-tight font-heading drop-shadow-[0_6px_20px_rgba(0,0,0,0.25)] sm:text-4xl lg:text-5xl xl:text-[3.4rem]">
+            <h2 className="text-3xl font-black leading-[1.08] tracking-tight font-heading text-brand-primary sm:text-4xl lg:text-5xl xl:text-[3.25rem]">
               Catálogo de{" "}
-              <span className="relative inline-block whitespace-nowrap">
+              <span className="relative inline-block whitespace-nowrap text-brand-accent">
                 Inmuebles
+                {/* Trazo orgánico artesanal debajo de Inmuebles */}
                 <svg
                   aria-hidden
                   viewBox="0 0 300 14"
                   preserveAspectRatio="none"
-                  className="absolute -bottom-1.5 left-0 h-2.5 w-full text-white/45"
+                  className="absolute -bottom-1.5 left-0 h-2.5 w-full text-brand-accent/50"
                 >
                   <path
                     d="M2 10C60 3 150 2 298 7"
@@ -58,40 +44,66 @@ export function CatalogBanner({ totalProperties, totalAgents }: CatalogBannerPro
               Disponibles
             </h2>
 
-            <p className="mx-auto mt-5 max-w-xl text-sm font-medium leading-relaxed text-white sm:text-base lg:mx-0">
+            <p className="mx-auto mt-4 max-w-xl text-sm font-medium leading-relaxed text-neutral-600 sm:text-base lg:mx-0">
               Explora propiedades verificadas con asesoría personalizada, respaldo legal y
               acompañamiento de principio a fin.
             </p>
           </div>
 
-          {/* Cifras del inventario en clave editorial: sin tarjetas, solo tipografia y lineas */}
-          <div className="animate-brand-fade-up" style={{ animationDelay: "0.15s" }}>
-            <div className="grid grid-cols-2 divide-x divide-white/20">
-              {stats.map((stat, index) => {
-                const Icon = stat.icon;
-                return (
-                  <div
-                    key={stat.label}
-                    className={index === 0 ? "pr-5 sm:pr-10" : "pl-5 sm:pl-10"}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <span className="text-[10px] font-bold tabular-nums tracking-widest text-white/55">
-                        {String(index + 1).padStart(2, "0")}
-                      </span>
-                      <Icon className="h-3.5 w-3.5 shrink-0 text-white/60" />
-                      <span aria-hidden className="h-px flex-1 bg-white/25" />
+          {/* Estadísticas: exactamente 2 unidades visuales (Cabecera unificada con icono + Cifra monumental) */}
+          <div className="animate-brand-fade-up" style={{ animationDelay: "0.14s" }}>
+            <div className="grid grid-cols-2 divide-x divide-neutral-300/70">
+              {/* Columna 1: Inmuebles Disponibles */}
+              <div className="group relative flex flex-col justify-center pr-4 sm:pr-8 lg:pr-10 transition-transform duration-300 hover:-translate-y-1">
+                {/* Resplandor ambiental suave en hover */}
+                <div className="pointer-events-none absolute -inset-4 rounded-3xl bg-brand-accent/[0.08] opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-100" />
+
+                <div className="relative">
+                  {/* Elemento 1: Bloque unificado (Icono + Título) */}
+                  <div className="flex items-center gap-2.5 sm:gap-3">
+                    <div className="flex h-9 w-9 sm:h-11 sm:w-11 lg:h-12 lg:w-12 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-white/90 text-brand-accent shadow-sm ring-1 ring-brand-accent/20 transition-transform duration-300 group-hover:scale-105">
+                      <Building2 className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 stroke-[1.8]" />
                     </div>
-
-                    <p className="mt-4 font-heading text-4xl font-black leading-none tracking-tight tabular-nums sm:text-5xl xl:text-[3.25rem]">
-                      {stat.value}
-                    </p>
-
-                    <p className="mt-3 text-[10px] font-semibold uppercase leading-snug tracking-[0.12em] text-white/90 sm:text-[11px]">
-                      {stat.label}
-                    </p>
+                    <h3 className="font-heading text-lg sm:text-2xl lg:text-2xl xl:text-3xl font-black tracking-tight text-brand-primary leading-none whitespace-nowrap">
+                      Disponibles
+                    </h3>
                   </div>
-                );
-              })}
+
+                  {/* Elemento 2: Cifra Monumental en naranja con aura lumínica */}
+                  <div className="relative mt-3 sm:mt-4 leading-none">
+                    <div className="pointer-events-none absolute -left-4 -top-2 h-20 w-24 rounded-full bg-brand-accent/15 blur-2xl" />
+                    <div className="relative font-heading text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight text-brand-accent tabular-nums drop-shadow-[0_8px_24px_rgba(222,88,42,0.3)]">
+                      <AnimatedCount value={totalProperties} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Columna 2: Asesores Expertos */}
+              <div className="group relative flex flex-col justify-center pl-4 sm:pl-8 lg:pl-10 transition-transform duration-300 hover:-translate-y-1">
+                {/* Resplandor ambiental suave en hover */}
+                <div className="pointer-events-none absolute -inset-4 rounded-3xl bg-brand-primary/[0.08] opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-100" />
+
+                <div className="relative">
+                  {/* Elemento 1: Bloque unificado (Icono + Título) */}
+                  <div className="flex items-center gap-2.5 sm:gap-3">
+                    <div className="flex h-9 w-9 sm:h-11 sm:w-11 lg:h-12 lg:w-12 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-white/90 text-brand-primary shadow-sm ring-1 ring-brand-primary/20 transition-transform duration-300 group-hover:scale-105">
+                      <Users className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 stroke-[1.8]" />
+                    </div>
+                    <h3 className="font-heading text-lg sm:text-2xl lg:text-2xl xl:text-3xl font-black tracking-tight text-brand-primary leading-none whitespace-nowrap">
+                      Asesores
+                    </h3>
+                  </div>
+
+                  {/* Elemento 2: Cifra Monumental en naranja con aura lumínica */}
+                  <div className="relative mt-3 sm:mt-4 leading-none">
+                    <div className="pointer-events-none absolute -left-4 -top-2 h-20 w-24 rounded-full bg-brand-accent/15 blur-2xl" />
+                    <div className="relative font-heading text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight text-brand-accent tabular-nums drop-shadow-[0_8px_24px_rgba(222,88,42,0.3)]">
+                      <AnimatedCount value={totalAgents} />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

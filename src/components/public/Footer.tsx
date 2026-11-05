@@ -1,103 +1,160 @@
-import { Building2, MapPin, FileText, Phone, MessageCircle, ShieldCheck } from "lucide-react";
-import { COMPANY_CONFIG } from "@/config/company";
 import Link from "next/link";
+import { ArrowUpRight, MessageCircle, Phone, Mail, MapPin } from "lucide-react";
+import { COMPANY_CONFIG } from "@/config/company";
 
-// Pie de pagina corporativo con datos legales, fiscales y enlaces rapidos
+// Pie de pagina editorial compacto con colores de marca y tipografia monumental
 export function Footer() {
   return (
-    <footer id="contacto" className="bg-[#0a1c10] text-white border-t border-emerald-500/15">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
-          {/* Columna 1: Identidad y Mision */}
-          <div className="md:col-span-2 space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-brand-accent to-[#c4441b] flex items-center justify-center shadow-md">
-                <Building2 className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <span className="text-xl font-black block font-heading">{COMPANY_CONFIG.tradeName}</span>
-                <span className="text-[11px] text-emerald-300 font-bold uppercase tracking-wider block">
-                  Bienes Raíces • Trujillo
-                </span>
-              </div>
-            </div>
-            <p className="text-xs sm:text-sm text-emerald-100/70 leading-relaxed max-w-md">
-              Firma inmobiliaria líder en el estado Trujillo. Especialistas en corretaje, asesoría jurídica notarial, avalúos y comercialización efectiva de inmuebles residenciales y comerciales.
-            </p>
-
-            <div className="pt-2 flex items-center gap-3">
-              <a
-                href="https://wa.me/584140000000?text=Hola,%20deseo%20asesor%C3%ADa"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all"
-              >
-                <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Atención WhatsApp</span>
-              </a>
-            </div>
+    <footer id="contacto" className="w-full border-t border-neutral-200/90 bg-[#f4f5f2] text-neutral-900 overflow-hidden pt-8 sm:pt-10">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Cabecera superior compacta: Titular de marca y Boton de Contacto */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 sm:pb-8 border-b border-neutral-300/60">
+          <div>
+            <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-accent block mb-1">
+              Bienes Raíces
+            </span>
+            <h2 className="font-heading text-2xl sm:text-3xl font-extrabold text-brand-primary tracking-tight leading-tight">
+              Tu aliado inmobiliario de confianza
+            </h2>
           </div>
 
-          {/* Columna 2: Datos Fiscales y Domicilio */}
-          <div className="space-y-3.5">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-brand-accent">
-              Razón Social & Domicilio
-            </h3>
-            <ul className="space-y-3 text-xs text-emerald-100/80">
-              <li className="flex items-start gap-2.5">
-                <FileText className="w-4 h-4 text-brand-accent mt-0.5 shrink-0" />
-                <div>
-                  <span className="block font-bold text-white">{COMPANY_CONFIG.legalName}</span>
-                  <span className="text-[11px] text-emerald-300/80">RIF: {COMPANY_CONFIG.rifFormatted}</span>
-                </div>
-              </li>
-              <li className="flex items-start gap-2.5">
-                <MapPin className="w-4 h-4 text-brand-accent mt-0.5 shrink-0" />
-                <span className="text-[11px] leading-relaxed">
-                  {COMPANY_CONFIG.address.fullAddress}
-                </span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Columna 3: Enlaces de Acceso y Administracion */}
-          <div className="space-y-3.5">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-brand-accent">
-              Enlaces y Gestión
-            </h3>
-            <ul className="space-y-2 text-xs text-emerald-100/80">
-              <li>
-                <Link href="/#catalogo" className="hover:text-white transition-colors">
-                  Catálogo de Inmuebles
-                </Link>
-              </li>
-              <li>
-                <Link href="/#asesores" className="hover:text-white transition-colors">
-                  Nuestros Asesores
-                </Link>
-              </li>
-              <li>
-                <Link href="/#nosotros" className="hover:text-white transition-colors">
-                  Sobre Nosotros
-                </Link>
-              </li>
-              <li className="pt-2">
-                <Link
-                  href="/admin"
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-white/10 hover:bg-white/20 border border-white/20 px-3 py-1.5 rounded-xl transition-all"
-                >
-                  <ShieldCheck className="w-3.5 h-3.5 text-brand-accent" />
-                  <span>Acceso para Asesores</span>
-                </Link>
-              </li>
-            </ul>
+          <div className="shrink-0">
+            <a
+              href="https://wa.me/584140000000?text=Hola,%20deseo%20asesor%C3%ADa%20inmobiliaria"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center justify-center gap-2 rounded-full bg-brand-primary px-7 py-3 text-sm sm:text-base font-bold text-white transition-all duration-300 hover:bg-brand-accent active:scale-95 shadow-md shadow-brand-primary/10"
+            >
+              <span>Contacto</span>
+              <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </a>
           </div>
         </div>
 
-        {/* Barra Inferior de Derechos */}
-        <div className="mt-12 pt-8 border-t border-emerald-500/10 flex flex-col sm:flex-row items-center justify-between text-[11px] text-emerald-100/60 gap-4">
-          <p>© {new Date().getFullYear()} {COMPANY_CONFIG.legalName}. Todos los derechos reservados.</p>
-          <p>Trujillo, Estado Trujillo, República Bolivariana de Venezuela.</p>
+        {/* Columnas intermedias limpias y compactas */}
+        <div className="pt-6 sm:pt-8 pb-2">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8">
+            {/* Columna 1: Inmuebles */}
+            <div className="space-y-2.5">
+              <h3 className="font-heading text-xs font-bold uppercase tracking-[0.16em] text-brand-primary">
+                Inmuebles
+              </h3>
+              <ul className="space-y-2 text-xs sm:text-sm text-neutral-600 font-medium">
+                <li>
+                  <Link href="/?tipo=APARTMENT#catalogo" className="hover:text-brand-accent transition-colors">
+                    Apartamentos
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/?tipo=HOUSE#catalogo" className="hover:text-brand-accent transition-colors">
+                    Casas & Residencias
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/?tipo=LAND#catalogo" className="hover:text-brand-accent transition-colors">
+                    Terrenos & Parcelas
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/?tipo=COMMERCIAL#catalogo" className="hover:text-brand-accent transition-colors">
+                    Locales Comerciales
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/?tipo=OFFICE#catalogo" className="hover:text-brand-accent transition-colors">
+                    Galpones & Oficinas
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Columna 2: Explorar */}
+            <div className="space-y-2.5">
+              <h3 className="font-heading text-xs font-bold uppercase tracking-[0.16em] text-brand-primary">
+                Explorar
+              </h3>
+              <ul className="space-y-2 text-xs sm:text-sm text-neutral-600 font-medium">
+                <li>
+                  <Link href="/#catalogo" className="hover:text-brand-accent transition-colors">
+                    Catálogo Completo
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/#asesores" className="hover:text-brand-accent transition-colors">
+                    Nuestros Asesores
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/#nosotros" className="hover:text-brand-accent transition-colors">
+                    Por Qué Elegirnos
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Columna 3: Hablemos */}
+            <div className="space-y-2.5">
+              <h3 className="font-heading text-xs font-bold uppercase tracking-[0.16em] text-brand-primary">
+                Hablemos
+              </h3>
+              <ul className="space-y-2.5 text-xs sm:text-sm font-medium">
+                <li>
+                  <a
+                    href="https://wa.me/584140000000?text=Hola,%20deseo%20asesor%C3%ADa"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-neutral-600 hover:text-emerald-700 transition-colors"
+                  >
+                    <MessageCircle className="h-4 w-4 text-emerald-600 shrink-0" />
+                    <span>WhatsApp directo</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="tel:+584140000000"
+                    className="inline-flex items-center gap-2 text-neutral-600 hover:text-brand-accent transition-colors"
+                  >
+                    <Phone className="h-4 w-4 text-brand-accent shrink-0" />
+                    <span>+58 (414) 000-0000</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="mailto:contacto@inmobiliarialosandes.com"
+                    className="inline-flex items-center gap-2 text-neutral-600 hover:text-brand-primary transition-colors"
+                  >
+                    <Mail className="h-4 w-4 text-neutral-500 shrink-0" />
+                    <span>contacto@inmobiliarialosandes.com</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Columna 4: Sede y Legal */}
+            <div className="space-y-2.5">
+              <h3 className="font-heading text-xs font-bold uppercase tracking-[0.16em] text-brand-primary">
+                Sede & Legal
+              </h3>
+              <div className="space-y-2 text-xs sm:text-sm text-neutral-600 font-medium leading-relaxed">
+                <div className="flex items-start gap-2">
+                  <MapPin className="h-4 w-4 text-brand-accent shrink-0 mt-0.5" />
+                  <span>Av. Independencia, Centro Chiquinquirá, Trujillo.</span>
+                </div>
+                <p className="text-xs text-neutral-500 pl-6">
+                  RIF: {COMPANY_CONFIG.rifFormatted}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Tipografía Monumental Gigante Naranja en la base */}
+      <div className="relative overflow-hidden select-none pointer-events-none mt-2 sm:mt-4">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex justify-center sm:justify-start">
+          <span className="font-heading text-[17.5vw] font-black leading-[0.74] tracking-[-0.05em] text-brand-accent block translate-y-[8%]">
+            los andes
+          </span>
         </div>
       </div>
     </footer>

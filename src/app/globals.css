@@ -19,7 +19,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Desplazamiento suave hacia anclas (secciones con id) */
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 80px;
@@ -36,42 +35,76 @@ h6 {
 }
 
 /* ============================================================
-   Animaciones del banner del catalogo (franja naranja)
+   Animaciones del banner del catalogo
    ============================================================ */
 
-@keyframes brand-gradient-x {
-  0%,
-  100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
+@keyframes brand-gradient-flow {
+  0%   { background-position: 0%   50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0%   50%; }
 }
 
 @keyframes brand-fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(18px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0);    }
 }
 
+/* Orbita eliptica lenta con expansion — orbe ambar superior */
+@keyframes orb-drift-1 {
+  0%   { transform: translate3d(   0px,    0px, 0) scale(1.00); }
+  20%  { transform: translate3d(  80px,  -55px, 0) scale(1.18); }
+  45%  { transform: translate3d( 140px,   30px, 0) scale(0.90); }
+  70%  { transform: translate3d(  30px,   80px, 0) scale(1.12); }
+  100% { transform: translate3d(   0px,    0px, 0) scale(1.00); }
+}
+
+/* Orbita inversa y más rápida — orbe coral inferior */
+@keyframes orb-drift-2 {
+  0%   { transform: translate3d(    0px,   0px, 0) scale(1.05); }
+  25%  { transform: translate3d( -110px,  60px, 0) scale(0.85); }
+  55%  { transform: translate3d(  -50px, -80px, 0) scale(1.20); }
+  80%  { transform: translate3d(   70px, -30px, 0) scale(0.92); }
+  100% { transform: translate3d(    0px,   0px, 0) scale(1.05); }
+}
+
+/* Latido radial con desplazamiento libre — orbe de luz blanca cálida */
+@keyframes orb-pulse-3 {
+  0%   { transform: translate3d(   0px,   0px, 0) scale(0.85); opacity: 0.45; }
+  30%  { transform: translate3d(  60px, -40px, 0) scale(1.25); opacity: 0.80; }
+  60%  { transform: translate3d( -50px,  50px, 0) scale(0.90); opacity: 0.50; }
+  100% { transform: translate3d(   0px,   0px, 0) scale(0.85); opacity: 0.45; }
+}
+
+/* Movimiento muy lento de base oscura — crea sensacion de profundidad ondulante */
+@keyframes orb-sway-4 {
+  0%   { transform: translate3d(   0px,  0px, 0) scale(1.00); opacity: 0.50; }
+  40%  { transform: translate3d( -80px, 30px, 0) scale(1.15); opacity: 0.70; }
+  100% { transform: translate3d(   0px,  0px, 0) scale(1.00); opacity: 0.50; }
+}
+
+/* ---- Clases utilitarias ---- */
 .animate-brand-gradient {
-  background-size: 200% 200%;
-  animation: brand-gradient-x 22s ease-in-out infinite;
+  background-size: 220% 220%;
+  animation: brand-gradient-flow 10s ease-in-out infinite;
 }
 
 .animate-brand-fade-up {
-  animation: brand-fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation: brand-fade-up 0.65s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
+
+/* Tiempos primo-asimétricos para que nunca coincidan en fase */
+.animate-orb-1 { animation: orb-drift-1   8.3s ease-in-out infinite; }
+.animate-orb-2 { animation: orb-drift-2   6.7s ease-in-out infinite; }
+.animate-orb-3 { animation: orb-pulse-3   5.1s ease-in-out infinite; }
+.animate-orb-4 { animation: orb-sway-4   13.0s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {
   .animate-brand-gradient,
-  .animate-brand-fade-up {
+  .animate-brand-fade-up,
+  .animate-orb-1,
+  .animate-orb-2,
+  .animate-orb-3,
+  .animate-orb-4 {
     animation: none;
   }
 }

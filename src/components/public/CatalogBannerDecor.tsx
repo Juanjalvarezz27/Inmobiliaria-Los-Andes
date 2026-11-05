@@ -2,55 +2,67 @@
 
 import { useEffect, useRef } from "react";
 
-// Capa decorativa del banner: los resplandores y el brillo acompanan el scroll.
-// Los transforms se aplican directo por JS (sin depender de clases CSS externas)
-// y se interpolan con lerp para que el movimiento se sienta continuo.
+// Fondo atmosferico interactivo al scroll con destellos y orbes de luz calida naranja
 export function CatalogBannerDecor() {
   const layerRef = useRef<HTMLDivElement>(null);
-  const blobARef = useRef<HTMLDivElement>(null);
-  const blobBRef = useRef<HTMLDivElement>(null);
-  const glowRef = useRef<HTMLDivElement>(null);
-  const shineRef = useRef<HTMLDivElement>(null);
+  const flareTopRightRef = useRef<HTMLDivElement>(null);
+  const flareBottomLeftRef = useRef<HTMLDivElement>(null);
+  const flareCenterRef = useRef<HTMLDivElement>(null);
+  const flareRightEdgeRef = useRef<HTMLDivElement>(null);
+  const shimmerBeamRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const layer = layerRef.current;
     if (!layer) return;
 
-    const blobA = blobARef.current;
-    const blobB = blobBRef.current;
-    const glow = glowRef.current;
-    const shine = shineRef.current;
-
-    const paint = (progress: number) => {
-      const d = progress - 0.5;
-      const grow = 1 + Math.abs(d) * 0.18;
-
-      if (blobA) {
-        blobA.style.transform = `translate3d(0, ${d * -260}px, 0) scale(${grow})`;
-      }
-      if (blobB) {
-        blobB.style.transform = `translate3d(0, ${d * 330}px, 0) scale(${grow})`;
-      }
-      if (glow) {
-        glow.style.transform = `translate3d(calc(-50% + ${d * 150}px), ${d * -120}px, 0) scale(${grow})`;
-      }
-      if (shine) {
-        // Recorre toda la franja: fuera de cuadro en los extremos, centrado en 0.5
-        shine.style.transform = `translate3d(${-100 + progress * 310}%, 0, 0)`;
-        // Aparece con fuerza al cruzar el centro y se desvanece en los bordes
-        shine.style.opacity = String(0.35 + (1 - Math.abs(d) * 2) * 0.65);
-      }
-    };
-
-    // Estado neutro (franja centrada) mientras no haya scroll
-    paint(0.5);
+    const flareTopRight = flareTopRightRef.current;
+    const flareBottomLeft = flareBottomLeftRef.current;
+    const flareCenter = flareCenterRef.current;
+    const flareRightEdge = flareRightEdgeRef.current;
+    const shimmerBeam = shimmerBeamRef.current;
 
     let target = 0.5;
     let current = 0.5;
     let frame = 0;
 
+    const paint = (progress: number) => {
+      // d va de -0.5 (arriba del viewport) a +0.5 (abajo del viewport)
+      const d = progress - 0.5;
+      const centerFactor = Math.max(0, 1 - Math.abs(d) * 2);
+      const grow = 1 + Math.abs(d) * 0.28;
+
+      // Destello 1 (naranja terracota superior derecho): viaja diagonalmente al scroll
+      if (flareTopRight) {
+        flareTopRight.style.transform = `translate3d(${d * -320}px, ${d * 240}px, 0) scale(${grow})`;
+      }
+
+      // Destello 2 (ambar dorado inferior izquierdo): viaja en contra-fase
+      if (flareBottomLeft) {
+        flareBottomLeft.style.transform = `translate3d(${d * 340}px, ${d * -220}px, 0) scale(${grow})`;
+      }
+
+      // Destello 3 (luz naranja calida central): se intensifica y expande al cruzar el centro
+      if (flareCenter) {
+        flareCenter.style.transform = `translate3d(calc(-50% + ${d * 160}px), ${d * -100}px, 0) scale(${0.85 + centerFactor * 0.45})`;
+        flareCenter.style.opacity = String(0.45 + centerFactor * 0.45);
+      }
+
+      // Destello 4 (acento calido lateral derecho): asciende suavemente con el scroll
+      if (flareRightEdge) {
+        flareRightEdge.style.transform = `translate3d(${d * -180}px, ${d * -140}px, 0) scale(${0.9 + centerFactor * 0.25})`;
+      }
+
+      // Haz de luz horizontal que barre de izquierda a derecha al hacer scroll
+      if (shimmerBeam) {
+        shimmerBeam.style.transform = `translate3d(${-90 + progress * 280}%, 0, 0)`;
+        shimmerBeam.style.opacity = String(0.28 + centerFactor * 0.45);
+      }
+    };
+
+    paint(0.5);
+
     const tick = () => {
-      current += (target - current) * 0.1;
+      current += (target - current) * 0.09;
 
       if (Math.abs(target - current) < 0.0004) {
         current = target;
@@ -75,10 +87,8 @@ export function CatalogBannerDecor() {
     };
 
     measure();
-    // El listener en captura cubre tanto el scroll de la ventana como el de
-    // cualquier contenedor con scroll propio.
     window.addEventListener("scroll", measure, { passive: true });
-    document.addEventListener("scroll", measure, { passive: true, capture: true });
+    document.addEventListener("scroll", measure, { capture: true, passive: true });
     window.addEventListener("resize", measure);
 
     return () => {
@@ -95,36 +105,52 @@ export function CatalogBannerDecor() {
       aria-hidden
       className="pointer-events-none absolute inset-0 overflow-hidden"
     >
-      {/* Textura de puntos sutil sobre el degradado */}
-      <div className="absolute inset-0 opacity-[0.16] [background-image:radial-gradient(circle_at_1px_1px,#ffffff_1px,transparent_0)] [background-size:22px_22px]" />
-
-      {/* Resplandores que se desplazan a distintas velocidades con el scroll */}
+      {/* Destello 1: Naranja terracota superior derecho, reactivo al scroll */}
       <div
-        ref={blobARef}
+        ref={flareTopRightRef}
         style={{ willChange: "transform" }}
-        className="absolute -top-28 -left-24 h-80 w-80 rounded-full bg-white/35 blur-3xl"
-      />
-      <div
-        ref={blobBRef}
-        style={{ willChange: "transform" }}
-        className="absolute -bottom-36 right-[-4rem] h-96 w-96 rounded-full bg-[#ffc79c]/55 blur-3xl"
-      />
-      <div
-        ref={glowRef}
-        style={{ willChange: "transform" }}
-        className="absolute top-1/3 left-1/2 h-64 w-64 rounded-full bg-[#8a2a0b]/25 blur-3xl"
+        className="absolute -top-32 right-[-6rem] h-[32rem] w-[32rem] rounded-full
+          bg-[radial-gradient(circle_at_50%_50%,rgba(222,88,42,0.38),rgba(249,115,22,0.22),transparent_70%)]
+          blur-3xl"
       />
 
-      {/* Brillo suave que recorre la franja segun el avance del scroll */}
+      {/* Destello 2: Ambar dorado y fuego inferior izquierdo, reactivo en contra-fase */}
       <div
-        ref={shineRef}
+        ref={flareBottomLeftRef}
+        style={{ willChange: "transform" }}
+        className="absolute -bottom-36 left-[-6rem] h-[34rem] w-[34rem] rounded-full
+          bg-[radial-gradient(circle_at_50%_50%,rgba(245,158,11,0.40),rgba(222,88,42,0.28),transparent_70%)]
+          blur-3xl"
+      />
+
+      {/* Destello 3: Nucleo central naranja soleado que florece al pasar por el centro */}
+      <div
+        ref={flareCenterRef}
+        style={{ willChange: "transform, opacity" }}
+        className="absolute top-1/4 left-1/2 h-[26rem] w-[26rem] -translate-x-1/2 rounded-full
+          bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.85),rgba(254,215,170,0.6),rgba(222,88,42,0.38),transparent_70%)]
+          blur-2xl opacity-50"
+      />
+
+      {/* Destello 4: Resplandor calido lateral derecho que ilumina la zona de estadisticas */}
+      <div
+        ref={flareRightEdgeRef}
+        style={{ willChange: "transform" }}
+        className="absolute top-1/3 right-[15%] h-80 w-80 rounded-full
+          bg-[radial-gradient(circle_at_50%_50%,rgba(249,115,22,0.32),rgba(222,88,42,0.20),transparent_70%)]
+          blur-3xl"
+      />
+
+      {/* Haz suave de luz horizontal calida que barre segun bajamos o subimos */}
+      <div
+        ref={shimmerBeamRef}
         style={{
           willChange: "transform, opacity",
           background:
-            "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.06) 20%, rgba(255,255,255,0.32) 50%, rgba(255,255,255,0.06) 80%, transparent 100%)",
-          filter: "blur(12px)",
+            "linear-gradient(90deg, transparent 0%, rgba(255,240,225,0.7) 45%, rgba(254,215,170,0.5) 55%, transparent 100%)",
+          filter: "blur(22px)",
         }}
-        className="absolute inset-y-0 left-0 w-[50%]"
+        className="absolute inset-y-0 left-0 w-[50%] opacity-40"
       />
     </div>
   );

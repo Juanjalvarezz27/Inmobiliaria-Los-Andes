@@ -169,9 +169,9 @@ export function HeroSearch({ slides }: HeroSearchProps) {
           );
         })}
 
-        {/* Capa de contraste cinematográfica calibrada: con tonalidad verde bosque corporativa reforzada */}
-        <div className="absolute inset-0 z-20 bg-gradient-to-b from-[#0a1c10]/65 via-[#0d2616]/45 to-[#08150c]/80" />
-        <div className="absolute inset-0 z-20 bg-black/20" />
+        {/* Capa de contraste cinematográfica equilibrada: oscura y neutra con un matiz muy sutil */}
+        <div className="absolute inset-0 z-20 bg-gradient-to-b from-neutral-950/70 via-neutral-950/50 to-neutral-950/80" />
+        <div className="absolute inset-0 z-20 bg-black/30" />
       </div>
 
       <div className="relative z-30 max-w-5xl mx-auto text-center space-y-5 w-full">

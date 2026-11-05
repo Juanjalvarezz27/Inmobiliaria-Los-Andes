@@ -8,6 +8,13 @@ interface PublicPaginationProps {
   totalPages: number;
   totalItems: number;
   itemsPerPage: number;
+  /** Ruta base de la paginacion (por defecto el portal principal) */
+  basePath?: string;
+  /** Ancla opcional para conservar el scroll en la seccion */
+  anchor?: string;
+  /** Sustantivo mostrado en el resumen de resultados */
+  itemNoun?: string;
+  ariaLabel?: string;
 }
 
 // Paginacion publica adaptativa con navegacion por URL para soporte SEO y marcadores
@@ -16,6 +23,10 @@ export function PublicPagination({
   totalPages,
   totalItems,
   itemsPerPage,
+  basePath = "/",
+  anchor = "catalogo",
+  itemNoun = "inmuebles",
+  ariaLabel = "Paginación de propiedades",
 }: PublicPaginationProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -28,7 +39,8 @@ export function PublicPagination({
   const goToPage = (pageNumber: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", pageNumber.toString());
-    router.push(`/?${params.toString()}#catalogo`);
+    const query = params.toString();
+    router.push(`${basePath}${query ? `?${query}` : ""}${anchor ? `#${anchor}` : ""}`);
   };
 
   // Generador inteligente de elipsis
@@ -68,10 +80,10 @@ export function PublicPagination({
   return (
     <div
       className="bg-white rounded-3xl border border-neutral-200/90 shadow-sm px-4 py-3.5 sm:px-6 sm:py-4 flex flex-col sm:flex-row items-center justify-between gap-3.5 select-none"
-      aria-label="Paginación de propiedades"
+      aria-label={ariaLabel}
     >
       <div className="text-xs font-semibold text-text-secondary text-center sm:text-left">
-        Mostrando inmuebles{" "}
+        Mostrando {itemNoun}{" "}
         <span className="font-extrabold text-brand-primary">
           {startItem} al {endItem}
         </span>{" "}
@@ -134,4 +146,3 @@ export function PublicPagination({
     </div>
   );
 }
-

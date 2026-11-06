@@ -60,7 +60,7 @@ export default async function HomePage({ searchParams }: PageProps) {
   }
 
   // Ordenamiento dinamico
-  let orderByClause: Prisma.PropertyOrderByWithRelationInput[] = [{ featured: "desc" }];
+  const orderByClause: Prisma.PropertyOrderByWithRelationInput[] = [{ featured: "desc" }];
   if (sortOrder === "menor-precio") {
     orderByClause.push({ price: "asc" });
   } else if (sortOrder === "mayor-precio") {
@@ -104,7 +104,7 @@ export default async function HomePage({ searchParams }: PageProps) {
         },
       },
       orderBy: { properties: { _count: "desc" } },
-      take: 4,
+      take: 8,
     }),
   ]);
 
@@ -208,7 +208,7 @@ export default async function HomePage({ searchParams }: PageProps) {
       </main>
 
       {/* Seccion Destacada de Asesores Inmobiliarios */}
-      <FeaturedAgentsSection agents={featuredAgents} />
+      <FeaturedAgentsSection agents={featuredAgents} totalAgents={totalAgentsCount} />
 
       {/* Pilares Institucionales de Confianza */}
       <TrustSection />

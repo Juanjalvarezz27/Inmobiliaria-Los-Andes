@@ -310,6 +310,201 @@ async function main() {
     },
   });
 
+  await prisma.property.create({
+    data: {
+      title: "Casa Quinta con Vista Panorámica en Sector San Antonio",
+      slug: "casa-quinta-con-vista-panoramica-en-sector-san-antonio",
+      description:
+        "Hermosa residencia unifamiliar con arquitectura de techos altos y amplios jardines. Dispone de cocina empotrada moderna con isla central, sala de estar independiente, terraza con vista directa a la serranía trujillana y amplio estacionamiento techado.",
+      operationType: "SALE",
+      propertyType: "HOUSE",
+      status: "AVAILABLE",
+      price: 85000,
+      currency: "USD",
+      featured: true,
+      bedrooms: 4,
+      bathrooms: 4,
+      parkingSpots: 3,
+      areaSquareMeters: 340,
+      lotSquareMeters: 450,
+      yearBuilt: 2020,
+      city: "Trujillo Capital",
+      sector: "Sector San Antonio",
+      address: "Calle Los Pinos, Quinta Villa Serrana",
+      googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=Trujillo,+Venezuela",
+      amenities: [
+        "Tanque subterráneo 15.000L con hidroneumático",
+        "Terraza techada con parrillera",
+        "Jardines privados",
+        "Circuito cerrado de seguridad",
+        "Portón eléctrico",
+      ],
+      agentId: agent2.id,
+      images: {
+        create: [
+          {
+            url: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=80",
+            caption: "Fachada frontal y jardines",
+            isMain: true,
+            order: 0,
+          },
+          {
+            url: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80",
+            caption: "Área social interna",
+            isMain: false,
+            order: 1,
+          },
+        ],
+      },
+    },
+  });
+
+  await prisma.property.create({
+    data: {
+      title: "Penthouse Exclusivo en Residencias Las Acacias",
+      slug: "penthouse-exclusivo-en-residencias-las-acacias",
+      description:
+        "Impresionante penthouse en piso alto con ventanales de piso a techo y vista panorámica 360 grados. Acabados de lujo en mármol y cuarzo, terraza privada descubierta, ascensor privado directo al apartamento y climatización integral.",
+      operationType: "SALE",
+      propertyType: "APARTMENT",
+      status: "AVAILABLE",
+      price: 58000,
+      currency: "USD",
+      featured: true,
+      bedrooms: 3,
+      bathrooms: 3,
+      parkingSpots: 2,
+      areaSquareMeters: 165,
+      yearBuilt: 2022,
+      city: "Trujillo Capital",
+      sector: "Sector Las Acacias",
+      address: "Avenida Cuatricentenaria, Torre Las Acacias, PH-A",
+      googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=Las+Acacias,+Trujillo,+Venezuela",
+      amenities: [
+        "Planta eléctrica total",
+        "Ascensor privado",
+        "Terraza con vista panorámica",
+        "Tanque de reserva propio",
+        "Pisos de mármol",
+        "Vigilancia 24/7",
+      ],
+      agentId: agent1.id,
+      images: {
+        create: [
+          {
+            url: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1200&q=80",
+            caption: "Salón principal con vista abierta",
+            isMain: true,
+            order: 0,
+          },
+          {
+            url: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1200&q=80",
+            caption: "Cocina y área de comedor",
+            isMain: false,
+            order: 1,
+          },
+        ],
+      },
+    },
+  });
+
+  await prisma.property.create({
+    data: {
+      title: "Oficina Ejecutiva Corporativa en Sector Carmona",
+      slug: "oficina-ejecutiva-corporativa-en-sector-carmona",
+      description:
+        "Moderna oficina en torre empresarial con excelente conectividad y acabados de primera. Cuenta con área de recepción, sala de juntas amoblada, dos cubículos gerenciales, baño privado y kitchenette.",
+      operationType: "RENT",
+      propertyType: "OFFICE",
+      status: "AVAILABLE",
+      price: 380,
+      currency: "USD",
+      featured: false,
+      bedrooms: 0,
+      bathrooms: 1,
+      parkingSpots: 1,
+      areaSquareMeters: 65,
+      yearBuilt: 2018,
+      city: "Trujillo Capital",
+      sector: "Sector Carmona",
+      address: "Avenida Carmona, Centro Empresarial Los Andes, Nivel 3",
+      googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=Carmona,+Trujillo,+Venezuela",
+      amenities: [
+        "Conexión fibra óptica redundante",
+        "Control de acceso biométrico",
+        "Planta eléctrica",
+        "Aire acondicionado central",
+        "Ascensores de alta velocidad",
+      ],
+      agentId: agent1.id,
+      images: {
+        create: [
+          {
+            url: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=1200&q=80",
+            caption: "Área de recepción y estaciones",
+            isMain: true,
+            order: 0,
+          },
+          {
+            url: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=80",
+            caption: "Sala de reuniones gerencial",
+            isMain: false,
+            order: 1,
+          },
+        ],
+      },
+    },
+  });
+
+  await prisma.property.create({
+    data: {
+      title: "Moderna Villa Campestre en Sector Mesa de Gallardo",
+      slug: "moderna-villa-campestre-en-sector-mesa-de-gallardo",
+      description:
+        "Hermosa propiedad de retiro estilo campestre contemporáneo en clima fresco de montaña. Amplia parcela con frutales, piscina climatizada, corredor perimetral de madera y techos con machihembrado de cedro.",
+      operationType: "SALE",
+      propertyType: "HOUSE",
+      status: "AVAILABLE",
+      price: 95000,
+      currency: "USD",
+      featured: true,
+      bedrooms: 4,
+      bathrooms: 3,
+      parkingSpots: 4,
+      areaSquareMeters: 290,
+      lotSquareMeters: 800,
+      yearBuilt: 2023,
+      city: "Trujillo Capital",
+      sector: "Mesa de Gallardo",
+      address: "Carretera Principal Mesa de Gallardo, Parcela 12",
+      googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=Trujillo,+Venezuela",
+      amenities: [
+        "Piscina climatizada",
+        "Árboles frutales",
+        "Tanque de 20.000L",
+        "Parrillera rústica techada",
+        "Portón automatizado",
+      ],
+      agentId: agent2.id,
+      images: {
+        create: [
+          {
+            url: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=1200&q=80",
+            caption: "Fachada campestre moderna",
+            isMain: true,
+            order: 0,
+          },
+          {
+            url: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1200&q=80",
+            caption: "Piscina y área de jardín",
+            isMain: false,
+            order: 1,
+          },
+        ],
+      },
+    },
+  });
+
   console.log("¡Sembrado de datos finalizado con éxito!");
   console.log(`Usuario Admin creado: ${admin.email} (Contraseña: Admin123*LosAndes)`);
 }

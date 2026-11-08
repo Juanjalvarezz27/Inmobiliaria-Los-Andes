@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { Navbar } from "@/components/public/Navbar";
 import { Footer } from "@/components/public/Footer";
 import { PropertyGallery } from "@/components/public/PropertyGallery";
+import { PropertyActionsBar } from "@/components/public/PropertyActionsBar";
+import { PropertyCard } from "@/components/public/PropertyCard";
 import { formatCurrency } from "@/lib/utils/format";
 import { buildWhatsAppPropertyLink } from "@/lib/utils/whatsapp";
 import {
@@ -15,8 +17,11 @@ import {
   MapPin,
   CheckCircle2,
   MessageCircle,
-  ArrowLeft,
+  Phone,
+  Calendar,
+  Layers,
   ExternalLink,
+  FileText,
 } from "lucide-react";
 import { InstagramIcon } from "@/components/icons/InstagramIcon";
 
@@ -28,7 +33,27 @@ interface PageProps {
   }>;
 }
 
-// Vista de detalle completa de una propiedad
+// Generador de iniciales en texto para avatar del asesor
+function getInitials(name: string): string {
+  if (!name) return "AS";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  }
+  return name.substring(0, 2).toUpperCase();
+}
+
+const PROPERTY_TYPE_NAMES: Record<string, string> = {
+  TOWNHOUSE: "Townhouse",
+  HOUSE: "Casa",
+  APARTMENT: "Apartamento",
+  COMMERCIAL: "Local Comercial",
+  LAND: "Terreno",
+  OFFICE: "Oficina",
+  OTHER: "Inmueble",
+};
+
+// Vista arquitectonica moderna estilo revista inmobiliaria de lujo con fondo topografico andino
 export default async function PropertyDetailPage({ params }: PageProps) {
   const { slug } = await params;
 
@@ -36,7 +61,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
     where: { slug },
     include: {
       images: {
-        orderBy: { order: "asc" },
+        orderBy: [{ isMain: "desc" }, { order: "asc" }],
       },
       agent: true,
     },
@@ -46,7 +71,50 @@ export default async function PropertyDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  // Enlace directo a WhatsApp del asesor asignado
+  // Obtencion de 4 inmuebles aleatorios disponibles excluyendo el actual
+  const allAvailableIds = await prisma.property.findMany({
+    where: {
+      status: "AVAILABLE",
+      id: { not: property.id },
+    },
+    select: { id: true },
+  });
+
+  // Si hay menos de 4 disponibles, completa con propiedades no ocultas para garantizar siempre 4
+  let candidateIds = allAvailableIds.map((item) => item.id);
+  if (candidateIds.length < 4) {
+    const additionalIds = await prisma.property.findMany({
+      where: {
+        status: { not: "HIDDEN" },
+        id: { notIn: [property.id, ...candidateIds] },
+      },
+      select: { id: true },
+      take: 4 - candidateIds.length,
+    });
+    candidateIds = [...candidateIds, ...additionalIds.map((item) => item.id)];
+  }
+
+  // Barajado aleatorio en memoria de IDs para seleccion no determinista
+  const shuffledIds = candidateIds
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 4);
+
+  const similarProperties = shuffledIds.length > 0
+    ? await prisma.property.findMany({
+        where: { id: { in: shuffledIds } },
+        include: {
+          images: {
+            orderBy: [{ isMain: "desc" }, { order: "asc" }],
+          },
+          agent: true,
+          _count: {
+            select: { images: true },
+          },
+        },
+      })
+    : [];
+
+  // Enlace directo a WhatsApp del asesor asignado con mensaje prellenado
   const whatsappUrl = buildWhatsAppPropertyLink({
     phone: property.agent.phone || "+584140000000",
     propertyTitle: property.title,
@@ -54,171 +122,129 @@ export default async function PropertyDetailPage({ params }: PageProps) {
     propertyUrl: `https://inmobiliarialosandes.com/propiedades/${property.slug}`,
   });
 
-  const propertyTypeNameMap: Record<string, string> = {
-    TOWNHOUSE: "Townhouse",
-    HOUSE: "Casa",
-    APARTMENT: "Apartamento",
-    COMMERCIAL: "Local Comercial",
-    LAND: "Terreno",
-    OFFICE: "Oficina",
-    OTHER: "Inmueble",
-  };
-
   const propertyTypeLabel =
     property.propertyType === "OTHER" && property.customPropertyType
       ? property.customPropertyType
-      : propertyTypeNameMap[property.propertyType] || property.propertyType;
+      : PROPERTY_TYPE_NAMES[property.propertyType] || property.propertyType;
 
   return (
-    <div className="min-h-screen flex flex-col bg-ui-background">
+    <div className="relative isolate z-10 min-h-screen flex flex-col bg-gradient-to-b from-[#FAF7F2] via-[#F3ECE0] to-[#EBE0D2] text-text-primary">
+      {/* Capa decorativa: relieve topografico andino refinado con iluminacion calida */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-10 pointer-events-none overflow-hidden"
+      >
+        {/* Orbes de luz ambiental calida muy difusos para dar profundidad */}
+        <div className="absolute -top-28 -right-24 w-[480px] h-[480px] rounded-full blur-[130px] opacity-[0.12] bg-[#F27441]" />
+        <div className="absolute top-1/2 -left-32 -translate-y-1/2 w-[520px] h-[520px] rounded-full blur-[130px] opacity-[0.15] bg-[#D9B382]" />
+        <div className="absolute -bottom-28 right-1/4 w-[450px] h-[450px] rounded-full blur-[130px] opacity-[0.12] bg-[#F27441]" />
+
+        {/* Patron SVG de curvas de nivel topograficas andinas estilo grabado cartografico */}
+        <svg
+          className="absolute inset-0 w-full h-full"
+          xmlns="http://www.w3.org/2000/svg"
+          style={{
+            maskImage: "radial-gradient(ellipse at center, black 65%, transparent 96%)",
+            WebkitMaskImage: "radial-gradient(ellipse at center, black 65%, transparent 96%)",
+          }}
+        >
+          <defs>
+            <pattern
+              id="andean-topography-refined"
+              width="360"
+              height="360"
+              patternUnits="userSpaceOnUse"
+            >
+              <g stroke="#8E7A60" strokeWidth="0.95" fill="none" opacity="0.35">
+                {/* Curvas concentricas del pico principal */}
+                <path d="M 125 135 C 135 120 160 125 165 140 C 170 155 152 165 140 162 C 128 160 120 148 125 135 Z" />
+                <path d="M 110 125 C 125 102 175 108 185 132 C 195 158 168 180 140 178 C 114 176 98 150 110 125 Z" />
+                <path d="M 92 112 C 115 80 192 88 205 125 C 218 165 182 198 140 195 C 100 192 75 152 92 112 Z" />
+                <path d="M 75 98 C 105 58 212 68 228 118 C 244 172 198 215 140 210 C 85 205 52 152 75 98 Z" />
+                <path d="M 56 82 C 95 38 232 48 250 110 C 268 178 214 232 140 226 C 68 220 28 150 56 82 Z" />
+                <path d="M 38 68 C 85 18 252 28 272 102 C 292 185 230 248 140 242 C 50 236 6 148 38 68 Z" />
+
+                {/* Relieve del collado secundario */}
+                <path d="M 265 252 C 272 242 290 245 292 255 C 295 265 282 274 272 272 C 262 270 258 260 265 252 Z" />
+                <path d="M 250 240 C 265 220 305 228 312 248 C 318 268 296 290 272 286 C 250 282 238 258 250 240 Z" />
+                <path d="M 232 225 C 255 198 322 208 332 238 C 342 272 312 305 272 300 C 235 295 218 258 232 225 Z" />
+
+                {/* Curvas topograficas transversales continuas */}
+                <path d="M 0 35 C 70 35 120 22 180 25 C 240 28 290 35 360 35" />
+                <path d="M 0 195 C 70 195 90 218 135 218 C 180 218 225 195 290 195 C 325 195 345 195 360 195" />
+                <path d="M 0 325 C 70 325 145 345 215 338 C 285 330 320 325 360 325" />
+                <path d="M 22 0 C 22 70 10 135 12 180 C 14 235 22 290 22 360" />
+                <path d="M 180 0 C 180 60 195 105 195 160 C 195 225 180 295 180 360" />
+                <path d="M 338 0 C 338 70 350 135 348 180 C 345 235 338 290 338 360" />
+
+                {/* Arcos concentricos en esquinas para ensamble continuo */}
+                <path d="M 0 22 C 12 22 22 12 22 0" />
+                <path d="M 338 0 C 338 12 348 22 360 22" />
+                <path d="M 0 338 C 12 338 22 348 22 360" />
+                <path d="M 338 360 C 338 348 348 338 360 338" />
+
+                <path d="M 0 50 C 28 50 50 28 50 0" />
+                <path d="M 310 0 C 310 28 332 50 360 50" />
+                <path d="M 0 310 C 28 310 50 332 50 360" />
+                <path d="M 310 360 C 310 332 332 310 360 310" />
+              </g>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#andean-topography-refined)" />
+        </svg>
+
+        {/* Microtextura de papel fino para tacto editorial */}
+        <div
+          className="absolute inset-0 opacity-[0.022] mix-blend-multiply"
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+            backgroundSize: "180px 180px",
+          }}
+        />
+      </div>
+
       <Navbar />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-28 sm:pt-34 pb-16 space-y-8">
-        {/* Enlace de regreso */}
-        <div>
-          <Link
-            href="/#catalogo"
-            className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-text-secondary hover:text-brand-primary transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Volver al Catálogo</span>
-          </Link>
-        </div>
+      <main className="flex-1 w-full max-w-7xl 2xl:max-w-[1420px] mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 pb-16 space-y-6">
+        {/* Barra Superior con Navegacion y Compartir */}
+        <PropertyActionsBar propertyTitle={property.title} propertyType={propertyTypeLabel} />
 
-        {/* Encabezado Principal */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-neutral-200">
-          <div className="space-y-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="bg-brand-accent text-white text-xs font-bold uppercase tracking-wider px-3.5 py-1 rounded-full shadow-sm">
-                {property.operationType === "SALE" ? "En Venta" : "En Alquiler"}
-              </span>
-              <span className="bg-brand-primary text-white text-xs font-semibold px-3 py-1 rounded-full">
-                {propertyTypeLabel}
-              </span>
-              {property.status === "SOLD" && (
-                <span className="bg-neutral-900 text-white text-xs font-bold uppercase px-3 py-1 rounded-full">
-                  Vendido
-                </span>
-              )}
-              {property.status === "RENTED" && (
-                <span className="bg-neutral-800 text-white text-xs font-bold uppercase px-3 py-1 rounded-full">
-                  Alquilado
-                </span>
-              )}
-            </div>
-
-            <h1 className="text-2xl sm:text-4xl font-black text-brand-primary tracking-tight leading-tight">
-              {property.title}
-            </h1>
-
-            {/* Direccion escrita descriptiva */}
-            <div className="flex items-center gap-2 text-text-secondary text-sm">
-              <MapPin className="w-4 h-4 text-neutral-400 shrink-0" />
-              <span>
-                {property.sector ? `${property.sector}, ` : ""}
-                {property.city} • {property.address}
-              </span>
-            </div>
-
-            {property.googleMapsUrl && (
-              <div className="pt-2">
-                <a
-                  href={property.googleMapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 pl-1.5 pr-3 py-1 rounded-xl bg-neutral-50/80 hover:bg-white text-text-primary hover:text-brand-accent border border-neutral-200/80 hover:border-brand-accent/40 text-xs font-semibold shadow-2xs hover:shadow-xs transition-all duration-150 group/map self-start"
-                  title="Abrir ubicación en Google Maps"
-                >
-                  <span className="w-5 h-5 rounded-lg bg-white border border-neutral-200/70 flex items-center justify-center text-brand-accent shadow-2xs group-hover/map:border-brand-accent/30 group-hover/map:scale-105 transition-all shrink-0">
-                    <MapPin className="w-3 h-3 text-brand-accent" />
-                  </span>
-                  <span>Ver en Google Maps</span>
-                  <ExternalLink className="w-3 h-3 text-neutral-400 group-hover/map:text-brand-accent group-hover/map:translate-x-0.5 group-hover/map:-translate-y-0.5 transition-transform shrink-0 ml-0.5" />
-                </a>
-              </div>
-            )}
-          </div>
-
-          {/* Precio Destacado */}
-          <div className="bg-ui-surface p-4 sm:p-6 rounded-2xl border border-neutral-200 shadow-sm shrink-0">
-            <span className="block text-xs uppercase font-bold text-text-secondary tracking-wider">
-              Precio Asignado
-            </span>
-            <div className="text-3xl sm:text-4xl font-black text-brand-accent">
-              {formatCurrency(property.price.toString(), property.currency)}
-            </div>
-            {property.operationType === "RENT" && (
-              <span className="text-xs text-text-secondary">Canon mensual de arrendamiento</span>
-            )}
-          </div>
-        </div>
-
-        {/* Contenido en dos columnas: Galeria y Ficha vs Tarjeta del Asesor */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-          {/* Columna Izquierda: Galeria y Ficha Tecnica (8 cols) */}
-          <div className="lg:col-span-8 space-y-10">
-            {/* Galeria */}
+        {/* LAYOUT EDITORIAL DE ALTO IMPACTO (Galeria y Contenido a la izquierda, Ficha Maestra con Precio y Asesor a la derecha sin espacios vacios) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+          {/* COLUMNA IZQUIERDA (7 de 12 cols): Galeria de fotos + Descripcion detallada + Amenidades */}
+          <div className="lg:col-span-7 space-y-6">
+            {/* 1. Galeria Interactiva de Fotografias (El elemento visual protagonista) */}
             <PropertyGallery images={property.images} title={property.title} />
 
-            {/* Barra de Distribucion Cuantitativa */}
-            <section className="bg-ui-surface p-6 sm:p-8 rounded-3xl border border-neutral-200 shadow-sm">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-text-secondary mb-6">
-                Distribución Cuantitativa
+            {/* 2. Descripcion Editorial de la Propiedad con Sombra y Profundidad Real */}
+            <section className="bg-white rounded-[28px] p-6 sm:p-7 border border-[#DFD1B8] shadow-[0_12px_36px_rgba(24,38,28,0.10),0_2px_8px_rgba(0,0,0,0.04)] ring-1 ring-black/[0.03] space-y-3">
+              <h2 className="text-xs font-black uppercase tracking-widest text-neutral-400 font-heading flex items-center gap-2">
+                <FileText className="w-4 h-4 text-brand-accent" />
+                <span>Sobre esta propiedad</span>
               </h2>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
-                <div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-100 flex flex-col items-center justify-center">
-                  <Bed className="w-6 h-6 text-brand-primary mb-2" />
-                  <span className="text-2xl font-black text-text-primary">
-                    {property.bedrooms ?? 0}
-                  </span>
-                  <span className="text-xs font-medium text-text-secondary">Habitaciones</span>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-100 flex flex-col items-center justify-center">
-                  <Bath className="w-6 h-6 text-brand-primary mb-2" />
-                  <span className="text-2xl font-black text-text-primary">
-                    {property.bathrooms ?? 0}
-                  </span>
-                  <span className="text-xs font-medium text-text-secondary">Baños</span>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-100 flex flex-col items-center justify-center">
-                  <Car className="w-6 h-6 text-brand-primary mb-2" />
-                  <span className="text-2xl font-black text-text-primary">
-                    {property.parkingSpots ?? 0}
-                  </span>
-                  <span className="text-xs font-medium text-text-secondary">Puestos Est.</span>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-100 flex flex-col items-center justify-center">
-                  <Maximize2 className="w-6 h-6 text-brand-primary mb-2" />
-                  <span className="text-2xl font-black text-text-primary">
-                    {property.areaSquareMeters ? property.areaSquareMeters.toString() : "-"}
-                  </span>
-                  <span className="text-xs font-medium text-text-secondary">Área m²</span>
-                </div>
-              </div>
-            </section>
-
-            {/* Descripcion General */}
-            <section className="bg-ui-surface p-6 sm:p-8 rounded-3xl border border-neutral-200 shadow-sm space-y-4">
-              <h2 className="text-lg font-bold text-brand-primary">Descripción General del Inmueble</h2>
-              <div className="text-text-primary text-sm sm:text-base leading-relaxed whitespace-pre-line">
+              <div className="text-neutral-700 text-sm sm:text-base leading-relaxed whitespace-pre-line font-normal">
                 {property.description}
               </div>
             </section>
 
-            {/* Amenidades y Equipamiento */}
+            {/* 3. Amenidades y Equipamiento en Chips Modernos con Sombra y Profundidad */}
             {property.amenities.length > 0 && (
-              <section className="bg-ui-surface p-6 sm:p-8 rounded-3xl border border-neutral-200 shadow-sm space-y-4">
-                <h2 className="text-lg font-bold text-brand-primary">Amenidades y Equipamiento</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              <section className="bg-white rounded-[28px] p-6 sm:p-7 border border-[#DFD1B8] shadow-[0_12px_36px_rgba(24,38,28,0.10),0_2px_8px_rgba(0,0,0,0.04)] ring-1 ring-black/[0.03] space-y-3.5">
+                <h2 className="text-xs font-black uppercase tracking-widest text-neutral-400 font-heading flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <span>Amenidades y Equipamiento ({property.amenities.length})</span>
+                </h2>
+
+                <div className="flex flex-wrap gap-2 pt-1">
                   {property.amenities.map((item, index) => (
                     <div
                       key={index}
-                      className="flex items-center gap-3 p-3 rounded-xl bg-neutral-50 border border-neutral-100 text-sm font-medium text-text-primary"
+                      className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-b from-white to-[#FAF8F4] border border-[#DFD1B8] text-xs sm:text-sm font-bold text-neutral-800 shadow-[0_2px_8px_-2px_rgba(26,59,38,0.06),0_1px_2px_rgba(0,0,0,0.02)] hover:border-brand-accent/50 hover:shadow-md hover:-translate-y-0.5 transition-all"
                     >
-                      <CheckCircle2 className="w-5 h-5 text-brand-accent shrink-0" />
+                      <div className="w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 shadow-xs">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                      </div>
                       <span>{item}</span>
                     </div>
                   ))}
@@ -227,70 +253,292 @@ export default async function PropertyDetailPage({ params }: PageProps) {
             )}
           </div>
 
-          {/* Columna Derecha: Tarjeta del Asesor Asignado (4 cols) */}
-          <aside className="lg:col-span-4 space-y-6">
-            <div className="sticky top-28 bg-ui-surface p-6 sm:p-8 rounded-3xl border border-neutral-200 shadow-lg space-y-6">
-              <div className="text-center space-y-3 pb-6 border-b border-neutral-100">
-                <div className="relative w-24 h-24 mx-auto rounded-full overflow-hidden border-4 border-brand-accent/20 shadow-md">
-                  <Image
-                    src={
-                      property.agent.avatarUrl ||
-                      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80"
-                    }
-                    alt={property.agent.name}
-                    fill
-                    sizes="96px"
-                    className="object-cover"
-                  />
+          {/* COLUMNA DERECHA (5 de 12 cols): Panel Maestro de Decision, Precio, Especificaciones y Asesor */}
+          <div className="lg:col-span-5 lg:sticky lg:top-24 self-start space-y-4">
+            {/* Tarjeta Maestra Integrada: Titulo + Precio + Medidas Clave + Asesor con Sombra y Profundidad */}
+            <div className="bg-white rounded-[28px] p-6 sm:p-7 border border-[#DFD1B8] shadow-[0_18px_48px_rgba(24,38,28,0.13),0_4px_12px_rgba(0,0,0,0.05)] ring-1 ring-black/[0.04] space-y-5">
+              {/* Badges de Operacion y Tipo */}
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`text-white text-xs font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-md ${
+                      property.operationType === "SALE"
+                        ? "bg-gradient-to-r from-brand-accent via-[#ea5a2a] to-[#d64516] border border-white/20 shadow-brand-accent/30"
+                        : "bg-gradient-to-r from-brand-primary to-[#255236] border border-white/20 shadow-brand-primary/30"
+                    }`}
+                  >
+                    {property.operationType === "SALE" ? "En Venta" : "En Alquiler"}
+                  </span>
+                  <span className="bg-white text-brand-primary text-xs font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full border border-neutral-200/90 shadow-2xs">
+                    {propertyTypeLabel}
+                  </span>
                 </div>
-                <div>
-                  <h3 className="text-lg font-black text-brand-primary">{property.agent.name}</h3>
-                  <p className="text-xs font-semibold text-text-secondary">Asesor Inmobiliario</p>
-                </div>
+
+                {property.status === "SOLD" && (
+                  <span className="bg-red-600 text-white text-[11px] font-black uppercase px-2.5 py-0.5 rounded-full shadow-sm">
+                    Vendido
+                  </span>
+                )}
+                {property.status === "RENTED" && (
+                  <span className="bg-neutral-800 text-white text-[11px] font-black uppercase px-2.5 py-0.5 rounded-full shadow-sm">
+                    Alquilado
+                  </span>
+                )}
               </div>
 
-              {/* Informacion de Contacto */}
-              <div className="space-y-3 text-xs text-text-secondary">
-                {property.agent.phone && (
-                  <div className="flex items-center justify-between p-3 rounded-xl bg-neutral-50 border border-neutral-100">
-                    <span className="font-medium">Teléfono / WhatsApp:</span>
-                    <span className="font-bold text-text-primary">{property.agent.phone}</span>
+              {/* Titulo Monumental */}
+              <h1 className="font-heading font-black text-2xl sm:text-3xl text-brand-primary tracking-tight leading-snug">
+                {property.title}
+              </h1>
+
+              {/* Ubicacion y Enlace a Google Maps */}
+              <div className="space-y-1 text-xs text-neutral-600 font-medium pb-2 border-b border-neutral-100">
+                <div className="flex items-center gap-1.5">
+                  <MapPin className="w-4 h-4 text-brand-accent shrink-0" />
+                  <span className="font-bold text-neutral-800 text-sm">
+                    {property.sector ? `${property.sector}, ` : ""}{property.city}
+                  </span>
+                </div>
+                <p className="text-neutral-500 pl-5 leading-relaxed">{property.address}</p>
+
+                {property.googleMapsUrl && (
+                  <div className="pt-1.5 pl-5">
+                    <a
+                      href={property.googleMapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs font-bold text-brand-accent hover:underline"
+                    >
+                      <span>Ver en Google Maps</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
                   </div>
                 )}
-                {property.agent.instagram && (
-                  <a
-                    href={`https://instagram.com/${property.agent.instagram.replace("@", "")}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between p-3 rounded-xl bg-neutral-50 border border-neutral-100 hover:bg-neutral-100 transition-colors"
-                  >
-                    <span className="flex items-center gap-1.5 font-medium">
-                      <InstagramIcon className="w-3.5 h-3.5 text-pink-600" />
-                      Instagram:
-                    </span>
-                    <span className="font-bold text-brand-primary">@{property.agent.instagram.replace("@", "")}</span>
-                  </a>
-                )}
               </div>
 
-              {/* Boton CTA Principal a WhatsApp */}
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full py-4 px-6 rounded-2xl bg-[#25D366] hover:bg-[#20ba5a] text-white font-bold text-sm flex items-center justify-center gap-2.5 shadow-lg shadow-green-600/20 transition-all active:scale-95 text-center leading-tight"
-              >
-                <MessageCircle className="w-5 h-5 fill-current" />
-                <span>Consultar por WhatsApp</span>
-              </a>
+              {/* Bloque Destacado de Precio con Mayor Relieve */}
+              <div className="p-4.5 rounded-2xl bg-gradient-to-br from-[#FAF7F1] via-[#F5EFE3] to-[#ECE3D2] border border-[#DFD1B8] shadow-[inset_0_2px_5px_rgba(26,59,38,0.05),0_2px_6px_rgba(0,0,0,0.03)]">
+                <span className="text-[10px] font-black uppercase tracking-widest text-neutral-400 block mb-0.5">
+                  {property.operationType === "SALE" ? "Precio de Venta" : "Canon de Arrendamiento"}
+                </span>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3xl sm:text-4xl font-black font-heading tracking-tight text-brand-primary">
+                    {formatCurrency(property.price.toString(), property.currency)}
+                  </span>
+                  {property.operationType === "RENT" && (
+                    <span className="text-xs font-bold text-brand-accent">/ mes</span>
+                  )}
+                </div>
+              </div>
 
-              <p className="text-[11px] text-center text-text-secondary leading-normal">
-                Al presionar el botón se abrirá el chat con el asesor a cargo con la ficha de la propiedad prellenada.
-              </p>
+              {/* Tira Unificada de Especificaciones con Profundidad Inset */}
+              <div className="py-3 px-1.5 bg-gradient-to-b from-[#FDFBF7] via-[#F8F3EA] to-[#EFE7D8] rounded-2xl border border-[#DFD1B8] shadow-[inset_0_2px_5px_rgba(26,59,38,0.06),0_2px_6px_rgba(0,0,0,0.03)] grid grid-cols-4 divide-x divide-[#DFD1B8] text-center">
+                <div className="flex flex-col items-center justify-center px-1">
+                  <div className="flex items-center gap-1 text-brand-primary">
+                    <Bed className="w-3.5 h-3.5 text-brand-accent shrink-0" />
+                    <span className="font-black text-sm text-neutral-900 leading-none">
+                      {property.bedrooms ?? "-"}
+                    </span>
+                  </div>
+                  <span className="text-[9.5px] text-neutral-500 font-bold uppercase tracking-wider mt-1 block">
+                    Hab
+                  </span>
+                </div>
+
+                <div className="flex flex-col items-center justify-center px-1">
+                  <div className="flex items-center gap-1 text-brand-primary">
+                    <Bath className="w-3.5 h-3.5 text-brand-accent shrink-0" />
+                    <span className="font-black text-sm text-neutral-900 leading-none">
+                      {property.bathrooms ?? "-"}
+                    </span>
+                  </div>
+                  <span className="text-[9.5px] text-neutral-500 font-bold uppercase tracking-wider mt-1 block">
+                    Baños
+                  </span>
+                </div>
+
+                <div className="flex flex-col items-center justify-center px-1">
+                  <div className="flex items-center gap-1 text-brand-primary">
+                    <Car className="w-3.5 h-3.5 text-brand-accent shrink-0" />
+                    <span className="font-black text-sm text-neutral-900 leading-none">
+                      {property.parkingSpots ?? "-"}
+                    </span>
+                  </div>
+                  <span className="text-[9.5px] text-neutral-500 font-bold uppercase tracking-wider mt-1 block">
+                    Estac.
+                  </span>
+                </div>
+
+                <div className="flex flex-col items-center justify-center px-1">
+                  <div className="flex items-center gap-1 text-brand-primary">
+                    <Maximize2 className="w-3.5 h-3.5 text-brand-accent shrink-0" />
+                    <span className="font-black text-sm text-neutral-900 leading-none truncate max-w-full">
+                      {property.areaSquareMeters ? Number(property.areaSquareMeters) : "-"}
+                    </span>
+                  </div>
+                  <span className="text-[9.5px] text-neutral-500 font-bold uppercase tracking-wider mt-1 block">
+                    m²
+                  </span>
+                </div>
+              </div>
+
+              {/* Terreno y Año si existen (chips secundarios armoniosos) */}
+              {(property.lotSquareMeters || property.yearBuilt) && (
+                <div className="flex flex-wrap items-center gap-2 text-xs font-bold text-neutral-600">
+                  {property.lotSquareMeters && (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-b from-white to-[#F9F6F0] border border-[#DFD1B8] text-neutral-700 text-[11px] shadow-xs">
+                      <Layers className="w-3 h-3 text-brand-accent" />
+                      <span>Terreno: {Number(property.lotSquareMeters)} m²</span>
+                    </span>
+                  )}
+                  {property.yearBuilt && (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-b from-white to-[#F9F6F0] border border-[#DFD1B8] text-neutral-700 text-[11px] shadow-xs">
+                      <Calendar className="w-3 h-3 text-brand-accent" />
+                      <span>Año: {property.yearBuilt}</span>
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {/* Ficha del Asesor y Canales de Contacto Directo */}
+              <div className="pt-3 border-t border-neutral-100 space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="relative w-14 h-14 rounded-2xl overflow-hidden bg-brand-primary text-white font-black text-base flex items-center justify-center shrink-0 ring-4 ring-white shadow-[0_8px_20px_-4px_rgba(26,59,38,0.22)]">
+                    {property.agent.avatarUrl ? (
+                      <Image
+                        src={property.agent.avatarUrl}
+                        alt={property.agent.name}
+                        fill
+                        sizes="56px"
+                        className="object-cover"
+                      />
+                    ) : (
+                      <span>{getInitials(property.agent.name)}</span>
+                    )}
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <span className="text-[9px] font-extrabold uppercase tracking-widest text-neutral-400 block leading-none">
+                      Asesor Asignado
+                    </span>
+                    <h3 className="text-base font-black text-brand-primary font-heading truncate mt-0.5">
+                      {property.agent.name}
+                    </h3>
+                    <p className="text-xs font-medium text-neutral-500 truncate">
+                      {property.agent.position || "Asesor Inmobiliario"}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Boton Primario WhatsApp de Alta Conversion con Mayor Profundidad */}
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-emerald-600 via-emerald-600 to-[#128c46] hover:from-emerald-500 hover:to-[#0f7a3d] text-white font-black text-sm flex items-center justify-center gap-2 shadow-[0_10px_28px_-6px_rgba(16,149,76,0.40),0_4px_10px_-2px_rgba(0,0,0,0.06)] hover:shadow-[0_16px_34px_-6px_rgba(16,149,76,0.50)] hover:-translate-y-0.5 transition-all active:scale-95 text-center cursor-pointer group"
+                >
+                  <MessageCircle className="w-4 h-4 fill-white text-emerald-600 group-hover:scale-110 transition-transform" />
+                  <span>Consultar por WhatsApp</span>
+                </a>
+
+                {/* Canales Secundarios Directos */}
+                <div className="grid grid-cols-2 gap-2 text-xs font-bold text-neutral-700">
+                  {property.agent.phone && (
+                    <a
+                      href={`tel:${property.agent.phone.replace(/\s+/g, "")}`}
+                      className="p-2.5 rounded-xl bg-gradient-to-b from-white to-[#FBF9F5] hover:to-white border border-[#DFD1B8] shadow-xs hover:shadow-sm hover:-translate-y-0.5 flex items-center justify-center gap-1.5 transition-all"
+                      title="Llamar directo al asesor"
+                    >
+                      <Phone className="w-3.5 h-3.5 text-brand-primary" />
+                      <span>Llamar</span>
+                    </a>
+                  )}
+
+                  {property.agent.instagram && (
+                    <a
+                      href={`https://instagram.com/${property.agent.instagram.replace("@", "")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2.5 rounded-xl bg-gradient-to-b from-white to-[#FBF9F5] hover:to-white border border-[#DFD1B8] shadow-xs hover:shadow-sm hover:-translate-y-0.5 flex items-center justify-center gap-1.5 transition-all"
+                      title="Ver Instagram"
+                    >
+                      <InstagramIcon className="w-3.5 h-3.5 text-pink-600" />
+                      <span>Instagram</span>
+                    </a>
+                  )}
+                </div>
+              </div>
             </div>
-          </aside>
+          </div>
         </div>
+
+        {/* SECCION INFERIOR: Inmuebles que tambien te pueden interesar (4 aleatorios) */}
+        {similarProperties.length > 0 && (
+          <section className="pt-12 sm:pt-16 border-t border-[#E8DEC9]/80 space-y-6">
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-accent/10 border border-brand-accent/25 text-brand-accent text-xs font-black uppercase tracking-wider shadow-2xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-accent" />
+                <span>Recomendaciones para ti</span>
+              </div>
+
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black font-heading text-brand-primary tracking-tight">
+                Inmuebles que también te pueden interesar
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+              {similarProperties.map((simProp) => (
+                <PropertyCard
+                  key={simProp.id}
+                  property={{
+                    id: simProp.id,
+                    title: simProp.title,
+                    slug: simProp.slug,
+                    operationType: simProp.operationType as "SALE" | "RENT",
+                    propertyType: simProp.propertyType,
+                    customPropertyType: simProp.customPropertyType,
+                    status: simProp.status as "AVAILABLE" | "RESERVED" | "SOLD" | "RENTED",
+                    price: simProp.price.toString(),
+                    currency: simProp.currency,
+                    bedrooms: simProp.bedrooms,
+                    bathrooms: simProp.bathrooms,
+                    parkingSpots: simProp.parkingSpots,
+                    areaSquareMeters: simProp.areaSquareMeters?.toString(),
+                    city: simProp.city,
+                    sector: simProp.sector,
+                    coverImageUrl: simProp.images[0]?.url || null,
+                    imagesCount: simProp._count.images,
+                    images: simProp.images,
+                    agent: simProp.agent,
+                  }}
+                />
+              ))}
+            </div>
+          </section>
+        )}
       </main>
+
+      {/* Barra de Conversion Flotante Inferior en Moviles con Mayor Profundidad */}
+      <div className="sm:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-xl border-t border-[#DFD1B8] p-3 flex items-center justify-between gap-3 shadow-[0_-12px_36px_rgba(26,59,38,0.15)] ring-1 ring-black/[0.04]">
+        <div>
+          <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+            {property.operationType === "SALE" ? "Venta" : "Alquiler"}
+          </span>
+          <span className="text-lg font-black font-heading text-brand-primary">
+            {formatCurrency(property.price.toString(), property.currency)}
+          </span>
+        </div>
+
+        <a
+          href={whatsappUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="py-2.5 px-4 rounded-xl bg-emerald-600 text-white font-black text-xs flex items-center gap-1.5 shadow-md active:scale-95"
+        >
+          <MessageCircle className="w-4 h-4 fill-white text-emerald-600" />
+          <span>Consultar</span>
+        </a>
+      </div>
 
       <Footer />
     </div>

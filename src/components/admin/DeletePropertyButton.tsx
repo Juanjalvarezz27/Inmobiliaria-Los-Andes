@@ -4,16 +4,38 @@ import { useState, useTransition } from "react";
 import { deletePropertyAction } from "@/app/admin/actions";
 import { Trash2 } from "lucide-react";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { toast } from "sonner";
 
-// Boton de eliminacion con modal de confirmacion y transicion de estado
-export function DeletePropertyButton({ id, title }: { id: string; title: string }) {
+// Boton de eliminacion con modal de confirmacion y soporte para eliminacion optimista
+export function DeletePropertyButton({
+  id,
+  title,
+  onDeleted,
+}: {
+  id: string;
+  title: string;
+  onDeleted?: (id: string) => void;
+}) {
   const [isPending, startTransition] = useTransition();
   const [showConfirm, setShowConfirm] = useState(false);
 
   const handleDelete = () => {
-    startTransition(async () => {
-      await deletePropertyAction(id);
+    // Si hay callback optimista, cierra modal y remueve de la lista al instante (0ms)
+    if (onDeleted) {
+      onDeleted(id);
       setShowConfirm(false);
+    }
+    startTransition(async () => {
+      try {
+        await deletePropertyAction(id);
+        if (!onDeleted) {
+          toast.success("Inmueble eliminado correctamente");
+          setShowConfirm(false);
+        }
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "Error al eliminar el inmueble.";
+        toast.error("Error al eliminar", { description: msg });
+      }
     });
   };
 

@@ -178,7 +178,7 @@ export function AgentPropertiesGrid({
               return (
                 <div
                   key={property.id}
-                  className="bg-white rounded-[26px] border border-neutral-200/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,1)] hover:shadow-[0_14px_32px_-8px_rgba(26,59,38,0.14)] hover:-translate-y-1 hover:border-brand-primary/30 transition-all duration-200 overflow-hidden flex flex-col justify-between group"
+                  className="bg-white rounded-[26px] border border-neutral-200/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,1)] hover:shadow-[0_14px_32px_-8px_rgba(26,59,38,0.14)] hover:-translate-y-1 hover:border-brand-primary/30 transition-[transform,box-shadow,border-color] duration-200 ease-out overflow-hidden flex flex-col justify-between group will-change-transform"
                 >
                   <div>
                     {/* Imagen de Portada y Badges flotantes */}
@@ -187,30 +187,32 @@ export function AgentPropertiesGrid({
                         src={coverImage}
                         alt={property.title}
                         fill
+                        loading="lazy"
+                        decoding="async"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="object-cover group-hover:scale-105 transition-transform duration-300 ease-out will-change-transform"
                       />
                       <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
                         <span
-                          className={`text-[10px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-xl text-white shadow-md backdrop-blur-md ${
+                          className={`text-[10px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-xl text-white shadow-md ${
                             property.operationType === "SALE"
-                              ? "bg-brand-primary/90 border border-emerald-500/30"
-                              : "bg-brand-accent/90 border border-orange-400/30"
+                              ? "bg-brand-primary/95 border border-emerald-500/30"
+                              : "bg-brand-accent/95 border border-orange-400/30"
                           }`}
                         >
                           {property.operationType === "SALE" ? "Venta" : "Alquiler"}
                         </span>
                         <span
-                          className={`text-[10px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-xl text-white shadow-md backdrop-blur-md ${
+                          className={`text-[10px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-xl text-white shadow-md ${
                             property.status === "AVAILABLE"
-                              ? "bg-emerald-600/90 border border-emerald-400/30"
+                              ? "bg-emerald-600/95 border border-emerald-400/30"
                               : property.status === "RESERVED"
-                              ? "bg-amber-600/90 border border-amber-400/30"
+                              ? "bg-amber-600/95 border border-amber-400/30"
                               : property.status === "SOLD"
-                              ? "bg-red-600/90 border border-red-400/30"
+                              ? "bg-red-600/95 border border-red-400/30"
                               : property.status === "RENTED"
-                              ? "bg-blue-600/90 border border-blue-400/30"
-                              : "bg-neutral-700/90 border border-neutral-500/30"
+                              ? "bg-blue-600/95 border border-blue-400/30"
+                              : "bg-neutral-700/95 border border-neutral-500/30"
                           }`}
                         >
                           {property.status === "AVAILABLE"

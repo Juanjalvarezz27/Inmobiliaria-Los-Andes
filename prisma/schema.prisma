@@ -56,6 +56,7 @@ model User {
   instagram    String?
   role         Role       @default(AGENT)
   isActive     Boolean    @default(true)
+  featured     Boolean    @default(false)
   properties   Property[]
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt

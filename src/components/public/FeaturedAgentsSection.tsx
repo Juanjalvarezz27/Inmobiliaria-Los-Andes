@@ -2,7 +2,7 @@
 
 import { useRef, useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { MessageCircle, ChevronLeft, ChevronRight, UserCheck } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 
 export interface FeaturedAgentData {
   id: string;
@@ -28,14 +28,26 @@ function getInitials(name: string): string {
   return name.substring(0, 2).toUpperCase();
 }
 
-// Escaparate de asesores con fondo Parallax arquitectonico, tarjetas luminosas y titular heroico
+// Escaparate de asesores con fondo Parallax arquitectonico, tarjetas luminosas y carrusel 3D autonomo
 export function FeaturedAgentsSection({ agents, totalAgents }: FeaturedAgentsSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const parallaxRef = useRef<HTMLDivElement>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const touchStartX = useRef<number | null>(null);
+  const touchDeltaX = useRef<number>(0);
+  const total = agents.length;
+
+  // Deteccion responsiva para espaciado optimo en moviles y escritorio
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Efecto Parallax desacoplado a 60fps acelerado por hardware
   useEffect(() => {
@@ -64,42 +76,51 @@ export function FeaturedAgentsSection({ agents, totalAgents }: FeaturedAgentsSec
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Evaluacion continua de scroll
-  const checkScroll = useCallback(() => {
-    if (!scrollRef.current) return;
-    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-    setCanScrollLeft(scrollLeft > 15);
-    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 15);
+  const nextSlide = useCallback(() => {
+    if (total <= 1) return;
+    setActiveIndex((prev) => (prev + 1) % total);
+  }, [total]);
 
-    const cardWidth = 295;
-    const index = Math.round(scrollLeft / cardWidth);
-    setActiveIndex(Math.max(0, Math.min(index, agents.length - 1)));
-  }, [agents.length]);
+  const prevSlide = useCallback(() => {
+    if (total <= 1) return;
+    setActiveIndex((prev) => (prev - 1 + total) % total);
+  }, [total]);
 
-  useEffect(() => {
-    checkScroll();
-    window.addEventListener("resize", checkScroll);
-    return () => window.removeEventListener("resize", checkScroll);
-  }, [checkScroll]);
-
-  // Desplazamiento horizontal adaptado a dimensiones compactas
-  const scroll = (direction: "left" | "right") => {
-    if (!scrollRef.current) return;
-    const amount = 295;
-    scrollRef.current.scrollBy({
-      left: direction === "left" ? -amount : amount,
-      behavior: "smooth",
-    });
+  const goToSlide = (idx: number) => {
+    setActiveIndex(idx);
   };
 
-  // Navegacion directa desde puntos inferiores
-  const scrollToIndex = (index: number) => {
-    if (!scrollRef.current) return;
-    const amount = 295;
-    scrollRef.current.scrollTo({
-      left: index * amount,
-      behavior: "smooth",
-    });
+  // Rotacion automatica a 3.5s pausada en hover o toque
+  useEffect(() => {
+    if (isPaused || total <= 1) return;
+    const timer = setInterval(() => {
+      nextSlide();
+    }, 3500);
+    return () => clearInterval(timer);
+  }, [isPaused, nextSlide, total]);
+
+  // Manejadores de gestos tactiles para swipe en moviles
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchDeltaX.current = 0;
+    setIsPaused(true);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    touchDeltaX.current = e.touches[0].clientX - touchStartX.current;
+  };
+
+  const handleTouchEnd = () => {
+    if (Math.abs(touchDeltaX.current) > 35) {
+      if (touchDeltaX.current > 0) {
+        prevSlide();
+      } else {
+        nextSlide();
+      }
+    }
+    touchStartX.current = null;
+    setIsPaused(false);
   };
 
   if (agents.length === 0) return null;
@@ -134,7 +155,7 @@ export function FeaturedAgentsSection({ agents, totalAgents }: FeaturedAgentsSec
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Cabecera monumental con sistema de iluminacion bilateral verde esmeralda */}
-        <div className="relative mx-auto max-w-5xl text-center pb-10 sm:pb-14">
+        <div className="relative mx-auto max-w-5xl text-center pb-2 sm:pb-4">
           {/* Sistema de luces bilateral verde: destellos esmeralda a los lados y centro limpio */}
           <div aria-hidden className="pointer-events-none absolute inset-0 overflow-visible">
             {/* Flanco lateral izquierdo: Destello esmeralda vivo expandido */}
@@ -196,175 +217,202 @@ export function FeaturedAgentsSection({ agents, totalAgents }: FeaturedAgentsSec
           </h2>
         </div>
 
-        {/* Controles de navegacion flotantes cuando hay mas de 3 asesores */}
-        <div className="relative">
-          {agents.length > 3 && (
-            <div className="hidden sm:flex items-center justify-end gap-2 mb-4">
-              <button
-                type="button"
-                onClick={() => scroll("left")}
-                disabled={!canScrollLeft}
-                aria-label="Ver asesor anterior"
-                className={`flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200/90 bg-white text-neutral-800 shadow-sm backdrop-blur-md transition-all duration-300 ${
-                  canScrollLeft
-                    ? "hover:bg-brand-accent hover:text-white hover:border-brand-accent hover:scale-105 active:scale-95 cursor-pointer"
-                    : "opacity-35 cursor-not-allowed"
-                }`}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => scroll("right")}
-                disabled={!canScrollRight}
-                aria-label="Ver asesor siguiente"
-                className={`flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200/90 bg-white text-neutral-800 shadow-sm backdrop-blur-md transition-all duration-300 ${
-                  canScrollRight
-                    ? "hover:bg-brand-accent hover:text-white hover:border-brand-accent hover:scale-105 active:scale-95 cursor-pointer"
-                    : "opacity-35 cursor-not-allowed"
-                }`}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
-          )}
-
-          {/* Riel horizontal con tarjetas luminosas blancas y notch integrado */}
+        {/* Escenario 3D interactivo con rotacion continua */}
+        <div className="relative mt-0 sm:mt-1">
           <div
-            ref={scrollRef}
-            onScroll={checkScroll}
-            className="flex gap-6 overflow-x-auto px-4 py-6 justify-start md:justify-center no-scrollbar snap-x snap-mandatory scroll-smooth"
-            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            className="relative w-full select-none"
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           >
-            {agents.map((agent) => {
-              const cleanPhone = (agent.phone || "").replace(/\D/g, "");
-              const waUrl = `https://wa.me/${cleanPhone || "584140000000"}?text=${encodeURIComponent(
-                `Hola ${agent.name}, deseo recibir asesoría inmobiliaria personalizada con Inmobiliaria Los Andes.`
-              )}`;
+            {/* Contenedor de perspectiva 3D cilindrica */}
+            <div
+              className="relative mx-auto flex h-[430px] sm:h-[455px] md:h-[470px] w-full items-center justify-center overflow-visible"
+              style={{ perspective: "1400px" }}
+            >
+              {agents.map((agent, idx) => {
+                let diff = idx - activeIndex;
+                if (diff > total / 2) diff -= total;
+                if (diff < -total / 2) diff += total;
 
-              return (
-                <div
-                  key={agent.id}
-                  className="group relative flex w-[250px] sm:w-[275px] shrink-0 snap-start flex-col rounded-[26px] bg-white p-3 text-neutral-900 border border-neutral-200/80 shadow-[0_8px_24px_rgba(0,0,0,0.05)] transition-all duration-300 hover:-translate-y-1.5 hover:border-brand-accent/40 hover:shadow-[0_16px_36px_rgba(222,88,42,0.12)]"
-                >
-                  {/* Marco superior de fotografia con muesca exterior superpuesta sin costuras ni cortes */}
-                  <div className="relative">
-                    <div className="relative w-full h-56 sm:h-60 rounded-[20px] overflow-hidden select-none bg-neutral-100 group/photo">
-                      {agent.avatarUrl ? (
-                        <Image
-                          src={agent.avatarUrl}
-                          alt={agent.name}
-                          fill
-                          sizes="(max-width: 640px) 100vw, 275px"
-                          className="object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#123824] via-[#0e1713] to-[#06120b] text-white">
-                          <span className="font-heading text-4xl font-black text-emerald-300">
-                            {getInitials(agent.name)}
+                const isActive = diff === 0;
+                const absDiff = Math.abs(diff);
+
+                // Geometria de punto medio: arco 3D equilibrado hacia los laterales
+                let translateX = 0;
+                let rotateY = 0;
+                let translateZ = 0;
+                let scale = 1;
+                let opacity = 0;
+                let zIndex = 10;
+                const isInteractive = isMobile ? absDiff <= 1 : absDiff <= 2;
+
+                if (absDiff === 0) {
+                  translateX = 0;
+                  rotateY = 0;
+                  translateZ = isMobile ? 30 : 50;
+                  scale = isMobile ? 1.02 : 1.06;
+                  opacity = 1;
+                  zIndex = 40;
+                } else if (absDiff === 1) {
+                  const sign = Math.sign(diff);
+                  translateX = sign * (isMobile ? 175 : 255);
+                  rotateY = -sign * (isMobile ? 16 : 20);
+                  translateZ = isMobile ? -50 : -60;
+                  scale = isMobile ? 0.84 : 0.88;
+                  opacity = 0.94;
+                  zIndex = 30;
+                } else if (absDiff === 2 && !isMobile) {
+                  const sign = Math.sign(diff);
+                  translateX = sign * 460;
+                  rotateY = -sign * 30;
+                  translateZ = -150;
+                  scale = 0.75;
+                  opacity = 0.58;
+                  zIndex = 20;
+                } else {
+                  opacity = 0;
+                  zIndex = 5;
+                  translateX = Math.sign(diff) * (isMobile ? 260 : 540);
+                  scale = 0.65;
+                  translateZ = -220;
+                }
+
+                const cleanPhone = (agent.phone || "").replace(/\D/g, "");
+                const waUrl = `https://wa.me/${cleanPhone || "584140000000"}?text=${encodeURIComponent(
+                  `Hola ${agent.name}, deseo recibir asesoría inmobiliaria personalizada con Inmobiliaria Los Andes.`
+                )}`;
+
+                return (
+                  <div
+                    key={agent.id}
+                    onClick={(e) => {
+                      if (!isActive && isInteractive) {
+                        e.preventDefault();
+                        goToSlide(idx);
+                      }
+                    }}
+                    style={{
+                      transform: `translate3d(calc(-50% + ${translateX}px), calc(-50% + ${absDiff * 6}px), ${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`,
+                      zIndex,
+                      opacity,
+                      pointerEvents: isInteractive ? "auto" : "none",
+                      transition:
+                        "transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease, box-shadow 0.5s ease",
+                      willChange: "transform, opacity",
+                    }}
+                    className={`group absolute top-1/2 left-1/2 flex w-[250px] sm:w-[275px] md:w-[280px] shrink-0 select-none flex-col rounded-[26px] bg-white p-3 text-neutral-900 border transition-all duration-300 cursor-pointer ${
+                      isActive
+                        ? "ring-2 ring-brand-accent/90 shadow-[0_25px_60px_-10px_rgba(222,88,42,0.35)] border-brand-accent/40"
+                        : "ring-1 ring-white/60 shadow-xl border-neutral-200/80 hover:opacity-100 hover:ring-brand-accent/40"
+                    }`}
+                  >
+                    {/* Marco superior de fotografia con muesca exterior superpuesta */}
+                    <div className="relative">
+                      <div
+                        className="relative w-full h-56 sm:h-60 rounded-[20px] overflow-hidden select-none bg-neutral-100 group/photo isolate [transform:translateZ(0)]"
+                        style={{
+                          WebkitMaskImage: "-webkit-radial-gradient(white, black)",
+                          maskImage: "radial-gradient(white, black)",
+                        }}
+                      >
+                        {agent.avatarUrl ? (
+                          <Image
+                            src={agent.avatarUrl}
+                            alt={agent.name}
+                            fill
+                            sizes="(max-width: 640px) 100vw, 280px"
+                            className="object-cover object-center rounded-[20px] transition-transform duration-500 ease-out group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center rounded-[20px] bg-gradient-to-br from-[#123824] via-[#0e1713] to-[#06120b] text-white">
+                            <span className="font-heading text-4xl font-black text-emerald-300">
+                              {getInitials(agent.name)}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Barra superior con estado disponible */}
+                        <div className="relative z-20 w-full flex items-center justify-between p-3">
+                          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1.5 bg-white/95 text-emerald-800 border border-emerald-500/20 shadow-xs">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            Disponible
                           </span>
                         </div>
-                      )}
+                      </div>
 
-                      {/* Barra superior con estado disponible */}
-                      <div className="relative z-20 w-full flex items-center justify-between p-3">
-                        <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1.5 backdrop-blur-md bg-white/95 text-emerald-800 border border-emerald-500/20 shadow-xs">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                          Disponible
-                        </span>
+                      {/* Notch curvo invertido blanco fusionado sobre la base */}
+                      <div className="absolute -bottom-[2px] left-1/2 -translate-x-1/2 z-10 pointer-events-none flex items-end justify-center">
+                        <svg
+                          viewBox="0 0 180 40"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="w-38 sm:w-40 h-[32px] sm:h-[34px] text-white"
+                        >
+                          <path
+                            d="M 0 38 C 16 36 20 18 32 6 C 38 0 46 0 54 0 L 126 0 C 134 0 142 0 148 6 C 160 18 164 36 180 38 L 180 40 L 0 40 Z"
+                            fill="currentColor"
+                          />
+                        </svg>
+                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-center pointer-events-auto">
+                          <span className="text-[11.5px] font-bold text-brand-primary font-heading tracking-wide block whitespace-nowrap">
+                            {agent.propertiesCount} {agent.propertiesCount === 1 ? "Inmueble" : "Inmuebles"}
+                          </span>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Notch curvo invertido blanco fusionado sobre la base sin lineas ni costuras */}
-                    <div className="absolute -bottom-[2px] left-1/2 -translate-x-1/2 z-10 pointer-events-none flex items-end justify-center">
-                      <svg
-                        viewBox="0 0 180 40"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="w-38 sm:w-40 h-[32px] sm:h-[34px] text-white"
+                    {/* Nombre del asesor */}
+                    <div className="mt-3 px-1 text-center">
+                      <h3 className="text-base sm:text-lg font-black text-neutral-900 font-heading truncate leading-snug group-hover:text-brand-accent transition-colors">
+                        {agent.name}
+                      </h3>
+                    </div>
+
+                    {/* Accion directa de contacto por WhatsApp */}
+                    <div className="mt-2.5 px-0.5">
+                      <a
+                        href={waUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => {
+                          if (!isActive) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            goToSlide(idx);
+                          }
+                        }}
+                        className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-accent hover:bg-[#c94b21] py-2.5 px-3 text-xs font-bold text-white shadow-sm shadow-brand-accent/20 hover:shadow-md transition-all duration-300 active:scale-95 cursor-pointer"
                       >
-                        <path
-                          d="M 0 38 C 16 36 20 18 32 6 C 38 0 46 0 54 0 L 126 0 C 134 0 142 0 148 6 C 160 18 164 36 180 38 L 180 40 L 0 40 Z"
-                          fill="currentColor"
-                        />
-                      </svg>
-                      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-center pointer-events-auto">
-                        <span className="text-[11.5px] font-bold text-brand-primary font-heading tracking-wide block whitespace-nowrap">
-                          {agent.propertiesCount} {agent.propertiesCount === 1 ? "Inmueble" : "Inmuebles"}
-                        </span>
-                      </div>
+                        <MessageCircle className="w-3.5 h-3.5" />
+                        <span>Contactar Asesor</span>
+                      </a>
                     </div>
                   </div>
-
-                  {/* Nombre del asesor sin espacio muerto */}
-                  <div className="mt-3 px-1 text-center">
-                    <h3 className="text-base sm:text-lg font-black text-neutral-900 font-heading truncate leading-snug group-hover:text-brand-accent transition-colors">
-                      {agent.name}
-                    </h3>
-                  </div>
-
-                  {/* Accion directa de contacto por WhatsApp ajustada sin huecos blancos */}
-                  <div className="mt-2.5 px-0.5">
-                    <a
-                      href={waUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-accent hover:bg-[#c94b21] py-2.5 px-3 text-xs font-bold text-white shadow-sm shadow-brand-accent/20 hover:shadow-md transition-all duration-300 active:scale-95 cursor-pointer"
-                    >
-                      <MessageCircle className="w-3.5 h-3.5" />
-                      <span>Contactar Asesor</span>
-                    </a>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
 
-          {/* Indicador de puntos interactivo */}
-          {agents.length > 3 ? (
-            <div className="flex items-center justify-center gap-2 pt-2">
-              {agents.map((agent, idx) => (
-                <button
-                  key={agent.id}
-                  type="button"
-                  onClick={() => scrollToIndex(idx)}
-                  aria-label={`Ver asesor ${agent.name}`}
-                  className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                    activeIndex === idx
-                      ? "w-7 bg-brand-accent"
-                      : "w-2 bg-neutral-300 hover:bg-neutral-400"
-                  }`}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="flex md:hidden items-center justify-center gap-2 pt-2">
-              {agents.map((agent, idx) => (
-                <button
-                  key={agent.id}
-                  type="button"
-                  onClick={() => scrollToIndex(idx)}
-                  aria-label={`Ver asesor ${agent.name}`}
-                  className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                    activeIndex === idx
-                      ? "w-7 bg-brand-accent"
-                      : "w-2 bg-neutral-300 hover:bg-neutral-400"
-                  }`}
-                />
-              ))}
-            </div>
-          )}
+          {/* Indicador de puntos interactivo con píldora animada */}
+          <div className="flex items-center justify-center gap-2 pt-4">
+            {agents.map((agent, idx) => (
+              <button
+                key={agent.id}
+                type="button"
+                onClick={() => goToSlide(idx)}
+                aria-label={`Ver asesor ${agent.name}`}
+                className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                  activeIndex === idx
+                    ? "w-8 bg-brand-accent shadow-sm shadow-brand-accent/40"
+                    : "w-2 bg-white/40 hover:bg-white/70"
+                }`}
+              />
+            ))}
+          </div>
         </div>
-
-        {/* Insignia de respaldo del equipo completo */}
-        {totalAgents && totalAgents > agents.length && (
-          <div className="mt-8 text-center">
-            <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-1.5 text-xs font-semibold text-neutral-800 border border-neutral-200/90 shadow-xs backdrop-blur-sm">
-              <UserCheck className="h-3.5 w-3.5 text-brand-primary" />
-              <span>Equipo de {totalAgents} profesionales certificados en Trujillo</span>
-            </span>
-          </div>
-        )}
       </div>
     </section>
   );

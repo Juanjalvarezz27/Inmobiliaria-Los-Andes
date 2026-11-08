@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminMainContent } from "@/components/admin/AdminMainContent";
+import { AdminAtmosphereBackground } from "@/components/admin/AdminAtmosphereBackground";
 
 export const dynamic = "force-dynamic";
 
@@ -27,7 +28,10 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen md:h-screen md:overflow-hidden bg-neutral-100 flex flex-col md:flex-row relative">
+    <div className="min-h-screen md:h-screen md:overflow-hidden bg-gradient-to-b from-[#FAF7F2] via-[#F4EDE2] to-[#EAE0D3] flex flex-col md:flex-row relative isolate">
+      {/* Fondo atmosferico beige andino con destellos calidos naranja */}
+      <AdminAtmosphereBackground />
+
       <AdminSidebar user={user} />
 
       {/* Contenedor principal de vistas con scroll independiente y reset automatico al tope */}

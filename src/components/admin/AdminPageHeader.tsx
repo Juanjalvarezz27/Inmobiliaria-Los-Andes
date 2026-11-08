@@ -60,7 +60,7 @@ export function AdminPageHeader({
             )}
           </h1>
 
-          <p className="text-xs sm:text-sm text-text-secondary mt-1 max-w-2xl font-normal leading-relaxed">
+          <p className="text-xs sm:text-sm text-neutral-900 mt-1 max-w-2xl font-semibold leading-relaxed">
             {description}
           </p>
         </div>

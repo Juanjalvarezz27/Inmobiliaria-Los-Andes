@@ -51,6 +51,7 @@ interface TransferPropertiesModalProps {
   properties: TransferableProperty[];
   availableAgents: TransferAgentOption[];
   onSuccess?: () => void;
+  isLoadingProperties?: boolean;
 }
 
 // Generador de iniciales en texto plano sin sobrecargar imagenes en el DOM
@@ -71,6 +72,7 @@ export function TransferPropertiesModal({
   properties,
   availableAgents,
   onSuccess,
+  isLoadingProperties = false,
 }: TransferPropertiesModalProps) {
   const router = useRouter();
   const [targetAgentId, setTargetAgentId] = useState<string>("");
@@ -507,7 +509,12 @@ export function TransferPropertiesModal({
 
               {/* Contenedor con scroll para los inmuebles */}
               <div className="max-h-60 overflow-y-auto space-y-2 pr-1 border border-neutral-200/90 rounded-2xl p-2 bg-neutral-50/50">
-                {filteredProperties.length === 0 ? (
+                {isLoadingProperties ? (
+                  <div className="py-8 text-center flex items-center justify-center gap-2 text-xs text-text-secondary">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Cargando propiedades...
+                  </div>
+                ) : filteredProperties.length === 0 ? (
                   <div className="py-8 text-center text-xs text-text-secondary">
                     No se encontraron inmuebles que coincidan con la búsqueda.
                   </div>

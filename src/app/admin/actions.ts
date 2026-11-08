@@ -223,9 +223,20 @@ export async function createAgentAction(data: {
   instagram?: string;
   avatarUrl?: string;
   isActive: boolean;
+  featured?: boolean;
 }) {
   const user = await getCurrentUser();
   if (!user) throw new Error("No autorizado");
+
+  // Validar limite de 8 destacados en el Home
+  if (data.featured) {
+    const currentFeatured = await prisma.user.count({
+      where: { role: "AGENT", isActive: true, featured: true },
+    });
+    if (currentFeatured >= 8) {
+      throw new Error("Máximo 8 asesores en el Home. Desmarca uno primero.");
+    }
+  }
 
   // Los asesores son perfiles de contacto y no tienen credenciales de acceso al sistema
   const passwordHash = await bcrypt.hash(crypto.randomUUID() + "-" + Date.now(), 10);
@@ -243,9 +254,11 @@ export async function createAgentAction(data: {
         "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
       role: "AGENT",
       isActive: data.isActive,
+      featured: data.featured || false,
     },
   });
 
+  revalidatePath("/");
   revalidatePath("/admin/asesores");
   return { success: true };
 }
@@ -261,10 +274,21 @@ export async function updateAgentAction(
     instagram?: string;
     avatarUrl?: string;
     isActive: boolean;
+    featured?: boolean;
   }
 ) {
   const user = await getCurrentUser();
   if (!user) throw new Error("No autorizado");
+
+  // Validar limite de 8 destacados excluyendo al asesor actual
+  if (data.featured) {
+    const currentFeatured = await prisma.user.count({
+      where: { role: "AGENT", isActive: true, featured: true, NOT: { id } },
+    });
+    if (currentFeatured >= 8) {
+      throw new Error("Máximo 8 asesores en el Home. Desmarca uno primero.");
+    }
+  }
 
   await prisma.user.update({
     where: { id },
@@ -276,11 +300,92 @@ export async function updateAgentAction(
       instagram: data.instagram,
       avatarUrl: data.avatarUrl,
       isActive: data.isActive,
+      ...(typeof data.featured === "boolean" ? { featured: data.featured } : {}),
     },
   });
 
+  revalidatePath("/");
   revalidatePath("/admin/asesores");
+  revalidatePath(`/admin/asesores/${id}`);
   return { success: true };
+}
+
+// Accion para alternar si un asesor esta destacado en el Home publico (limite: 8)
+export async function toggleAgentFeaturedAction(
+  id: string
+): Promise<{ success: boolean; featured?: boolean; error?: string }> {
+  const user = await getCurrentUser();
+  if (!user) throw new Error("No autorizado");
+
+  const agent = await prisma.user.findUnique({
+    where: { id },
+    select: { id: true, featured: true, isActive: true },
+  });
+
+  if (!agent) return { success: false, error: "Asesor no encontrado." };
+
+  // Si se va a activar, validar que no se exceda el limite de 8
+  if (!agent.featured) {
+    const currentFeatured = await prisma.user.count({
+      where: { role: "AGENT", isActive: true, featured: true },
+    });
+
+    if (currentFeatured >= 8) {
+      return {
+        success: false,
+        error: "Desmarca un asesor antes de agregar otro.",
+      };
+    }
+  }
+
+  const updated = await prisma.user.update({
+    where: { id },
+    data: { featured: !agent.featured },
+  });
+
+  revalidatePath("/");
+  revalidatePath("/admin/asesores");
+  revalidatePath(`/admin/asesores/${id}`);
+
+  return { success: true, featured: updated.featured };
+}
+
+// Carga lazy de propiedades de un asesor para el modal de transferencia (evita over-fetching inicial)
+export async function getAgentPropertiesForTransferAction(agentId: string) {
+  const user = await getCurrentUser();
+  if (!user) throw new Error("No autorizado");
+
+  const properties = await prisma.property.findMany({
+    where: { agentId },
+    select: {
+      id: true,
+      title: true,
+      price: true,
+      currency: true,
+      status: true,
+      operationType: true,
+      city: true,
+      sector: true,
+      images: {
+        orderBy: { order: "asc" },
+        take: 1,
+        select: { url: true },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return properties.map((p) => ({
+    id: p.id,
+    title: p.title,
+    price: Number(p.price),
+    currency: p.currency,
+    status: p.status,
+    operationType: p.operationType,
+    city: p.city,
+    sector: p.sector,
+    coverImage: p.images[0]?.url || null,
+  }));
 }
 
 // Accion para transferir cartera de inmuebles entre asesores

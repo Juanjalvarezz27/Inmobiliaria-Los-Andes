@@ -16,6 +16,7 @@ import {
   Phone,
   Check,
   UserCog,
+  Star,
 } from "lucide-react";
 import { InstagramIcon } from "@/components/icons/InstagramIcon";
 import { compressImage } from "@/lib/imageCompression";
@@ -34,6 +35,7 @@ export interface AgentFormData {
   instagram: string | null;
   avatarUrl: string | null;
   isActive: boolean;
+  featured?: boolean;
 }
 
 interface AgentModalProps {
@@ -64,6 +66,7 @@ function AgentFormContent({
   const [isCompressing, setIsCompressing] = useState(false);
 
   const [isActive, setIsActive] = useState(agent?.isActive ?? true);
+  const [featured, setFeatured] = useState(agent?.featured ?? false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -135,6 +138,7 @@ function AgentFormContent({
           instagram,
           avatarUrl: finalAvatarUrl,
           isActive,
+          featured,
         });
       } else {
         await createAgentAction({
@@ -144,6 +148,7 @@ function AgentFormContent({
           instagram,
           avatarUrl: finalAvatarUrl,
           isActive,
+          featured,
         });
       }
       onClose();
@@ -400,6 +405,33 @@ function AgentFormContent({
               {!isActive && <Check className="w-4 h-4 text-amber-600 shrink-0" />}
             </button>
           </div>
+        </div>
+
+        {/* Destacar en el Carrusel del Home Público (máximo 8 asesores) */}
+        <div className="p-4 rounded-2xl border border-amber-200/80 bg-amber-50/50 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-700 flex items-center justify-center shrink-0">
+              <Star className={`w-4 h-4 ${featured ? "fill-amber-500 text-amber-600" : "text-amber-600"}`} />
+            </div>
+            <div>
+              <span className="text-xs font-bold text-neutral-900 block">
+                Destacar en el Home Público
+              </span>
+              <span className="text-[11px] text-text-secondary block">
+                Muestra al asesor en el carrusel 3D principal (límite máximo de 8).
+              </span>
+            </div>
+          </div>
+
+          <label className="relative inline-flex items-center cursor-pointer shrink-0">
+            <input
+              type="checkbox"
+              checked={featured}
+              onChange={(e) => setFeatured(e.target.checked)}
+              className="sr-only peer"
+            />
+            <div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500" />
+          </label>
         </div>
 
         {/* Pie del modal con acciones */}

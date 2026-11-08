@@ -166,6 +166,14 @@ export function PropertiesManager({
     }
   }, [searchParams]);
 
+  // Estado reactivo sincronizado para mutaciones optimistas
+  const [propertiesList, setPropertiesList] = useState<SerializedAdminProperty[]>(properties);
+
+  // Sincroniza estado cuando el servidor actualiza props
+  useEffect(() => {
+    setPropertiesList(properties);
+  }, [properties]);
+
   // Estados de filtrado y busqueda
   const [searchQuery, setSearchQuery] = useState("");
   const [operationFilter, setOperationFilter] = useState<"ALL" | "SALE" | "RENT">("ALL");
@@ -173,11 +181,16 @@ export function PropertiesManager({
   const [typeFilter, setTypeFilter] = useState<string>("ALL");
   const [agentFilter, setAgentFilter] = useState<string>("ALL");
 
+  // Eliminacion optimista inmediata en interfaz (0ms)
+  const handleOptimisticDelete = (id: string) => {
+    setPropertiesList((prev) => prev.filter((p) => p.id !== id));
+  };
+
   // Metricas resumidas calculadas en tiempo real
-  const totalCount = properties.length;
-  const saleCount = properties.filter((p) => p.operationType === "SALE").length;
-  const rentCount = properties.filter((p) => p.operationType === "RENT").length;
-  const availableCount = properties.filter((p) => p.status === "AVAILABLE").length;
+  const totalCount = propertiesList.length;
+  const saleCount = propertiesList.filter((p) => p.operationType === "SALE").length;
+  const rentCount = propertiesList.filter((p) => p.operationType === "RENT").length;
+  const availableCount = propertiesList.filter((p) => p.status === "AVAILABLE").length;
 
   // Opciones dinamicas de asesores para el selector con fotos reales
   const agentFilterOptions: CustomSelectOption[] = useMemo(
@@ -280,7 +293,7 @@ export function PropertiesManager({
 
   // Inmuebles filtrados reactivamente
   const filteredProperties = useMemo(() => {
-    return properties.filter((p) => {
+    return propertiesList.filter((p) => {
       const q = searchQuery.toLowerCase().trim();
       const matchesSearch =
         q === "" ||
@@ -304,7 +317,7 @@ export function PropertiesManager({
 
       return matchesSearch && matchesOperation && matchesStatus && matchesType && matchesAgent;
     });
-  }, [properties, searchQuery, operationFilter, statusFilter, typeFilter, agentFilter]);
+  }, [propertiesList, searchQuery, operationFilter, statusFilter, typeFilter, agentFilter]);
 
   // Paginacion reactiva de inmuebles (9 tarjetas por pagina para matriz 3x3)
   const [currentPage, setCurrentPage] = useState(1);
@@ -624,7 +637,7 @@ export function PropertiesManager({
             return (
               <div
                 key={p.id}
-                className="bg-ui-surface rounded-3xl border border-neutral-200/90 shadow-xs hover:shadow-xl hover:border-brand-accent/40 transition-all duration-300 overflow-hidden flex flex-col justify-between group"
+                className="bg-ui-surface rounded-3xl border border-neutral-200/90 shadow-xs hover:shadow-xl hover:border-brand-accent/40 transition-[transform,box-shadow,border-color] duration-200 ease-out overflow-hidden flex flex-col justify-between group will-change-transform"
               >
                 <div>
                   {/* Portada del Inmueble y Badges Flotantes */}
@@ -633,8 +646,10 @@ export function PropertiesManager({
                       src={coverImage}
                       alt={p.title}
                       fill
+                      loading="lazy"
+                      decoding="async"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="object-cover group-hover:scale-105 transition-transform duration-300 ease-out will-change-transform"
                     />
 
                     {/* Gradiente sutil para legibilidad de badges */}
@@ -644,7 +659,7 @@ export function PropertiesManager({
                     <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10">
                       {/* Operacion */}
                       <span
-                        className={`text-[10px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-xl text-white shadow-md backdrop-blur-md ${
+                        className={`text-[10px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-xl text-white shadow-md ${
                           p.operationType === "SALE"
                             ? "bg-brand-primary/95 border border-emerald-500/30"
                             : "bg-brand-accent/95 border border-orange-400/30"
@@ -655,7 +670,7 @@ export function PropertiesManager({
 
                       {/* Estado */}
                       <span
-                        className={`text-[10px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-xl text-white shadow-md backdrop-blur-md ${
+                        className={`text-[10px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-xl text-white shadow-md ${
                           p.status === "AVAILABLE"
                             ? "bg-emerald-600/95 border border-emerald-400/30"
                             : p.status === "RESERVED"
@@ -672,7 +687,7 @@ export function PropertiesManager({
 
                       {/* Destacado */}
                       {p.featured && (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-xl bg-amber-500/95 text-white shadow-md border border-amber-300/40 backdrop-blur-md">
+                        <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-xl bg-amber-500 text-white shadow-md border border-amber-300/40">
                           <Star className="w-2.5 h-2.5 fill-current" />
                           <span>Destacado</span>
                         </span>
@@ -681,7 +696,7 @@ export function PropertiesManager({
 
                     {/* Contador de fotos superior derecho */}
                     <div className="absolute top-3 right-3 z-10">
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-black/60 text-white text-[10px] font-bold backdrop-blur-md shadow-xs">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-black/75 text-white text-[10px] font-bold shadow-xs">
                         <Camera className="w-3 h-3" />
                         <span>{p.images.length}</span>
                       </span>
@@ -689,7 +704,7 @@ export function PropertiesManager({
 
                     {/* Tipo de Inmueble en la esquina inferior */}
                     <div className="absolute bottom-3 left-3 z-10">
-                      <span className="px-2.5 py-0.5 rounded-lg bg-white/90 text-brand-primary text-[11px] font-extrabold backdrop-blur-md shadow-xs">
+                      <span className="px-2.5 py-0.5 rounded-lg bg-white/95 text-brand-primary text-[11px] font-extrabold shadow-xs">
                         {typeLabel}
                       </span>
                     </div>
@@ -842,7 +857,11 @@ export function PropertiesManager({
                       <Edit3 className="w-3.5 h-3.5 text-brand-accent" />
                       <span>Editar</span>
                     </button>
-                    <DeletePropertyButton id={p.id} title={p.title} />
+                    <DeletePropertyButton
+                      id={p.id}
+                      title={p.title}
+                      onDeleted={handleOptimisticDelete}
+                    />
                   </div>
                 </div>
               </div>

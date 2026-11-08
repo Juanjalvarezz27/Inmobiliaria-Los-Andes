@@ -70,11 +70,14 @@ export function AgentDetailActions({ agent, agents, properties = [] }: AgentDeta
           <button
             type="button"
             onClick={() => setShowTransferModal(true)}
-            className="w-full inline-flex items-center justify-center gap-2 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow-xs transition-all active:scale-95 cursor-pointer"
+            className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow-md shadow-amber-950/20 hover:shadow-lg transition-all active:scale-95 cursor-pointer whitespace-nowrap"
             title="Transferir cartera a otro asesor"
           >
-            <ArrowRightLeft className="w-4 h-4 text-amber-400 shrink-0" />
-            <span>Transferir Cartera ({properties.length})</span>
+            <ArrowRightLeft className="w-4 h-4 text-white shrink-0" />
+            <span>Transferir Cartera</span>
+            <span className="px-1.5 py-0.5 rounded-md bg-black/20 text-white text-[11px] font-black shrink-0">
+              {properties.length}
+            </span>
           </button>
         )}
 
@@ -86,7 +89,7 @@ export function AgentDetailActions({ agent, agents, properties = [] }: AgentDeta
           title={isActive ? "Pausar actividad del asesor" : "Reactivar asesor en el equipo"}
           className={`w-full group inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-xs active:scale-95 border ${
             isActive
-              ? "bg-white/10 hover:bg-white/20 text-white border-white/20 hover:border-white/35 backdrop-blur-xs"
+              ? "bg-white/15 hover:bg-white/25 text-white border-white/20 hover:border-white/35"
               : "bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-500 shadow-md shadow-emerald-950/40"
           }`}
         >

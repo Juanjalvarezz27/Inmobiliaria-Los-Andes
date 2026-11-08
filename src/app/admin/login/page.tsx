@@ -5,14 +5,18 @@ import { loginAction } from "@/app/admin/actions";
 import { Building2, Lock, Mail, ArrowRight, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { COMPANY_CONFIG } from "@/config/company";
+import { AdminAtmosphereBackground } from "@/components/admin/AdminAtmosphereBackground";
 
 // Pantalla de inicio de sesion privada para administradores y asesores
 export default function AdminLoginPage() {
   const [state, formAction, isPending] = useActionState(loginAction, null);
 
   return (
-    <div className="min-h-screen bg-ui-background flex flex-col justify-center items-center px-4 py-12">
-      <div className="w-full max-w-md space-y-8">
+    <div className="min-h-screen bg-gradient-to-b from-[#FAF7F2] via-[#F4EDE2] to-[#EAE0D3] flex flex-col justify-center items-center px-4 py-12 relative isolate">
+      {/* Fondo atmosferico beige andino con destellos naranja */}
+      <AdminAtmosphereBackground />
+
+      <div className="w-full max-w-md space-y-8 relative z-10">
         {/* Cabecera y Logotipo */}
         <div className="text-center space-y-3">
           <Link href="/" className="inline-flex items-center gap-2.5 group">

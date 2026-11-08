@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Inter } from "next/font/google";
 import { COMPANY_CONFIG } from "@/config/company";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -35,6 +36,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col font-sans bg-ui-background text-text-primary">
         {children}
+        <Toaster position="top-right" closeButton duration={4500} />
       </body>
     </html>
   );

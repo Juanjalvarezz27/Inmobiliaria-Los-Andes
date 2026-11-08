@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -98,8 +99,8 @@ export async function logoutUser(): Promise<void> {
   cookieStore.delete(COOKIE_NAME);
 }
 
-// Obtiene y valida el usuario actual comprobando tanto el JWT como la base de datos
-export async function getCurrentUser(): Promise<SessionUser | null> {
+// Obtiene y valida el usuario actual con deduplicacion de peticiones en memoria por request (React.cache)
+export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
   const cookieStore = await cookies();
   const token = cookieStore.get(COOKIE_NAME)?.value;
   if (!token) return null;
@@ -127,7 +128,7 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
     name: dbUser.name,
     role: dbUser.role,
   };
-}
+});
 
 // Capa de autorizacion estricta (Data Access Layer) que aborta y redirige si no hay sesion
 export async function requireAuth(): Promise<SessionUser> {

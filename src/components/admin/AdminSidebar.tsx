@@ -117,6 +117,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
               <Link
                 key={item.href}
                 href={item.href}
+                prefetch={true}
                 title={isCollapsed ? item.label : undefined}
                 className={`relative flex items-center gap-3.5 px-3 py-3 rounded-2xl transition-all duration-200 ease-out group hover:scale-[1.03] hover:translate-x-1.5 active:scale-[0.98] ${
                   item.active
@@ -217,7 +218,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
       </nav>
 
       {/* Perfil del Administrador y Footer Legal */}
-      <div className="p-3.5 shrink-0 border-t border-white/[0.08] bg-black/25 backdrop-blur-md mt-auto">
+      <div className="p-3.5 shrink-0 border-t border-white/[0.08] bg-black/35 mt-auto">
         <div className={`flex items-center gap-2.5 ${isCollapsed ? "flex-col justify-center" : "justify-between"}`}>
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="relative shrink-0">

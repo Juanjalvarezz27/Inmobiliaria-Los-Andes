@@ -249,7 +249,7 @@ export function HeroSearch({ slides }: HeroSearchProps) {
 
             <form
               onSubmit={handleSearch}
-              className="bg-white/98 backdrop-blur-md p-3 sm:p-4 rounded-3xl shadow-2xl border border-neutral-200/90 text-text-primary text-left grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center"
+              className="bg-white/98 p-3 sm:p-4 rounded-3xl shadow-2xl border border-neutral-200/90 text-text-primary text-left grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center"
             >
             {/* Filtro Desplegable Personalizado: Tipo de Inmueble */}
             <div

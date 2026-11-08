@@ -8,6 +8,7 @@ import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 export default async function AdminAgentsPage() {
   await requireAuth();
 
+  // Query liviana: solo conteos agregados, sin payload de propiedades completas
   const agents = await prisma.user.findMany({
     where: { role: "AGENT" },
     orderBy: { createdAt: "desc" },
@@ -20,33 +21,20 @@ export default async function AdminAgentsPage() {
       instagram: true,
       avatarUrl: true,
       isActive: true,
+      featured: true,
       createdAt: true,
       _count: {
-        select: {
-          properties: true,
-        },
+        select: { properties: true },
       },
+      // Solo propiedades activas con campos minimos para estadisticas y valor de cartera
       properties: {
-        select: {
-          id: true,
-          title: true,
-          price: true,
-          currency: true,
-          status: true,
-          operationType: true,
-          city: true,
-          sector: true,
-          images: {
-            orderBy: { order: "asc" },
-            take: 1,
-            select: { url: true },
-          },
-        },
+        where: { status: { in: ["AVAILABLE", "RESERVED"] } },
+        select: { operationType: true, price: true },
       },
     },
   });
 
-  // Mapeo seguro para Client Components evitando objetos complejos de base de datos
+  // Mapeo seguro para Client Components — propertiesList se carga lazy al abrir modal
   const serializedAgents: AgentItem[] = agents.map((agent) => ({
     id: agent.id,
     name: agent.name,
@@ -56,32 +44,14 @@ export default async function AdminAgentsPage() {
     instagram: agent.instagram,
     avatarUrl: agent.avatarUrl,
     isActive: agent.isActive,
+    featured: agent.featured,
     createdAt: agent.createdAt.toISOString(),
     propertiesCount: agent._count.properties,
-    activePropertiesCount: agent.properties.filter(
-      (p) => p.status === "AVAILABLE" || p.status === "RESERVED"
-    ).length,
-    forSaleCount: agent.properties.filter(
-      (p) => p.operationType === "SALE" && (p.status === "AVAILABLE" || p.status === "RESERVED")
-    ).length,
-    forRentCount: agent.properties.filter(
-      (p) => p.operationType === "RENT" && (p.status === "AVAILABLE" || p.status === "RESERVED")
-    ).length,
-    portfolioValue: agent.properties.reduce(
-      (sum, p) => sum + Number(p.price || 0),
-      0
-    ),
-    propertiesList: agent.properties.map((p) => ({
-      id: p.id,
-      title: p.title,
-      price: Number(p.price),
-      currency: p.currency,
-      status: p.status,
-      operationType: p.operationType,
-      city: p.city,
-      sector: p.sector,
-      coverImage: p.images[0]?.url || null,
-    })),
+    activePropertiesCount: agent.properties.length,
+    forSaleCount: agent.properties.filter((p) => p.operationType === "SALE").length,
+    forRentCount: agent.properties.filter((p) => p.operationType === "RENT").length,
+    portfolioValue: agent.properties.reduce((sum, p) => sum + Number(p.price || 0), 0),
+    // Sin propertiesList — se obtiene lazy via getAgentPropertiesForTransferAction
   }));
 
   return (

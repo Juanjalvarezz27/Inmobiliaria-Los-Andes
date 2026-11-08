@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { MessageCircle } from "lucide-react";
+import { COMPANY_CONFIG } from "@/config/company";
 
 export interface FeaturedAgentData {
   id: string;
@@ -281,7 +282,7 @@ export function FeaturedAgentsSection({ agents, totalAgents }: FeaturedAgentsSec
                 }
 
                 const cleanPhone = (agent.phone || "").replace(/\D/g, "");
-                const waUrl = `https://wa.me/${cleanPhone || "584140000000"}?text=${encodeURIComponent(
+                const waUrl = `https://wa.me/${cleanPhone || COMPANY_CONFIG.contact.phoneRaw}?text=${encodeURIComponent(
                   `Hola ${agent.name}, deseo recibir asesoría inmobiliaria personalizada con Inmobiliaria Los Andes.`
                 )}`;
 

@@ -20,7 +20,7 @@ export default async function AdminPropertiesPage({ searchParams }: PageProps) {
       orderBy: { createdAt: "desc" },
       include: {
         agent: {
-          select: { id: true, name: true, position: true, avatarUrl: true },
+          select: { id: true, name: true, position: true, avatarUrl: true, isActive: true },
         },
         images: {
           orderBy: { order: "asc" },

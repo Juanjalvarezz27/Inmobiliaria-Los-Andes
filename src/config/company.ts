@@ -14,12 +14,15 @@ export const COMPANY_CONFIG = {
     fullAddress: "AV INDEPENDENCIA LOCAL NRO 6-22 SECTOR CENTRO CHIQUINQUIRA (TRUJILLO) TRUJILLO ZONA POSTAL 3102",
   },
   contact: {
-    phone: "",
-    email: "",
-    whatsapp: "",
+    phone: "+58 412-2431716",
+    phoneFormatted: "+58 (412) 243-1716",
+    phoneRaw: "584122431716",
+    email: "inv.inm.losandes@gmail.com",
+    whatsapp: "+584122431716",
   },
   social: {
-    instagram: "",
+    instagram: "inv_inmobiliarialosandes",
+    instagramUrl: "https://instagram.com/inv_inmobiliarialosandes",
     facebook: "",
   },
 } as const;

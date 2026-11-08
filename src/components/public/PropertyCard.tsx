@@ -37,6 +37,7 @@ export interface PropertyCardData {
     name: string;
     phone?: string | null;
     avatarUrl?: string | null;
+    isActive?: boolean;
   } | null;
 }
 
@@ -83,12 +84,15 @@ export function PropertyCard({
       ? property.customPropertyType
       : PROPERTY_TYPE_LABELS[property.propertyType] || property.propertyType;
 
-  // Enlace directo de consulta para WhatsApp
+  const isAgentActive = property.agent ? property.agent.isActive !== false : false;
+
+  // Enlace directo de consulta para WhatsApp (con redireccion automatica a Central si el asesor esta inactivo)
   const whatsappUrl = buildWhatsAppPropertyLink({
-    phone: property.agent?.phone || "584140000000",
+    phone: property.agent?.phone,
     propertyTitle: property.title,
     agentName: property.agent?.name,
     propertyUrl: `https://inmobiliarialosandes.com/propiedades/${property.slug}`,
+    isAgentActive,
   });
 
   return (
@@ -235,9 +239,9 @@ export function PropertyCard({
           </div>
         </div>
 
-        {/* Pie: Asesor Asignado y Boton WhatsApp de Alta Conversion */}
+        {/* Pie: Asesor Asignado o Atencion Central y Boton WhatsApp de Alta Conversion */}
         <div className="pt-3 border-t border-[#ECE4D8]/80 flex items-center justify-between gap-2.5">
-          {property.agent ? (
+          {property.agent && isAgentActive ? (
             <div className="flex items-center gap-2 min-w-0">
               <div className="relative w-8 h-8 rounded-full overflow-hidden bg-brand-primary text-white font-black text-xs flex items-center justify-center shrink-0 ring-2 ring-emerald-600/20 shadow-xs">
                 {property.agent.avatarUrl ? (
@@ -262,11 +266,24 @@ export function PropertyCard({
               </div>
             </div>
           ) : (
-            <div className="flex items-center gap-2 text-xs text-brand-primary font-bold">
-              <div className="w-7 h-7 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center shrink-0">
-                <Building2 className="w-3.5 h-3.5 text-brand-primary" />
+            <div className="flex items-center gap-2 text-xs text-brand-primary font-bold min-w-0">
+              <div className="relative w-8 h-8 rounded-full overflow-hidden shrink-0 ring-2 ring-brand-accent/30 shadow-2xs bg-white">
+                <Image
+                  src="/Logo redondo.png"
+                  alt="Inmobiliaria Los Andes"
+                  fill
+                  sizes="32px"
+                  className="object-cover"
+                />
               </div>
-              <span className="truncate">Inmobiliaria Los Andes</span>
+              <div className="min-w-0">
+                <span className="text-[9px] uppercase tracking-widest text-brand-accent font-extrabold block leading-none">
+                  Central
+                </span>
+                <span className="text-xs font-black text-brand-primary block truncate max-w-[110px] mt-0.5">
+                  Los Andes
+                </span>
+              </div>
             </div>
           )}
 

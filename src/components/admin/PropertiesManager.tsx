@@ -63,6 +63,7 @@ export interface SerializedAdminProperty {
     name: string;
     position?: string | null;
     avatarUrl?: string | null;
+    isActive?: boolean;
   } | null;
   images: {
     id?: string;
@@ -200,20 +201,32 @@ export function PropertiesManager({
         label: "Todos los Asesores",
         description: "Mostrar todos los inmuebles",
       },
-      ...agents.map((agent) => ({
-        value: agent.id,
-        label: agent.name,
-        description: agent.position || "Asesor Inmobiliario",
-        icon: agent.avatarUrl ? (
-          <div className="relative w-6 h-6 rounded-full overflow-hidden shrink-0 border border-neutral-200 shadow-2xs">
-            <Image src={agent.avatarUrl} alt="" fill sizes="24px" className="object-cover" />
-          </div>
-        ) : (
-          <div className="w-6 h-6 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center shrink-0">
-            <User className="w-3.5 h-3.5 text-neutral-500" />
+      {
+        value: "central-los-andes",
+        label: "Central Los Andes",
+        description: "Inmuebles corporativos o de asesores pausados",
+        icon: (
+          <div className="relative w-6 h-6 rounded-full overflow-hidden shrink-0 border border-brand-accent/30 shadow-2xs bg-white">
+            <Image src="/Logo redondo.png" alt="" fill sizes="24px" className="object-cover" />
           </div>
         ),
-      })),
+      },
+      ...agents
+        .filter((a) => a.id !== "central-los-andes")
+        .map((agent) => ({
+          value: agent.id,
+          label: agent.name,
+          description: agent.position || "Asesor Inmobiliario",
+          icon: agent.avatarUrl ? (
+            <div className="relative w-6 h-6 rounded-full overflow-hidden shrink-0 border border-neutral-200 shadow-2xs">
+              <Image src={agent.avatarUrl} alt="" fill sizes="24px" className="object-cover" />
+            </div>
+          ) : (
+            <div className="w-6 h-6 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center shrink-0">
+              <User className="w-3.5 h-3.5 text-neutral-500" />
+            </div>
+          ),
+        })),
     ],
     [agents]
   );
@@ -313,7 +326,10 @@ export function PropertiesManager({
         typeFilter === "ALL" || p.propertyType === typeFilter;
 
       const matchesAgent =
-        agentFilter === "ALL" || p.agentId === agentFilter;
+        agentFilter === "ALL" ||
+        (agentFilter === "central-los-andes"
+          ? p.agentId === "central-los-andes" || !p.agent || p.agent.isActive === false
+          : p.agentId === agentFilter);
 
       return matchesSearch && matchesOperation && matchesStatus && matchesType && matchesAgent;
     });
@@ -807,29 +823,44 @@ export function PropertiesManager({
                     </div>
 
                     {/* Asesor Asignado */}
-                    <div className="flex items-center gap-2.5 p-2.5 rounded-xl bg-neutral-50/80 border border-neutral-100">
-                      <div className="relative w-7 h-7 rounded-full overflow-hidden bg-brand-primary/10 text-brand-primary shrink-0 flex items-center justify-center font-bold text-xs border border-neutral-200/80">
-                        {p.agent?.avatarUrl ? (
-                          <Image
-                            src={p.agent.avatarUrl}
-                            alt={p.agent.name}
-                            fill
-                            sizes="28px"
-                            className="object-cover"
-                          />
-                        ) : (
-                          <User className="w-3.5 h-3.5" />
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <span className="text-[11px] font-extrabold text-text-primary block truncate">
-                          {p.agent?.name || "Sin Asesor Asignado"}
-                        </span>
-                        <span className="text-[10px] text-text-secondary block truncate">
-                          {p.agent?.position || "Asesor Inmobiliario"}
-                        </span>
-                      </div>
-                    </div>
+                    {(() => {
+                      const isCentral = p.agentId === "central-los-andes" || !p.agent || p.agent.isActive === false;
+                      return (
+                        <div className="flex items-center gap-2.5 p-2.5 rounded-xl bg-neutral-50/80 border border-neutral-100">
+                          <div className={`relative w-7 h-7 rounded-full overflow-hidden shrink-0 flex items-center justify-center font-bold text-xs border ${
+                            isCentral ? "border-brand-accent/30 bg-white" : "border-neutral-200/80 bg-brand-primary/10 text-brand-primary"
+                          }`}>
+                            {isCentral ? (
+                              <Image
+                                src="/Logo redondo.png"
+                                alt="Central Los Andes"
+                                fill
+                                sizes="28px"
+                                className="object-cover"
+                              />
+                            ) : p.agent?.avatarUrl ? (
+                              <Image
+                                src={p.agent.avatarUrl}
+                                alt={p.agent.name}
+                                fill
+                                sizes="28px"
+                                className="object-cover"
+                              />
+                            ) : (
+                              <User className="w-3.5 h-3.5" />
+                            )}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <span className="text-[11px] font-extrabold text-text-primary block truncate">
+                              {isCentral ? "Inmobiliaria Los Andes" : p.agent?.name || "Sin Asesor Asignado"}
+                            </span>
+                            <span className="text-[10px] text-text-secondary block truncate">
+                              {isCentral ? "Central Los Andes" : p.agent?.position || "Asesor Inmobiliario"}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
 

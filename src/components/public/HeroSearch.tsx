@@ -58,12 +58,30 @@ const PROPERTY_TYPE_OPTIONS = [
   { value: "OFFICE", label: "Oficina", icon: Briefcase },
 ];
 
+// Ubicaciones de respaldo por si la base de datos aun no contiene registros
+const DEFAULT_SUGGESTED_LOCATIONS = [
+  "Sector Centro",
+  "Sector Las Acacias",
+  "Sector Centro Chiquinquirá",
+  "Sector El Country",
+  "Trujillo Capital",
+];
+
+// Funcion de normalizacion de texto para comparaciones insensibles a mayusculas y tildes
+function normalizeSearchText(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
 interface HeroSearchProps {
   slides?: HeroSlide[];
+  availableLocations?: string[];
 }
 
 // Seccion principal Hero con fondo dinamico y buscador de alta gama
-export function HeroSearch({ slides }: HeroSearchProps) {
+export function HeroSearch({ slides, availableLocations }: HeroSearchProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -83,6 +101,20 @@ export function HeroSearch({ slides }: HeroSearchProps) {
   const [operation, setOperation] = useState<string>(searchParams.get("operacion") || "ALL");
   const [propertyType, setPropertyType] = useState<string>(searchParams.get("tipo") || "ALL");
   const [keyword, setKeyword] = useState<string>(searchParams.get("q") || "");
+
+  // Lista unificada de ubicaciones para sugerir
+  const locationsList =
+    availableLocations && availableLocations.length > 0
+      ? availableLocations
+      : DEFAULT_SUGGESTED_LOCATIONS;
+
+  // Control del desplegable de Autocompletado de Ubicaciones
+  const [locationDropdownOpen, setLocationDropdownOpen] = useState(false);
+  const locationContainerRef = useRef<HTMLDivElement>(null);
+
+  // Control del desplegable personalizado de Tipo de Inmueble
+  const [typeDropdownOpen, setTypeDropdownOpen] = useState(false);
+  const typeDropdownRef = useRef<HTMLDivElement>(null);
 
   // Sincronizar estado cuando cambian los parametros de URL
   useEffect(() => {
@@ -106,15 +138,14 @@ export function HeroSearch({ slides }: HeroSearchProps) {
     scrollToCatalog();
   };
 
-  // Control del desplegable personalizado de Tipo de Inmueble
-  const [typeDropdownOpen, setTypeDropdownOpen] = useState(false);
-  const typeDropdownRef = useRef<HTMLDivElement>(null);
-
-  // Cierre automatico al hacer clic fuera del desplegable
+  // Cierre automatico al hacer clic fuera de cualquiera de los dos desplegables
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (typeDropdownRef.current && !typeDropdownRef.current.contains(e.target as Node)) {
         setTypeDropdownOpen(false);
+      }
+      if (locationContainerRef.current && !locationContainerRef.current.contains(e.target as Node)) {
+        setLocationDropdownOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -124,17 +155,46 @@ export function HeroSearch({ slides }: HeroSearchProps) {
   const selectedTypeOption =
     PROPERTY_TYPE_OPTIONS.find((opt) => opt.value === propertyType) || PROPERTY_TYPE_OPTIONS[0];
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
+  // Calculo reactivo de sugerencias de ubicacion (solo cuando el usuario comienza a escribir, maximo 5 opciones)
+  const normalizedKeyword = normalizeSearchText(keyword.trim());
+  const filteredLocations = (
+    normalizedKeyword
+      ? locationsList.filter((loc) => normalizeSearchText(loc).includes(normalizedKeyword))
+      : []
+  ).slice(0, 5);
+
+  const executeSearch = (targetKeyword: string, targetType: string, targetOp: string) => {
     const params = new URLSearchParams();
-    if (operation !== "ALL") params.set("operacion", operation);
-    if (propertyType !== "ALL") params.set("tipo", propertyType);
-    if (keyword.trim()) params.set("q", keyword.trim());
+    if (targetOp !== "ALL") params.set("operacion", targetOp);
+    if (targetType !== "ALL") params.set("tipo", targetType);
+    if (targetKeyword.trim()) params.set("q", targetKeyword.trim());
     params.set("page", "1");
 
     const queryString = params.toString();
     router.push(`/${queryString ? `?${queryString}` : ""}#catalogo`);
     scrollToCatalog();
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setLocationDropdownOpen(false);
+    setTypeDropdownOpen(false);
+    executeSearch(keyword, propertyType, operation);
+  };
+
+  const handleSelectLocation = (loc: string) => {
+    setKeyword(loc);
+    setLocationDropdownOpen(false);
+    executeSearch(loc, propertyType, operation);
+  };
+
+  const handleClearKeyword = () => {
+    setKeyword("");
+    setLocationDropdownOpen(false);
+    // Si ya habia una busqueda activa en la URL, se ejecuta de inmediato para remover el filtro
+    if (searchParams.get("q")) {
+      executeSearch("", propertyType, operation);
+    }
   };
 
   const scrollToCatalog = () => {
@@ -281,9 +341,9 @@ export function HeroSearch({ slides }: HeroSearchProps) {
                 </div>
               </button>
 
-              {/* Menu Flotante con Estilo y Animacion */}
+              {/* Menu Flotante con Estilo y Animacion (sin scrollbar molesto) */}
               {typeDropdownOpen && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl border border-neutral-200 shadow-2xl p-1.5 space-y-0.5 z-50 animate-in fade-in zoom-in-95 duration-100 max-h-72 overflow-y-auto">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl border border-neutral-200/90 shadow-2xl p-1.5 space-y-0.5 z-50 animate-in fade-in zoom-in-95 duration-100 max-h-[85vh] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                   {PROPERTY_TYPE_OPTIONS.map((opt) => {
                     const Icon = opt.icon;
                     const isSelected = opt.value === propertyType;
@@ -321,8 +381,15 @@ export function HeroSearch({ slides }: HeroSearchProps) {
               )}
             </div>
 
-            {/* Busqueda por Sector / Ubicacion con Boton X para limpiar texto */}
-            <div className="relative sm:col-span-4 lg:col-span-5 bg-neutral-50 hover:bg-neutral-100/80 border border-neutral-200/80 rounded-2xl px-3.5 py-2.5 transition-colors">
+            {/* Busqueda por Sector / Ubicacion con Autocompletado Inteligente */}
+            <div
+              ref={locationContainerRef}
+              className={`relative sm:col-span-4 lg:col-span-5 bg-neutral-50 hover:bg-neutral-100/80 border border-neutral-200/80 rounded-2xl px-3.5 py-2.5 transition-colors ${
+                locationDropdownOpen && normalizedKeyword.length > 0 && filteredLocations.length > 0
+                  ? "z-50 ring-2 ring-brand-accent/20 border-brand-accent/40"
+                  : "z-10"
+              }`}
+            >
               <label className="flex items-center gap-1.5 text-[10px] font-bold text-text-secondary uppercase tracking-wider mb-1">
                 <MapPin className="w-3 h-3 text-brand-accent" />
                 <span>Ubicación o Sector</span>
@@ -332,20 +399,81 @@ export function HeroSearch({ slides }: HeroSearchProps) {
                   type="text"
                   placeholder="Ej. Centro, Las Acacias, La Chiquinquirá..."
                   value={keyword}
-                  onChange={(e) => setKeyword(e.target.value)}
+                  onFocus={() => {
+                    if (keyword.trim().length > 0) {
+                      setLocationDropdownOpen(true);
+                    }
+                    setTypeDropdownOpen(false);
+                  }}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setKeyword(val);
+                    setLocationDropdownOpen(val.trim().length > 0);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") {
+                      setLocationDropdownOpen(false);
+                    }
+                  }}
                   className="w-full bg-transparent text-xs font-bold text-text-primary placeholder:text-neutral-400 placeholder:font-normal focus:outline-none"
                 />
                 {keyword && (
                   <button
                     type="button"
-                    onClick={() => setKeyword("")}
+                    onClick={handleClearKeyword}
                     className="p-1 text-neutral-400 hover:text-brand-accent rounded-lg hover:bg-neutral-200/60 transition-colors shrink-0 cursor-pointer"
-                    title="Borrar texto"
+                    title="Quitar filtro de ubicación"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
                 )}
               </div>
+
+              {/* Menu Flotante de Autocompletado de Lugares (se activa unicamente al escribir, maximo 5 opciones) */}
+              {locationDropdownOpen && normalizedKeyword.length > 0 && filteredLocations.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl border border-neutral-200/90 shadow-2xl p-1.5 space-y-0.5 z-50 animate-in fade-in zoom-in-95 duration-100 max-h-[85vh] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                  <div className="px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-neutral-400 flex items-center justify-between border-b border-neutral-100 mb-1">
+                    <span className="flex items-center gap-1">
+                      <MapPin className="w-3 h-3 text-brand-accent" />
+                      <span>Lugares sugeridos</span>
+                    </span>
+                    <span className="text-[9px] lowercase font-semibold text-brand-accent">
+                      {filteredLocations.length} opciones
+                    </span>
+                  </div>
+                  {filteredLocations.map((loc) => {
+                    const isSelected = normalizeSearchText(keyword) === normalizeSearchText(loc);
+                    return (
+                      <button
+                        key={loc}
+                        type="button"
+                        onClick={() => handleSelectLocation(loc)}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer text-left ${
+                          isSelected
+                            ? "bg-orange-50 text-brand-accent font-black border border-orange-200/80"
+                            : "text-neutral-800 hover:bg-neutral-50 hover:text-brand-primary"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div
+                            className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ${
+                              isSelected
+                                ? "bg-brand-accent text-white"
+                                : "bg-neutral-100 text-neutral-500"
+                            }`}
+                          >
+                            <MapPin className="w-3.5 h-3.5" />
+                          </div>
+                          <span className="truncate">{loc}</span>
+                        </div>
+                        <span className="text-[10px] text-brand-accent font-bold shrink-0 pl-2">
+                          Filtrar →
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             {/* Boton Principal de Busqueda con Mayor Tamaño y Presencia */}

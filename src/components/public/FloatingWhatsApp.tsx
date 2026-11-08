@@ -1,9 +1,11 @@
 import { MessageCircle } from "lucide-react";
+import { COMPANY_CONFIG } from "@/config/company";
 
 // Boton flotante discreto de atencion rapida por WhatsApp para visitantes
 export function FloatingWhatsApp() {
-  const waUrl =
-    "https://wa.me/584140000000?text=Hola,%20estoy%20navegando%20en%20su%20portal%20web%20y%20deseo%20asesor%C3%ADa%20inmobiliaria.";
+  const waUrl = `https://wa.me/${COMPANY_CONFIG.contact.phoneRaw}?text=${encodeURIComponent(
+    "Hola, estoy navegando en su portal web y deseo asesoría inmobiliaria."
+  )}`;
 
   return (
     <div className="fixed bottom-6 right-6 z-40">

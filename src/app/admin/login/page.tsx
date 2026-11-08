@@ -12,8 +12,8 @@ export default function AdminLoginPage() {
   const [state, formAction, isPending] = useActionState(loginAction, null);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#FAF7F2] via-[#F4EDE2] to-[#EAE0D3] flex flex-col justify-center items-center px-4 py-12 relative isolate">
-      {/* Fondo atmosferico beige andino con destellos naranja */}
+    <div className="min-h-screen bg-gradient-to-b from-[#FAF7F2] via-[#F3ECE0] to-[#EBE0D2] flex flex-col justify-center items-center px-4 py-12 relative isolate">
+      {/* Fondo atmosferico beige andino con relieve topografico y microtextura */}
       <AdminAtmosphereBackground />
 
       <div className="w-full max-w-md space-y-8 relative z-10">

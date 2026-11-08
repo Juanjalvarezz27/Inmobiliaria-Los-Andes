@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowUpRight, MessageCircle, Phone, Mail, MapPin } from "lucide-react";
 import { COMPANY_CONFIG } from "@/config/company";
+import { InstagramIcon } from "@/components/icons/InstagramIcon";
 
 // Pie de pagina editorial compacto con colores de marca y tipografia monumental
 export function Footer() {
@@ -20,7 +21,7 @@ export function Footer() {
 
           <div className="shrink-0">
             <a
-              href="https://wa.me/584140000000?text=Hola,%20deseo%20asesor%C3%ADa%20inmobiliaria"
+              href={`https://wa.me/${COMPANY_CONFIG.contact.phoneRaw}?text=${encodeURIComponent("Hola, deseo asesoría inmobiliaria")}`}
               target="_blank"
               rel="noopener noreferrer"
               className="group inline-flex items-center justify-center gap-2 rounded-full bg-brand-primary px-7 py-3 text-sm sm:text-base font-bold text-white transition-all duration-300 hover:bg-brand-accent active:scale-95 shadow-md shadow-brand-primary/10"
@@ -100,7 +101,7 @@ export function Footer() {
               <ul className="space-y-2.5 text-xs sm:text-sm font-medium">
                 <li>
                   <a
-                    href="https://wa.me/584140000000?text=Hola,%20deseo%20asesor%C3%ADa"
+                    href={`https://wa.me/${COMPANY_CONFIG.contact.phoneRaw}?text=${encodeURIComponent("Hola, deseo asesoría")}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 text-neutral-600 hover:text-emerald-700 transition-colors"
@@ -111,20 +112,31 @@ export function Footer() {
                 </li>
                 <li>
                   <a
-                    href="tel:+584140000000"
+                    href={`tel:+${COMPANY_CONFIG.contact.phoneRaw}`}
                     className="inline-flex items-center gap-2 text-neutral-600 hover:text-brand-accent transition-colors"
                   >
                     <Phone className="h-4 w-4 text-brand-accent shrink-0" />
-                    <span>+58 (414) 000-0000</span>
+                    <span>{COMPANY_CONFIG.contact.phoneFormatted}</span>
                   </a>
                 </li>
                 <li>
                   <a
-                    href="mailto:contacto@inmobiliarialosandes.com"
+                    href={`mailto:${COMPANY_CONFIG.contact.email}`}
                     className="inline-flex items-center gap-2 text-neutral-600 hover:text-brand-primary transition-colors"
                   >
                     <Mail className="h-4 w-4 text-neutral-500 shrink-0" />
-                    <span>contacto@inmobiliarialosandes.com</span>
+                    <span className="truncate max-w-[210px] sm:max-w-none">{COMPANY_CONFIG.contact.email}</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href={COMPANY_CONFIG.social.instagramUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-neutral-600 hover:text-pink-600 transition-colors group"
+                  >
+                    <InstagramIcon className="h-4 w-4 text-pink-600 shrink-0 group-hover:scale-110 transition-transform" />
+                    <span>@{COMPANY_CONFIG.social.instagram}</span>
                   </a>
                 </li>
               </ul>

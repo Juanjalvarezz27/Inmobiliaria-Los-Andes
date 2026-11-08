@@ -17,6 +17,7 @@ import {
   Loader2,
   ArrowRightLeft,
   Star,
+  Building2,
 } from "lucide-react";
 import { toggleAgentStatusAction, toggleAgentFeaturedAction, getAgentPropertiesForTransferAction } from "@/app/admin/actions";
 import { AgentModal, AgentFormData } from "@/components/admin/AgentModal";
@@ -429,15 +430,15 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
             return (
               <div
                 key={agent.id}
-                className={`group relative bg-white text-neutral-900 rounded-[28px] p-3.5 border transition-[transform,box-shadow,border-color] duration-200 ease-out flex flex-col justify-between shadow-[0_4px_20px_-4px_rgba(26,59,38,0.06),0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-xl hover:border-brand-primary/30 hover:-translate-y-1 will-change-transform ${
+                className={`group relative bg-white rounded-[28px] p-3.5 border transition-[transform,box-shadow,border-color] duration-200 ease-out flex flex-col justify-between will-change-transform ${
                   agent.isActive
-                    ? "border-neutral-200/90"
-                    : "border-neutral-200/60 opacity-80"
+                    ? "text-neutral-900 border-neutral-200/90 shadow-[0_4px_20px_-4px_rgba(26,59,38,0.06),0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-xl hover:border-brand-primary/30 hover:-translate-y-1"
+                    : "text-neutral-600 border-neutral-200/80 shadow-xs opacity-90 hover:opacity-100 hover:shadow-md"
                 }`}
               >
                 <div>
                   {/* Marco Superior de Retrato a Sangrado Completo (Full-Bleed Showcase) */}
-                  <div className="relative w-full h-72 rounded-[22px] overflow-hidden select-none bg-neutral-100 group/photo isolate [transform:translateZ(0)]">
+                  <div className="relative w-full h-72 rounded-[22px] overflow-hidden select-none group/photo isolate [transform:translateZ(0)] bg-neutral-100">
                     {/* Fotografia de Retrato a Cobertura Total */}
                     <Image
                       src={
@@ -449,7 +450,11 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
                       sizes="(max-width: 768px) 100vw, 380px"
                       loading="lazy"
                       decoding="async"
-                      className="object-cover object-top rounded-[22px] group-hover:scale-105 transition-transform duration-300 ease-out will-change-transform"
+                      className={`object-cover object-top rounded-[22px] transition-all duration-300 ease-out will-change-transform ${
+                        agent.isActive
+                          ? "group-hover:scale-105"
+                          : "grayscale contrast-95 opacity-80 group-hover:opacity-90"
+                      }`}
                     />
 
                     {/* Degradados sutiles para legibilidad de badges */}
@@ -463,7 +468,7 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
                           className={`text-[11px] font-bold px-3 py-1 rounded-full flex items-center gap-1.5 border shadow-xs ${
                             agent.isActive
                               ? "bg-white/95 text-emerald-800 border-emerald-500/25"
-                              : "bg-neutral-900/80 text-white border-white/20"
+                              : "bg-white/95 text-neutral-600 border-neutral-200/90"
                           }`}
                         >
                           <span
@@ -527,10 +532,14 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
                           onClick={() => setAgentToToggle(agent)}
                           disabled={isToggling}
                           title={agent.isActive ? "Pausar asesor" : "Reactivar asesor"}
-                          className="p-1.5 rounded-xl bg-white/95 hover:bg-white border border-white/80 text-neutral-700 hover:text-red-600 transition-colors active:scale-95 cursor-pointer shadow-xs"
+                          className={`p-1.5 rounded-xl bg-white/95 border border-white/80 transition-colors active:scale-95 cursor-pointer shadow-xs ${
+                            agent.isActive
+                              ? "hover:bg-white text-neutral-700 hover:text-red-600"
+                              : "hover:bg-emerald-50 text-neutral-400 hover:text-emerald-600 hover:border-emerald-200"
+                          }`}
                         >
                           {isToggling ? (
-                            <Loader2 className="w-3.5 h-3.5 animate-spin text-neutral-700" />
+                            <Loader2 className="w-3.5 h-3.5 animate-spin text-current" />
                           ) : (
                             <Power className="w-3.5 h-3.5" />
                           )}
@@ -552,29 +561,51 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
                         />
                       </svg>
                       <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 text-center pointer-events-auto">
-                        <span className="text-[11.5px] font-bold text-brand-primary font-heading tracking-wide block whitespace-nowrap">
+                        <span
+                          className={`text-[11.5px] font-bold font-heading tracking-wide block whitespace-nowrap ${
+                            agent.isActive ? "text-brand-primary" : "text-neutral-500"
+                          }`}
+                        >
                           {agent.propertiesCount} {agent.propertiesCount === 1 ? "Inmueble" : "Inmuebles"}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Cuerpo de la Tarjeta: Minimalista y sin sobrecarga */}
+                  {/* Cuerpo de la Tarjeta */}
                   <div className="mt-3 px-1">
                     <div className="flex items-center justify-between gap-3">
-                      <h3 className="text-base sm:text-lg font-bold text-neutral-900 font-heading truncate leading-snug group-hover:text-brand-accent transition-colors">
-                        {agent.name}
-                      </h3>
+                      <div className="min-w-0">
+                        <h3
+                          className={`text-base sm:text-lg font-heading truncate leading-snug transition-colors ${
+                            agent.isActive
+                              ? "font-bold text-neutral-900 group-hover:text-brand-accent"
+                              : "font-semibold text-neutral-500"
+                          }`}
+                        >
+                          {agent.name}
+                        </h3>
+                        {!agent.isActive && (
+                          <div className="flex items-center gap-1 text-[11px] text-amber-700/90 font-medium mt-0.5">
+                            <Building2 className="w-3 h-3 text-amber-600 shrink-0" />
+                            <span>Cartera en Central</span>
+                          </div>
+                        )}
+                      </div>
 
                       {agent.phone && whatsappUrl && (
                         <a
                           href={whatsappUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          title="Contactar por WhatsApp"
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-800 text-xs font-bold transition-all active:scale-95 shadow-xs shrink-0"
+                          title={agent.isActive ? "Contactar por WhatsApp" : "Contactar asesor (pausado)"}
+                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all active:scale-95 shadow-xs shrink-0 ${
+                            agent.isActive
+                              ? "bg-emerald-50 hover:bg-emerald-100 border-emerald-300 text-emerald-800"
+                              : "bg-neutral-100 hover:bg-neutral-200 border-neutral-200 text-neutral-500"
+                          }`}
                         >
-                          <Phone className="w-3.5 h-3.5 text-emerald-600" />
+                          <Phone className={`w-3.5 h-3.5 ${agent.isActive ? "text-emerald-600" : "text-neutral-400"}`} />
                           <span>WhatsApp</span>
                         </a>
                       )}
@@ -595,7 +626,11 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
 
                   <Link
                     href={`/admin/asesores/${agent.id}`}
-                    className="inline-flex items-center gap-1 font-bold text-brand-accent hover:text-[#c94b21] transition-colors py-1 group/btn"
+                    className={`inline-flex items-center gap-1 font-bold transition-colors py-1 group/btn ${
+                      agent.isActive
+                        ? "text-brand-accent hover:text-[#c94b21]"
+                        : "text-neutral-500 hover:text-neutral-700"
+                    }`}
                   >
                     <span>Ver Perfil & Cartera</span>
                     <ChevronRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />

@@ -10,6 +10,7 @@ import {
   Home,
   Tag,
   Key,
+  Building2,
 } from "lucide-react";
 import { InstagramIcon } from "@/components/icons/InstagramIcon";
 import { AgentDetailActions } from "./AgentDetailActions";
@@ -138,7 +139,7 @@ export default async function AgentDetailPage({ params }: PageProps) {
                 alt={agent.name}
                 fill
                 sizes="(max-width: 640px) 88px, 96px"
-                className="object-cover"
+                className={`object-cover ${!agent.isActive ? "grayscale contrast-90 opacity-75" : ""}`}
                 priority
               />
             </div>
@@ -150,20 +151,27 @@ export default async function AgentDetailPage({ params }: PageProps) {
                   {agent.name}
                 </h1>
                 <span
-                  className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1.5 shrink-0 shadow-xs ${
+                  className={`text-[11px] font-black px-3 py-1 rounded-full flex items-center gap-1.5 shrink-0 shadow-md uppercase tracking-wider ${
                     agent.isActive
                       ? "bg-emerald-500/20 text-emerald-200 border border-emerald-400/30"
-                      : "bg-white/10 text-neutral-300 border border-white/15"
+                      : "bg-red-600 text-white border border-red-400 ring-2 ring-red-500/30 shadow-red-950/20"
                   }`}
                 >
                   <span
-                    className={`w-1.5 h-1.5 rounded-full ${
-                      agent.isActive ? "bg-emerald-400 animate-pulse" : "bg-neutral-400"
+                    className={`w-2 h-2 rounded-full ${
+                      agent.isActive ? "bg-emerald-400 animate-pulse" : "bg-white animate-pulse"
                     }`}
                   />
-                  {agent.isActive ? "Asesor Activo" : "Asesor Pausado"}
+                  {agent.isActive ? "Asesor Activo" : "Inactivo (Pausado)"}
                 </span>
               </div>
+
+              {!agent.isActive && (
+                <div className="p-2.5 rounded-xl bg-red-950/60 border border-red-500/40 text-red-200 text-xs font-semibold flex items-center gap-2 w-fit">
+                  <Building2 className="w-4 h-4 text-red-400 shrink-0" />
+                  <span>Asesor pausado • Inmuebles derivados a Central Los Andes</span>
+                </div>
+              )}
 
               {/* Canales de Contacto con solidez y contraste */}
               <div className="flex flex-wrap items-center gap-2.5 pt-0.5">

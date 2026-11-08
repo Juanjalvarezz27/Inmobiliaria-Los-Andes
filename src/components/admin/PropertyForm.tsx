@@ -37,6 +37,11 @@ import {
   UserCheck,
   Check,
   ChevronDown,
+  ExternalLink,
+  Navigation,
+  ClipboardCopy,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import type { OperationType, PropertyType, PropertyStatus } from "@/generated/prisma/client";
 import { CustomSelect, CustomSelectOption } from "./CustomSelect";
@@ -62,7 +67,6 @@ const PROPERTY_STATUS_OPTIONS: CustomSelectOption<PropertyStatus>[] = [
   { value: "RESERVED", label: "Reservado", dotColor: "bg-amber-500" },
   { value: "SOLD", label: "Vendido", dotColor: "bg-blue-500" },
   { value: "RENTED", label: "Alquilado", dotColor: "bg-purple-500" },
-  { value: "HIDDEN", label: "Oculto (Borrador)", dotColor: "bg-neutral-400" },
 ];
 
 export interface AgentOption {
@@ -71,6 +75,14 @@ export interface AgentOption {
   position: string;
   avatarUrl?: string | null;
 }
+
+// Opcion corporativa predeterminada para propiedades asignadas a la oficina Central
+export const CENTRAL_AGENT_OPTION: AgentOption = {
+  id: "central-los-andes",
+  name: "Inmobiliaria Los Andes",
+  position: "Central Los Andes",
+  avatarUrl: "/Logo redondo.png",
+};
 
 // Limite maximo estricto de fotografias por inmueble
 const MAX_PROPERTY_IMAGES = 8;
@@ -146,6 +158,17 @@ export function PropertyForm({
   const [status, setStatus] = useState<PropertyStatus>(initialData?.status || "AVAILABLE");
   const [price, setPrice] = useState(initialData?.price ? initialData.price.toString() : "");
 
+  // Opciones de estatus del inmueble (sin el estado oculto por defecto para nuevos o estandar)
+  const statusOptions = useMemo(() => {
+    if (initialData?.status === "HIDDEN") {
+      return [
+        ...PROPERTY_STATUS_OPTIONS,
+        { value: "HIDDEN" as PropertyStatus, label: "Oculto (Borrador)", dotColor: "bg-neutral-400" },
+      ];
+    }
+    return PROPERTY_STATUS_OPTIONS;
+  }, [initialData?.status]);
+
   // Opciones dinamicas que muestran el tipo personalizado en la etiqueta si se define
   const propertyTypeOptions = useMemo(() => {
     return PROPERTY_TYPE_OPTIONS.map((opt) => {
@@ -164,6 +187,17 @@ export function PropertyForm({
   const [sector, setSector] = useState(initialData?.sector || "");
   const [address, setAddress] = useState(initialData?.address || "");
   const [googleMapsUrl, setGoogleMapsUrl] = useState(initialData?.googleMapsUrl || "");
+
+  // Abre Google Maps en una pestaña nueva para visualizar la ubicacion o ubicar la busqueda
+  const handleOpenGoogleMaps = () => {
+    const raw = googleMapsUrl.trim();
+    if (raw.startsWith("http://") || raw.startsWith("https://")) {
+      window.open(raw, "_blank", "noopener,noreferrer");
+      return;
+    }
+    const query = raw || [address, sector, city, "Trujillo, Venezuela"].filter((p) => p && p.trim()).join(", ") || "Trujillo Capital, Venezuela";
+    window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`, "_blank", "noopener,noreferrer");
+  };
 
   // Seccion 4: Distribucion Cuantitativa
   const [bedrooms, setBedrooms] = useState(
@@ -190,13 +224,20 @@ export function PropertyForm({
   );
   const [newAmenity, setNewAmenity] = useState("");
 
-  // Seccion 6: Asesor Inmobiliario Asignado
+  // Seccion 6: Asesor Inmobiliario Asignado (vacio por defecto sin asesor preseleccionado)
   const [agentId, setAgentId] = useState(
-    initialData?.agentId || defaultAgentId || (agents[0]?.id || "")
+    initialData?.agentId || defaultAgentId || ""
   );
   const [isAgentDropdownOpen, setIsAgentDropdownOpen] = useState(false);
   const agentDropdownRef = useRef<HTMLDivElement>(null);
-  const selectedAgent = agents.find((a) => a.id === agentId);
+
+  // Lista consolidada de asesores: Primera opcion obligatoria "Inmobiliaria Los Andes - Central Los Andes"
+  const allAgentOptions = useMemo<AgentOption[]>(() => {
+    const list = agents.filter((a) => a.id !== "central-los-andes");
+    return [CENTRAL_AGENT_OPTION, ...list];
+  }, [agents]);
+
+  const selectedAgent = allAgentOptions.find((a) => a.id === agentId);
 
   // Cierre automatico al hacer clic fuera del desplegable de asesor
   useEffect(() => {
@@ -328,7 +369,7 @@ export function PropertyForm({
 
     try {
       if (!agentId) {
-        throw new Error("Debe seleccionar un Asesor Inmobiliario responsable.");
+        throw new Error("Debe seleccionar un Asesor Inmobiliario responsable o la opción Central Los Andes.");
       }
 
       if (images.length === 0) {
@@ -343,6 +384,14 @@ export function PropertyForm({
         throw new Error("Por favor especifica el tipo de inmueble para la opción 'Otro'.");
       }
 
+      const finalGoogleMapsUrl = (() => {
+        const raw = googleMapsUrl.trim();
+        if (!raw) return undefined;
+        if (raw.startsWith("http://") || raw.startsWith("https://")) return raw;
+        const query = [raw, city || "Trujillo Capital", "Venezuela"].filter(Boolean).join(", ");
+        return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+      })();
+
       const payload = {
         title,
         operationType,
@@ -355,7 +404,7 @@ export function PropertyForm({
         city,
         sector,
         address,
-        googleMapsUrl: googleMapsUrl.trim() || undefined,
+        googleMapsUrl: finalGoogleMapsUrl,
         bedrooms: bedrooms ? parseInt(bedrooms, 10) : undefined,
         bathrooms: bathrooms ? parseInt(bathrooms, 10) : undefined,
         parkingSpots: parkingSpots ? parseInt(parkingSpots, 10) : undefined,
@@ -392,7 +441,14 @@ export function PropertyForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl pb-6">
+    <form
+      onSubmit={handleSubmit}
+      className={
+        hideHeader
+          ? "flex-1 flex flex-col min-h-0 overflow-hidden relative"
+          : "space-y-8 max-w-4xl pb-6"
+      }
+    >
       {/* Cabecera independiente para paginas standalone */}
       {!hideHeader && (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-200 pb-5">
@@ -433,39 +489,52 @@ export function PropertyForm({
         </div>
       )}
 
-      {/* Alerta de error si ocurre alguno */}
-      {error && (
-        <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-sm font-semibold flex items-center justify-between">
-          <span>{error}</span>
-          <button
-            type="button"
-            onClick={() => setError(null)}
-            className="text-red-400 hover:text-red-700 p-1"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      )}
+      {/* Contenedor desplazable de secciones (transparente para proyectar el fondo andino continuo) */}
+      <div
+        className={
+          hideHeader
+            ? "flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 overscroll-contain relative z-10 bg-transparent"
+            : "space-y-6 relative isolate"
+        }
+      >
+        {/* Alerta de error si ocurre alguno */}
+        {error && (
+          <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-sm font-semibold flex items-center justify-between shadow-xs">
+            <span>{error}</span>
+            <button
+              type="button"
+              onClick={() => setError(null)}
+              className="text-red-400 hover:text-red-700 p-1"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
 
-      {/* 1. Galeria de Fotografias (PRIMER CAMPO) */}
-      <div className="space-y-4">
-        <div className="bg-[#122b1c]/[0.07] border border-[#122b1c]/10 px-4 py-2.5 rounded-xl flex items-center justify-between flex-wrap gap-2">
-          <div className="flex items-center gap-2.5">
-            <span className="w-6 h-6 rounded-lg bg-brand-accent text-white text-xs font-black flex items-center justify-center shrink-0 shadow-2xs">
-              1
+      {/* 1. Galería de Fotografías */}
+      <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-5 sm:p-6 space-y-4">
+        <div className="flex items-center justify-between flex-wrap gap-2 pb-3.5 border-b border-neutral-100">
+          <div className="flex items-center gap-3">
+            <span className="w-8 h-8 rounded-xl bg-orange-50 border border-orange-200/80 text-brand-accent text-xs font-black flex items-center justify-center shrink-0 shadow-2xs">
+              01
             </span>
-            <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-[#0e2115] font-heading">
-              Fotografías y Galería Multimedia *
-            </h2>
+            <div>
+              <h2 className="text-sm font-black uppercase tracking-wider text-brand-primary font-heading">
+                Fotografías y Galería Multimedia *
+              </h2>
+              <p className="text-[11px] text-text-secondary font-medium">
+                Sube hasta {MAX_PROPERTY_IMAGES} fotos en alta resolución. La marcada como portada encabezará la ficha pública.
+              </p>
+            </div>
           </div>
           <span
             className={`text-xs font-bold px-3 py-1 rounded-full border transition-colors ${
               images.length >= MAX_PROPERTY_IMAGES
                 ? "bg-amber-50 text-amber-700 border-amber-200"
-                : "bg-white text-text-secondary border-neutral-200 shadow-2xs"
+                : "bg-neutral-50 text-text-secondary border-neutral-200 shadow-2xs"
             }`}
           >
-            {images.length} de {MAX_PROPERTY_IMAGES} fotos {images.length >= MAX_PROPERTY_IMAGES ? "(Límite alcanzado)" : ""}
+            {images.length} de {MAX_PROPERTY_IMAGES} fotos {images.length >= MAX_PROPERTY_IMAGES ? "(Límite)" : ""}
           </span>
         </div>
 
@@ -622,15 +691,18 @@ export function PropertyForm({
       </div>
 
       {/* 2. Datos Principales de la Publicacion */}
-      <div className="space-y-4">
-        <div className="bg-[#122b1c]/[0.07] border border-[#122b1c]/10 px-4 py-2.5 rounded-xl flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <span className="w-6 h-6 rounded-lg bg-brand-accent text-white text-xs font-black flex items-center justify-center shrink-0 shadow-2xs">
-              2
-            </span>
-            <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-[#0e2115] font-heading">
-              Datos Principales de la Publicación
+      <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-5 sm:p-6 space-y-4">
+        <div className="flex items-center gap-3 pb-3.5 border-b border-neutral-100">
+          <span className="w-8 h-8 rounded-xl bg-orange-50 border border-orange-200/80 text-brand-accent text-xs font-black flex items-center justify-center shrink-0 shadow-2xs">
+            02
+          </span>
+          <div>
+            <h2 className="text-sm font-black uppercase tracking-wider text-brand-primary font-heading">
+              Información Básica y Comercial
             </h2>
+            <p className="text-[11px] text-text-secondary font-medium">
+              Define el título comercial, modalidad de negociación, tipo de propiedad y precio.
+            </p>
           </div>
         </div>
 
@@ -684,7 +756,7 @@ export function PropertyForm({
             <CustomSelect<PropertyStatus>
               value={status}
               onChange={setStatus}
-              options={PROPERTY_STATUS_OPTIONS}
+              options={statusOptions}
             />
           </div>
         </div>
@@ -710,35 +782,48 @@ export function PropertyForm({
           </div>
         )}
 
-        {/* Precio */}
-        <div>
-          <label className="block text-xs font-bold text-text-primary uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-            <DollarSign className="w-3.5 h-3.5 text-brand-accent shrink-0" />
-            <span>Precio en USD ($) *</span>
-          </label>
-          <input
-            type="number"
-            required
-            min="0"
-            step="1"
-            placeholder="Ej. 65000"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            className="w-full sm:max-w-xs bg-white border border-neutral-300 rounded-xl px-4 py-2.5 text-sm font-bold text-brand-accent focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:border-brand-accent shadow-2xs"
-          />
+        {/* Tarjeta destacada de Precio */}
+        <div className="p-4 rounded-xl bg-gradient-to-r from-orange-50/70 via-amber-50/40 to-orange-50/30 border border-orange-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <label className="block text-xs font-black text-brand-primary uppercase tracking-wider flex items-center gap-1.5">
+              <DollarSign className="w-3.5 h-3.5 text-brand-accent" />
+              <span>{operationType === "RENT" ? "Canon de Arrendamiento *" : "Precio de Venta *"}</span>
+            </label>
+            <p className="text-[11px] text-neutral-500 font-medium mt-0.5">
+              {operationType === "RENT" ? "Monto mensual en dólares estadounidenses (USD / mes)" : "Precio total de venta en dólares estadounidenses (USD)"}
+            </p>
+          </div>
+          <div className="relative w-full sm:w-56">
+            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-black text-brand-accent">
+              USD $
+            </span>
+            <input
+              type="number"
+              required
+              min="0"
+              step="1"
+              placeholder={operationType === "RENT" ? "Ej. 450" : "Ej. 55000"}
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              className="w-full bg-white border border-neutral-300 rounded-xl pl-16 pr-4 py-2.5 text-base font-black text-brand-accent focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:border-brand-accent shadow-2xs"
+            />
+          </div>
         </div>
       </div>
 
       {/* 3. Ubicacion Geografica */}
-      <div className="space-y-4">
-        <div className="bg-[#122b1c]/[0.07] border border-[#122b1c]/10 px-4 py-2.5 rounded-xl flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <span className="w-6 h-6 rounded-lg bg-brand-accent text-white text-xs font-black flex items-center justify-center shrink-0 shadow-2xs">
-              3
-            </span>
-            <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-[#0e2115] font-heading">
+      <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-5 sm:p-6 space-y-4">
+        <div className="flex items-center gap-3 pb-3.5 border-b border-neutral-100">
+          <span className="w-8 h-8 rounded-xl bg-orange-50 border border-orange-200/80 text-brand-accent text-xs font-black flex items-center justify-center shrink-0 shadow-2xs">
+            03
+          </span>
+          <div>
+            <h2 className="text-sm font-black uppercase tracking-wider text-brand-primary font-heading">
               Ubicación Geográfica
             </h2>
+            <p className="text-[11px] text-text-secondary font-medium">
+              Indica la ciudad, sector residencial y punto geográfico de referencia.
+            </p>
           </div>
         </div>
 
@@ -789,45 +874,80 @@ export function PropertyForm({
           />
         </div>
 
+        {/* Ubicacion en Google Maps */}
         <div>
           <div className="flex items-center justify-between mb-1.5">
             <label className="text-xs font-bold text-text-primary uppercase tracking-wider flex items-center gap-1.5">
               <Map className="w-3.5 h-3.5 text-brand-accent shrink-0" />
-              <span>Enlace a Google Maps</span>
+              <span>Ubicación en Google Maps</span>
             </label>
             <span className="text-[11px] font-bold text-neutral-400 bg-neutral-100 px-2.5 py-0.5 rounded-full border border-neutral-200/80">
               Opcional
             </span>
           </div>
-          <input
-            type="url"
-            placeholder="Ej. https://maps.app.goo.gl/... o https://maps.google.com/?q=..."
-            value={googleMapsUrl}
-            onChange={(e) => setGoogleMapsUrl(e.target.value)}
-            className="w-full bg-white border border-neutral-300 rounded-xl px-4 py-2.5 text-sm font-medium text-text-primary focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:border-brand-accent shadow-2xs placeholder-neutral-400"
-          />
-          <p className="text-[11px] text-text-secondary mt-1">
-            Si se proporciona, la tarjeta mostrará un botón para abrir la ubicación satelital en Google Maps.
+
+          <div className="flex flex-col sm:flex-row gap-2">
+            <div className="relative flex-1">
+              <input
+                type="text"
+                placeholder="Ej. Edificio La Cascada o enlace https://maps.app.goo.gl/..."
+                value={googleMapsUrl}
+                onChange={(e) => setGoogleMapsUrl(e.target.value)}
+                className="w-full bg-white border border-neutral-300 rounded-xl pl-4 pr-10 py-2.5 text-sm font-medium text-text-primary focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:border-brand-accent shadow-2xs placeholder-neutral-400"
+              />
+              {googleMapsUrl && (
+                <button
+                  type="button"
+                  onClick={() => setGoogleMapsUrl("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 p-1"
+                  title="Limpiar"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={handleOpenGoogleMaps}
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-orange-50 hover:bg-orange-100/80 border border-brand-accent/30 text-xs font-bold text-brand-primary transition-colors shrink-0 shadow-2xs active:scale-95"
+              title="Abrir y verificar la ubicación en Google Maps"
+            >
+              <Navigation className="w-3.5 h-3.5 text-brand-accent" />
+              <span>Ubicar en Maps</span>
+              <ExternalLink className="w-3 h-3 text-brand-accent ml-0.5" />
+            </button>
+          </div>
+
+          <p className="text-[11px] text-text-secondary mt-1.5">
+            {googleMapsUrl.trim().startsWith("http")
+              ? "✓ Enlace web de Google Maps configurado."
+              : googleMapsUrl.trim()
+              ? `✓ Se creará un enlace satelital automático hacia: "${googleMapsUrl.trim()}".`
+              : "Puedes escribir el nombre de un edificio/sitio de referencia o pegar directamente un link de Google Maps."}
           </p>
         </div>
       </div>
 
       {/* 4. Distribucion y Dimensiones */}
-      <div className="space-y-4">
-        <div className="bg-[#122b1c]/[0.07] border border-[#122b1c]/10 px-4 py-2.5 rounded-xl flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <span className="w-6 h-6 rounded-lg bg-brand-accent text-white text-xs font-black flex items-center justify-center shrink-0 shadow-2xs">
-              4
-            </span>
-            <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-[#0e2115] font-heading">
+      <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-5 sm:p-6 space-y-4">
+        <div className="flex items-center gap-3 pb-3.5 border-b border-neutral-100">
+          <span className="w-8 h-8 rounded-xl bg-orange-50 border border-orange-200/80 text-brand-accent text-xs font-black flex items-center justify-center shrink-0 shadow-2xs">
+            04
+          </span>
+          <div>
+            <h2 className="text-sm font-black uppercase tracking-wider text-brand-primary font-heading">
               Distribución y Dimensiones
             </h2>
+            <p className="text-[11px] text-text-secondary font-medium">
+              Especifica la cantidad de estancias y el metraje total de construcción o terreno.
+            </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div>
-            <label className="block text-xs font-bold text-text-primary uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 sm:gap-4">
+          <div className="bg-neutral-50/70 border border-neutral-200/80 rounded-2xl p-3.5 space-y-2">
+            <label className="block text-[11px] font-bold text-text-primary uppercase tracking-wider flex items-center gap-1.5">
               <BedDouble className="w-3.5 h-3.5 text-brand-accent shrink-0" />
               <span>Habitaciones</span>
             </label>
@@ -836,12 +956,12 @@ export function PropertyForm({
               min="0"
               value={bedrooms}
               onChange={(e) => setBedrooms(e.target.value)}
-              className="w-full bg-white border border-neutral-300 rounded-xl px-4 py-2.5 text-sm font-bold text-text-primary focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:border-brand-accent shadow-2xs"
+              className="w-full bg-white border border-neutral-300 rounded-xl px-3.5 py-2 text-sm font-bold text-text-primary focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:border-brand-accent shadow-2xs"
             />
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-text-primary uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+          <div className="bg-neutral-50/70 border border-neutral-200/80 rounded-2xl p-3.5 space-y-2">
+            <label className="block text-[11px] font-bold text-text-primary uppercase tracking-wider flex items-center gap-1.5">
               <Bath className="w-3.5 h-3.5 text-brand-accent shrink-0" />
               <span>Baños</span>
             </label>
@@ -850,12 +970,12 @@ export function PropertyForm({
               min="0"
               value={bathrooms}
               onChange={(e) => setBathrooms(e.target.value)}
-              className="w-full bg-white border border-neutral-300 rounded-xl px-4 py-2.5 text-sm font-bold text-text-primary focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:border-brand-accent shadow-2xs"
+              className="w-full bg-white border border-neutral-300 rounded-xl px-3.5 py-2 text-sm font-bold text-text-primary focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:border-brand-accent shadow-2xs"
             />
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-text-primary uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+          <div className="bg-neutral-50/70 border border-neutral-200/80 rounded-2xl p-3.5 space-y-2">
+            <label className="block text-[11px] font-bold text-text-primary uppercase tracking-wider flex items-center gap-1.5">
               <Car className="w-3.5 h-3.5 text-brand-accent shrink-0" />
               <span>Puestos Est.</span>
             </label>
@@ -864,12 +984,12 @@ export function PropertyForm({
               min="0"
               value={parkingSpots}
               onChange={(e) => setParkingSpots(e.target.value)}
-              className="w-full bg-white border border-neutral-300 rounded-xl px-4 py-2.5 text-sm font-bold text-text-primary focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:border-brand-accent shadow-2xs"
+              className="w-full bg-white border border-neutral-300 rounded-xl px-3.5 py-2 text-sm font-bold text-text-primary focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:border-brand-accent shadow-2xs"
             />
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-text-primary uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+          <div className="bg-neutral-50/70 border border-neutral-200/80 rounded-2xl p-3.5 space-y-2">
+            <label className="block text-[11px] font-bold text-text-primary uppercase tracking-wider flex items-center gap-1.5">
               <Maximize2 className="w-3.5 h-3.5 text-brand-accent shrink-0" />
               <span>Área (m²)</span>
             </label>
@@ -879,22 +999,25 @@ export function PropertyForm({
               step="0.01"
               value={areaSquareMeters}
               onChange={(e) => setAreaSquareMeters(e.target.value)}
-              className="w-full bg-white border border-neutral-300 rounded-xl px-4 py-2.5 text-sm font-bold text-text-primary focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:border-brand-accent shadow-2xs"
+              className="w-full bg-white border border-neutral-300 rounded-xl px-3.5 py-2 text-sm font-bold text-text-primary focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:border-brand-accent shadow-2xs"
             />
           </div>
         </div>
       </div>
 
       {/* 5. Descripcion y Amenidades */}
-      <div className="space-y-4">
-        <div className="bg-[#122b1c]/[0.07] border border-[#122b1c]/10 px-4 py-2.5 rounded-xl flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <span className="w-6 h-6 rounded-lg bg-brand-accent text-white text-xs font-black flex items-center justify-center shrink-0 shadow-2xs">
-              5
-            </span>
-            <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-[#0e2115] font-heading">
+      <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-5 sm:p-6 space-y-4">
+        <div className="flex items-center gap-3 pb-3.5 border-b border-neutral-100">
+          <span className="w-8 h-8 rounded-xl bg-orange-50 border border-orange-200/80 text-brand-accent text-xs font-black flex items-center justify-center shrink-0 shadow-2xs">
+            05
+          </span>
+          <div>
+            <h2 className="text-sm font-black uppercase tracking-wider text-brand-primary font-heading">
               Descripción y Amenidades
             </h2>
+            <p className="text-[11px] text-text-secondary font-medium">
+              Redacta los detalles más atractivos del inmueble y resalta su equipamiento clave.
+            </p>
           </div>
         </div>
 
@@ -913,7 +1036,7 @@ export function PropertyForm({
           />
         </div>
 
-        {/* Amenidades Dinamicas con chips */}
+        {/* Amenidades Dinamicas con chips y sugerencias rapidas */}
         <div className="space-y-3">
           <label className="block text-xs font-bold text-text-primary uppercase tracking-wider flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 text-brand-accent shrink-0" />
@@ -938,36 +1061,70 @@ export function PropertyForm({
             </button>
           </div>
 
-          <div className="flex flex-wrap gap-2 pt-1">
-            {amenities.map((item, idx) => (
-              <span
-                key={idx}
-                className="inline-flex items-center gap-1.5 bg-neutral-100 hover:bg-neutral-200/70 text-neutral-800 text-xs font-semibold px-3 py-1.5 rounded-xl border border-neutral-200/80 transition-colors"
-              >
-                <span>{item}</span>
+          {/* Sugerencias rapidas con un clic si no estan agregadas */}
+          <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+            <span className="text-[11px] font-bold text-text-secondary mr-1">Sugeridos:</span>
+            {[
+              "Tanque de Agua",
+              "Planta Eléctrica",
+              "Vigilancia Privada",
+              "Portón Eléctrico",
+              "Aire Acondicionado",
+              "Gas Directo",
+              "Piscina",
+              "Línea Cantv / Fibra",
+            ]
+              .filter((sug) => !amenities.includes(sug))
+              .slice(0, 5)
+              .map((suggestion) => (
                 <button
+                  key={suggestion}
                   type="button"
-                  onClick={() => handleRemoveAmenity(idx)}
-                  className="text-neutral-400 hover:text-red-500 p-0.5 rounded-md"
+                  onClick={() => setAmenities((prev) => [...prev, suggestion])}
+                  className="text-[11px] font-medium px-2.5 py-1 rounded-lg bg-neutral-100 hover:bg-orange-50 hover:text-brand-accent hover:border-brand-accent/30 border border-neutral-200/70 text-text-secondary transition-all"
                 >
-                  <X className="w-3 h-3" />
+                  + {suggestion}
                 </button>
-              </span>
-            ))}
+              ))}
           </div>
+
+          {/* Chips agregados */}
+          {amenities.length > 0 && (
+            <div className="flex flex-wrap gap-2 pt-1.5">
+              {amenities.map((item, idx) => (
+                <span
+                  key={idx}
+                  className="inline-flex items-center gap-1.5 bg-orange-50/70 hover:bg-orange-100/70 text-brand-primary text-xs font-semibold px-3 py-1.5 rounded-xl border border-orange-200/80 transition-colors"
+                >
+                  <span>{item}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveAmenity(idx)}
+                    className="text-neutral-400 hover:text-red-500 p-0.5 rounded-md"
+                    title="Eliminar amenidad"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
       {/* 6. Asesor Inmobiliario Responsable */}
-      <div className="space-y-4">
-        <div className="bg-[#122b1c]/[0.07] border border-[#122b1c]/10 px-4 py-2.5 rounded-xl flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <span className="w-6 h-6 rounded-lg bg-brand-accent text-white text-xs font-black flex items-center justify-center shrink-0 shadow-2xs">
-              6
-            </span>
-            <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-[#0e2115] font-heading">
+      <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-5 sm:p-6 space-y-4">
+        <div className="flex items-center gap-3 pb-3.5 border-b border-neutral-100">
+          <span className="w-8 h-8 rounded-xl bg-orange-50 border border-orange-200/80 text-brand-accent text-xs font-black flex items-center justify-center shrink-0 shadow-2xs">
+            06
+          </span>
+          <div>
+            <h2 className="text-sm font-black uppercase tracking-wider text-brand-primary font-heading">
               Asesor Inmobiliario Responsable *
             </h2>
+            <p className="text-[11px] text-text-secondary font-medium">
+              Asigna al agente inmobiliario que atenderá a los clientes interesados en esta propiedad.
+            </p>
           </div>
         </div>
 
@@ -1029,10 +1186,12 @@ export function PropertyForm({
           {isAgentDropdownOpen && (
             <div
               role="listbox"
-              className="absolute bottom-full mb-1.5 sm:bottom-auto sm:top-full sm:mt-1.5 left-0 right-0 bg-white rounded-2xl border border-neutral-200 shadow-xl z-50 p-1.5 space-y-1 max-h-60 overflow-y-auto animate-in fade-in zoom-in-95 duration-150"
+              className="absolute bottom-full mb-1.5 sm:bottom-auto sm:top-full sm:mt-1.5 left-0 right-0 bg-white rounded-2xl border border-neutral-200 shadow-xl z-50 p-1.5 space-y-1 max-h-64 overflow-y-auto animate-in fade-in zoom-in-95 duration-150"
             >
-              {agents.map((agent) => {
+              {allAgentOptions.map((agent, index) => {
                 const isSelected = agent.id === agentId;
+                const isCentralOption = agent.id === "central-los-andes";
+
                 return (
                   <button
                     key={agent.id}
@@ -1045,13 +1204,17 @@ export function PropertyForm({
                     }}
                     className={`w-full flex items-center justify-between p-2.5 rounded-xl text-left transition-colors ${
                       isSelected
-                        ? "bg-orange-50/80 text-brand-accent"
+                        ? "bg-orange-50/80 text-brand-accent ring-1 ring-brand-accent/20"
+                        : isCentralOption
+                        ? "bg-neutral-50/70 hover:bg-orange-50/50 text-brand-primary"
                         : "hover:bg-neutral-50 text-text-primary"
-                    }`}
+                    } ${index === 0 ? "border-b border-neutral-100 pb-3 mb-1" : ""}`}
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       {agent.avatarUrl ? (
-                        <div className="relative w-8 h-8 rounded-lg overflow-hidden border border-neutral-200 shrink-0">
+                        <div className={`relative w-8 h-8 rounded-lg overflow-hidden border shrink-0 ${
+                          isCentralOption ? "border-brand-accent/30 bg-white p-0.5" : "border-neutral-200"
+                        }`}>
                           <Image
                             src={agent.avatarUrl}
                             alt={agent.name}
@@ -1072,12 +1235,19 @@ export function PropertyForm({
                         </div>
                       )}
                       <div className="min-w-0">
-                        <div
-                          className={`text-sm font-bold truncate ${
-                            isSelected ? "text-brand-accent" : "text-brand-primary"
-                          }`}
-                        >
-                          {agent.name}
+                        <div className="flex items-center gap-1.5">
+                          <span
+                            className={`text-sm font-bold truncate ${
+                              isSelected ? "text-brand-accent" : "text-brand-primary"
+                            }`}
+                          >
+                            {agent.name}
+                          </span>
+                          {isCentralOption && (
+                            <span className="text-[10px] uppercase font-black tracking-wider px-2 py-0.5 rounded-full bg-brand-primary text-white shrink-0">
+                              Oficina Central
+                            </span>
+                          )}
                         </div>
                         {agent.position && (
                           <div className="text-xs text-text-secondary font-medium truncate">
@@ -1097,40 +1267,55 @@ export function PropertyForm({
           )}
 
           <p className="text-xs text-text-secondary mt-1.5">
-            El botón de WhatsApp en la ficha pública del inmueble contactará directamente a este asesor.
+            {selectedAgent?.id === "central-los-andes"
+              ? "Propiedad asignada a Central Los Andes. En la ficha y tarjetas mostrará el logo institucional y la atención corporativa directa."
+              : "El botón de WhatsApp en la ficha pública del inmueble contactará directamente a este asesor."}
           </p>
         </div>
       </div>
 
-      {/* Botones de Accion Final */}
-      <div className="pt-4 border-t border-neutral-200/90 flex items-center justify-end gap-3">
-        {onCancel && (
-          <button
-            type="button"
-            onClick={onCancel}
-            disabled={isSubmitting || isUploading}
-            className="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-neutral-600 hover:bg-neutral-100 border border-neutral-300 transition-colors disabled:opacity-50"
-          >
-            Cancelar
-          </button>
-        )}
-        <button
-          type="submit"
-          disabled={isSubmitting || isUploading}
-          className="inline-flex items-center gap-2 bg-gradient-to-r from-[#e85d30] via-brand-accent to-[#c4441b] hover:shadow-lg hover:shadow-brand-accent/30 text-white font-bold px-7 py-2.5 rounded-xl shadow-md shadow-brand-accent/20 transition-all active:scale-95 text-xs sm:text-sm disabled:opacity-50"
-        >
-          {isSubmitting ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              <span>Guardando Inmueble...</span>
-            </>
-          ) : (
-            <>
-              <Save className="w-4 h-4" />
-              <span>{isEditing ? "Guardar Cambios" : "Registrar Inmueble"}</span>
-            </>
+      </div>
+
+      {/* Botones de Accion Final - SIEMPRE FIJADO AL FONDO */}
+      <div
+        className={
+          hideHeader
+            ? "shrink-0 bg-white/95 backdrop-blur-md border-t border-neutral-200/90 px-5 sm:px-6 py-4 flex items-center justify-between flex-wrap gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] z-20"
+            : "pt-4 border-t border-neutral-200/90 flex items-center justify-end gap-3"
+        }
+      >
+        <p className="text-xs text-neutral-500 font-medium hidden sm:block">
+          * Campos obligatorios para publicación inmediata.
+        </p>
+        <div className="flex items-center gap-3 ml-auto">
+          {onCancel && (
+            <button
+              type="button"
+              onClick={onCancel}
+              disabled={isSubmitting || isUploading}
+              className="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-neutral-600 hover:bg-neutral-100 border border-neutral-300 transition-colors disabled:opacity-50"
+            >
+              Cancelar
+            </button>
           )}
-        </button>
+          <button
+            type="submit"
+            disabled={isSubmitting || isUploading}
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-[#e85d30] via-brand-accent to-[#c4441b] hover:shadow-lg hover:shadow-brand-accent/30 text-white font-bold px-7 py-2.5 rounded-xl shadow-md shadow-brand-accent/20 transition-all active:scale-95 text-xs sm:text-sm disabled:opacity-50"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Guardando Inmueble...</span>
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4" />
+                <span>{isEditing ? "Guardar Cambios" : "Registrar Inmueble"}</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </form>
   );

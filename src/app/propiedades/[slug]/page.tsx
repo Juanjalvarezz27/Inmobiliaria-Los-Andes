@@ -8,7 +8,12 @@ import { PropertyGallery } from "@/components/public/PropertyGallery";
 import { PropertyActionsBar } from "@/components/public/PropertyActionsBar";
 import { PropertyCard } from "@/components/public/PropertyCard";
 import { formatCurrency } from "@/lib/utils/format";
-import { buildWhatsAppPropertyLink } from "@/lib/utils/whatsapp";
+import { COMPANY_CONFIG } from "@/config/company";
+import {
+  buildWhatsAppPropertyLink,
+  cleanPhoneNumber,
+  COMPANY_CENTRAL_PHONE,
+} from "@/lib/utils/whatsapp";
 import {
   Bed,
   Bath,
@@ -22,6 +27,10 @@ import {
   Layers,
   ExternalLink,
   FileText,
+  Building2,
+  AlertCircle,
+  Map,
+  Navigation,
 } from "lucide-react";
 import { InstagramIcon } from "@/components/icons/InstagramIcon";
 
@@ -67,11 +76,13 @@ export default async function PropertyDetailPage({ params }: PageProps) {
     },
   });
 
-  if (!property || property.status === "HIDDEN") {
+  if (!property || property.status === "HIDDEN" || property.status === "ARCHIVED") {
     notFound();
   }
 
-  // Obtencion de 4 inmuebles aleatorios disponibles excluyendo el actual
+  const isUnavailable = property.status === "SOLD" || property.status === "RENTED";
+
+  // Obtencion de hasta 4 inmuebles aleatorios disponibles excluyendo el actual
   const allAvailableIds = await prisma.property.findMany({
     where: {
       status: "AVAILABLE",
@@ -80,19 +91,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
     select: { id: true },
   });
 
-  // Si hay menos de 4 disponibles, completa con propiedades no ocultas para garantizar siempre 4
-  let candidateIds = allAvailableIds.map((item) => item.id);
-  if (candidateIds.length < 4) {
-    const additionalIds = await prisma.property.findMany({
-      where: {
-        status: { not: "HIDDEN" },
-        id: { notIn: [property.id, ...candidateIds] },
-      },
-      select: { id: true },
-      take: 4 - candidateIds.length,
-    });
-    candidateIds = [...candidateIds, ...additionalIds.map((item) => item.id)];
-  }
+  const candidateIds = allAvailableIds.map((item) => item.id);
 
   // Barajado aleatorio en memoria de IDs para seleccion no determinista
   const shuffledIds = candidateIds
@@ -114,18 +113,40 @@ export default async function PropertyDetailPage({ params }: PageProps) {
       })
     : [];
 
-  // Enlace directo a WhatsApp del asesor asignado con mensaje prellenado
+  // Determina si el asesor asignado esta activo para derivar atencion a Central si esta pausado
+  const isAgentActive = Boolean(property.agent?.isActive);
+
+  // Mensaje adaptado para captacion de lead si la propiedad ya fue cerrada
+  const customWhatsAppMessage = isUnavailable
+    ? `Hola, estuve viendo la propiedad "${property.title}" que ya se encuentra ${property.status === "SOLD" ? "vendida" : "alquilada"}. ¿Tienen disponibles otras opciones similares en ${property.sector ? `${property.sector}, ` : ""}${property.city}?`
+    : undefined;
+
+  // Enlace directo a WhatsApp (asesor asignado o Central si el asesor esta inactivo)
   const whatsappUrl = buildWhatsAppPropertyLink({
-    phone: property.agent.phone || "+584140000000",
+    phone: property.agent?.phone,
     propertyTitle: property.title,
-    agentName: property.agent.name,
+    agentName: property.agent?.name,
     propertyUrl: `https://inmobiliarialosandes.com/propiedades/${property.slug}`,
+    isAgentActive,
+    customMessage: customWhatsAppMessage,
   });
 
   const propertyTypeLabel =
     property.propertyType === "OTHER" && property.customPropertyType
       ? property.customPropertyType
       : PROPERTY_TYPE_NAMES[property.propertyType] || property.propertyType;
+
+  // Resolucion de enlaces y proyeccion cartografica de Google Maps
+  const locationQuery = [property.address, property.sector, property.city, "Venezuela"]
+    .filter(Boolean)
+    .join(", ");
+
+  const googleMapsExternalUrl =
+    property.googleMapsUrl && property.googleMapsUrl.trim()
+      ? property.googleMapsUrl.trim()
+      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locationQuery)}`;
+
+  const mapEmbedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(locationQuery)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
 
   return (
     <div className="relative isolate z-10 min-h-screen flex flex-col bg-gradient-to-b from-[#FAF7F2] via-[#F3ECE0] to-[#EBE0D2] text-text-primary">
@@ -210,6 +231,23 @@ export default async function PropertyDetailPage({ params }: PageProps) {
         {/* Barra Superior con Navegacion y Compartir */}
         <PropertyActionsBar propertyTitle={property.title} propertyType={propertyTypeLabel} />
 
+        {/* Aviso de Inmueble No Disponible (Vendido / Alquilado) para preservar SEO y canalizar el lead */}
+        {isUnavailable && (
+          <div className="p-4 sm:p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 shadow-xs flex items-start sm:items-center gap-3.5 text-amber-950">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-800 flex items-center justify-center shrink-0 shadow-xs">
+              <AlertCircle className="w-5 h-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h4 className="text-sm font-black font-heading text-amber-950">
+                Inmueble {property.status === "SOLD" ? "Vendido" : "Alquilado"}
+              </h4>
+              <p className="text-xs text-amber-900/90 font-medium mt-0.5 leading-relaxed">
+                Esta propiedad ya concretó su operación y no se encuentra disponible. Puedes consultar con nuestro equipo alternativas similares o explorar las opciones sugeridas al final de esta página.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* LAYOUT EDITORIAL DE ALTO IMPACTO (Galeria y Contenido a la izquierda, Ficha Maestra con Precio y Asesor a la derecha sin espacios vacios) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
           {/* COLUMNA IZQUIERDA (7 de 12 cols): Galeria de fotos + Descripcion detallada + Amenidades */}
@@ -225,6 +263,68 @@ export default async function PropertyDetailPage({ params }: PageProps) {
               </h2>
               <div className="text-neutral-700 text-sm sm:text-base leading-relaxed whitespace-pre-line font-normal">
                 {property.description}
+              </div>
+            </section>
+
+            {/* 3. Card Monumental de Ubicacion Satelital y Google Maps */}
+            <section
+              id="ubicacion"
+              className="bg-white rounded-[28px] p-6 sm:p-7 border border-[#DFD1B8] shadow-[0_12px_36px_rgba(24,38,28,0.10),0_2px_8px_rgba(0,0,0,0.04)] ring-1 ring-black/[0.03] space-y-4 scroll-mt-28"
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-neutral-100">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-lg bg-orange-100/70 text-brand-accent flex items-center justify-center shrink-0">
+                      <MapPin className="w-3.5 h-3.5" />
+                    </div>
+                    <h2 className="text-xs font-black uppercase tracking-widest text-neutral-400 font-heading">
+                      Ubicación y Entorno
+                    </h2>
+                  </div>
+                  <h3 className="text-base sm:text-lg font-black text-brand-primary font-heading pl-8">
+                    {property.sector ? `${property.sector}, ` : ""}{property.city}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-neutral-600 font-medium pl-8">
+                    {property.address}
+                  </p>
+                </div>
+
+                <div className="shrink-0 pl-8 sm:pl-0">
+                  <a
+                    href={googleMapsExternalUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-brand-primary to-[#255236] hover:from-[#132d1d] hover:to-[#1b3e28] text-white text-xs font-bold shadow-md shadow-brand-primary/15 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all cursor-pointer group"
+                    title="Abrir ubicación en Google Maps"
+                  >
+                    <Navigation className="w-3.5 h-3.5 text-orange-300 group-hover:rotate-45 transition-transform" />
+                    <span>Cómo llegar</span>
+                    <ExternalLink className="w-3 h-3 opacity-80" />
+                  </a>
+                </div>
+              </div>
+
+              {/* Visor Cartografico Embebido con Relieve Editorial */}
+              <div className="relative w-full aspect-[16/10] sm:aspect-[21/9] rounded-2xl overflow-hidden border border-[#DFD1B8] shadow-inner bg-neutral-100">
+                <iframe
+                  src={mapEmbedUrl}
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen={false}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title={`Mapa de ubicación para ${property.title}`}
+                  className="w-full h-full min-h-[260px] sm:min-h-[300px] rounded-2xl"
+                />
+
+                {/* Insignia Flotante Satelital en el Mapa */}
+                <div className="absolute bottom-3 left-3 pointer-events-none">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-950/80 backdrop-blur-md border border-white/20 text-white text-[11px] font-bold shadow-lg">
+                    <MapPin className="w-3.5 h-3.5 text-brand-accent shrink-0" />
+                    <span className="truncate max-w-[200px] sm:max-w-xs">{property.sector || property.city}</span>
+                  </div>
+                </div>
               </div>
             </section>
 
@@ -301,19 +401,25 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                 </div>
                 <p className="text-neutral-500 pl-5 leading-relaxed">{property.address}</p>
 
-                {property.googleMapsUrl && (
-                  <div className="pt-1.5 pl-5">
-                    <a
-                      href={property.googleMapsUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs font-bold text-brand-accent hover:underline"
-                    >
-                      <span>Ver en Google Maps</span>
-                      <ExternalLink className="w-3 h-3" />
-                    </a>
-                  </div>
-                )}
+                <div className="pt-1.5 pl-5 flex items-center gap-3">
+                  <a
+                    href="#ubicacion"
+                    className="inline-flex items-center gap-1 text-xs font-bold text-brand-primary hover:text-brand-accent transition-colors"
+                  >
+                    <Map className="w-3.5 h-3.5 text-brand-accent" />
+                    <span>Ver mapa interactivo</span>
+                  </a>
+                  <span className="text-neutral-300">•</span>
+                  <a
+                    href={googleMapsExternalUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs font-bold text-brand-accent hover:underline"
+                  >
+                    <span>Google Maps</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
               </div>
 
               {/* Bloque Destacado de Precio con Mayor Relieve */}
@@ -400,35 +506,61 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                 </div>
               )}
 
-              {/* Ficha del Asesor y Canales de Contacto Directo */}
+              {/* Ficha del Asesor o Atencion Central y Canales de Contacto Directo */}
               <div className="pt-3 border-t border-neutral-100 space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="relative w-14 h-14 rounded-2xl overflow-hidden bg-brand-primary text-white font-black text-base flex items-center justify-center shrink-0 ring-4 ring-white shadow-[0_8px_20px_-4px_rgba(26,59,38,0.22)]">
-                    {property.agent.avatarUrl ? (
+                {isAgentActive && property.agent ? (
+                  <div className="flex items-center gap-3">
+                    <div className="relative w-14 h-14 rounded-2xl overflow-hidden bg-brand-primary text-white font-black text-base flex items-center justify-center shrink-0 ring-4 ring-white shadow-[0_8px_20px_-4px_rgba(26,59,38,0.22)]">
+                      {property.agent.avatarUrl ? (
+                        <Image
+                          src={property.agent.avatarUrl}
+                          alt={property.agent.name}
+                          fill
+                          sizes="56px"
+                          className="object-cover"
+                        />
+                      ) : (
+                        <span>{getInitials(property.agent.name)}</span>
+                      )}
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <span className="text-[9px] font-extrabold uppercase tracking-widest text-neutral-400 block leading-none">
+                        Asesor Asignado
+                      </span>
+                      <h3 className="text-base font-black text-brand-primary font-heading truncate mt-0.5">
+                        {property.agent.name}
+                      </h3>
+                      <p className="text-xs font-medium text-neutral-500 truncate">
+                        {property.agent.position || "Asesor Inmobiliario"}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-3">
+                    <div className="relative w-14 h-14 rounded-2xl overflow-hidden shrink-0 ring-4 ring-white shadow-[0_8px_20px_-4px_rgba(26,59,38,0.22)] bg-white">
                       <Image
-                        src={property.agent.avatarUrl}
-                        alt={property.agent.name}
+                        src="/Logo redondo.png"
+                        alt="Inmobiliaria Los Andes"
                         fill
                         sizes="56px"
                         className="object-cover"
                       />
-                    ) : (
-                      <span>{getInitials(property.agent.name)}</span>
-                    )}
-                  </div>
+                    </div>
 
-                  <div className="min-w-0 flex-1">
-                    <span className="text-[9px] font-extrabold uppercase tracking-widest text-neutral-400 block leading-none">
-                      Asesor Asignado
-                    </span>
-                    <h3 className="text-base font-black text-brand-primary font-heading truncate mt-0.5">
-                      {property.agent.name}
-                    </h3>
-                    <p className="text-xs font-medium text-neutral-500 truncate">
-                      {property.agent.position || "Asesor Inmobiliario"}
-                    </p>
+                    <div className="min-w-0 flex-1">
+                      <span className="text-[9px] font-extrabold uppercase tracking-widest text-brand-accent block leading-none">
+                        Atención Central
+                      </span>
+                      <h3 className="text-base font-black text-brand-primary font-heading truncate mt-0.5">
+                        Inmobiliaria Los Andes
+                      </h3>
+                      <p className="text-xs font-medium text-neutral-500 truncate">
+                        Equipo de Asesoría Inmobiliaria
+                      </p>
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Boton Primario WhatsApp de Alta Conversion con Mayor Profundidad */}
                 <a
@@ -438,29 +570,38 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                   className="w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-emerald-600 via-emerald-600 to-[#128c46] hover:from-emerald-500 hover:to-[#0f7a3d] text-white font-black text-sm flex items-center justify-center gap-2 shadow-[0_10px_28px_-6px_rgba(16,149,76,0.40),0_4px_10px_-2px_rgba(0,0,0,0.06)] hover:shadow-[0_16px_34px_-6px_rgba(16,149,76,0.50)] hover:-translate-y-0.5 transition-all active:scale-95 text-center cursor-pointer group"
                 >
                   <MessageCircle className="w-4 h-4 fill-white text-emerald-600 group-hover:scale-110 transition-transform" />
-                  <span>Consultar por WhatsApp</span>
+                  <span>{isUnavailable ? "Consultar opciones similares" : "Consultar por WhatsApp"}</span>
                 </a>
 
                 {/* Canales Secundarios Directos */}
                 <div className="grid grid-cols-2 gap-2 text-xs font-bold text-neutral-700">
-                  {property.agent.phone && (
-                    <a
-                      href={`tel:${property.agent.phone.replace(/\s+/g, "")}`}
-                      className="p-2.5 rounded-xl bg-gradient-to-b from-white to-[#FBF9F5] hover:to-white border border-[#DFD1B8] shadow-xs hover:shadow-sm hover:-translate-y-0.5 flex items-center justify-center gap-1.5 transition-all"
-                      title="Llamar directo al asesor"
-                    >
-                      <Phone className="w-3.5 h-3.5 text-brand-primary" />
-                      <span>Llamar</span>
-                    </a>
-                  )}
+                  <a
+                    href={`tel:${cleanPhoneNumber(isAgentActive && property.agent?.phone ? property.agent.phone : COMPANY_CENTRAL_PHONE)}`}
+                    className="p-2.5 rounded-xl bg-gradient-to-b from-white to-[#FBF9F5] hover:to-white border border-[#DFD1B8] shadow-xs hover:shadow-sm hover:-translate-y-0.5 flex items-center justify-center gap-1.5 transition-all"
+                    title={isAgentActive ? "Llamar directo al asesor" : "Llamar a Central Los Andes"}
+                  >
+                    <Phone className="w-3.5 h-3.5 text-brand-primary" />
+                    <span>Llamar</span>
+                  </a>
 
-                  {property.agent.instagram && (
+                  {isAgentActive && property.agent?.instagram ? (
                     <a
                       href={`https://instagram.com/${property.agent.instagram.replace("@", "")}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="p-2.5 rounded-xl bg-gradient-to-b from-white to-[#FBF9F5] hover:to-white border border-[#DFD1B8] shadow-xs hover:shadow-sm hover:-translate-y-0.5 flex items-center justify-center gap-1.5 transition-all"
-                      title="Ver Instagram"
+                      title="Ver Instagram del asesor"
+                    >
+                      <InstagramIcon className="w-3.5 h-3.5 text-pink-600" />
+                      <span>Instagram</span>
+                    </a>
+                  ) : (
+                    <a
+                      href={COMPANY_CONFIG.social.instagramUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2.5 rounded-xl bg-gradient-to-b from-white to-[#FBF9F5] hover:to-white border border-[#DFD1B8] shadow-xs hover:shadow-sm hover:-translate-y-0.5 flex items-center justify-center gap-1.5 transition-all"
+                      title="Ver Instagram oficial"
                     >
                       <InstagramIcon className="w-3.5 h-3.5 text-pink-600" />
                       <span>Instagram</span>

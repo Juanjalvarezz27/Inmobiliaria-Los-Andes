@@ -28,8 +28,8 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen md:h-screen md:overflow-hidden bg-gradient-to-b from-[#FAF7F2] via-[#F4EDE2] to-[#EAE0D3] flex flex-col md:flex-row relative isolate">
-      {/* Fondo atmosferico beige andino con destellos calidos naranja */}
+    <div className="min-h-screen md:h-screen md:overflow-hidden bg-gradient-to-b from-[#FAF7F2] via-[#F3ECE0] to-[#EBE0D2] flex flex-col md:flex-row relative isolate">
+      {/* Fondo atmosferico beige andino identico a la seccion de inmuebles */}
       <AdminAtmosphereBackground />
 
       <AdminSidebar user={user} />

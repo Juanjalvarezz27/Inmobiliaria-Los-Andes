@@ -23,6 +23,7 @@ interface PageProps {
     q?: string;
     orden?: string;
     page?: string;
+    estado?: string;
   }>;
 }
 
@@ -35,11 +36,9 @@ export default async function HomePage({ searchParams }: PageProps) {
   const sortOrder = params.orden || "recientes";
   const currentPage = Math.max(1, parseInt(params.page || "1", 10) || 1);
 
-  // Filtros dinamicos basados en la consulta
+  // Filtros dinamicos: por defecto solo inmuebles plenamente disponibles en el catalogo publico
   const whereClause: Prisma.PropertyWhereInput = {
-    status: {
-      not: "HIDDEN",
-    },
+    status: params.estado === "todos" ? { notIn: ["HIDDEN", "ARCHIVED"] } : "AVAILABLE",
   };
 
   if (operation && operation !== "ALL") {
@@ -70,7 +69,13 @@ export default async function HomePage({ searchParams }: PageProps) {
   }
 
   // Consultas concurrentes en base de datos
-  const [totalPropertiesCount, totalAgentsCount, properties, activeAgents] = await Promise.all([
+  const [
+    totalPropertiesCount,
+    totalAgentsCount,
+    properties,
+    activeAgents,
+    locationRecords,
+  ] = await Promise.all([
     prisma.property.count({ where: whereClause }),
     prisma.user.count({ where: { role: "AGENT", isActive: true } }),
     prisma.property.findMany({
@@ -94,6 +99,7 @@ export default async function HomePage({ searchParams }: PageProps) {
             name: true,
             phone: true,
             avatarUrl: true,
+            isActive: true,
           },
         },
       },
@@ -119,7 +125,27 @@ export default async function HomePage({ searchParams }: PageProps) {
       ],
       take: 8,
     }),
+    // Sectores y ciudades de inmuebles disponibles para el autocompletado en tiempo real
+    prisma.property.findMany({
+      where: { status: "AVAILABLE" },
+      select: { sector: true, city: true },
+      distinct: ["sector", "city"],
+    }),
   ]);
+
+  // Consolidar sectores y ciudades unicas para sugerencias del buscador
+  const uniqueLocationsSet = new Set<string>();
+  for (const item of locationRecords) {
+    if (item.sector && item.sector.trim()) {
+      uniqueLocationsSet.add(item.sector.trim());
+    }
+  }
+  for (const item of locationRecords) {
+    if (item.city && item.city.trim()) {
+      uniqueLocationsSet.add(item.city.trim());
+    }
+  }
+  const availableLocations = Array.from(uniqueLocationsSet);
 
   const totalPages = Math.ceil(totalPropertiesCount / PAGE_SIZE);
 
@@ -173,7 +199,7 @@ export default async function HomePage({ searchParams }: PageProps) {
       <Navbar />
 
       {/* Hero Principal con Buscador y Fondo Dinamico */}
-      <HeroSearch slides={heroBackgroundSlides} />
+      <HeroSearch slides={heroBackgroundSlides} availableLocations={availableLocations} />
 
       {/* Franja destacada del catalogo (ancho completo) */}
       <CatalogBanner totalProperties={totalPropertiesCount} totalAgents={totalAgentsCount} />

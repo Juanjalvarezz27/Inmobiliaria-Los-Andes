@@ -14,7 +14,7 @@ import type { Prisma, OperationType, PropertyType } from "@/generated/prisma/cli
 
 export const dynamic = "force-dynamic";
 
-const PAGE_SIZE = 9;
+const PAGE_SIZE = 12;
 
 interface PageProps {
   searchParams: Promise<{
@@ -76,8 +76,18 @@ export default async function HomePage({ searchParams }: PageProps) {
     prisma.property.findMany({
       where: whereClause,
       include: {
+        // Carga estricta de unicamente 1 imagen de portada para maximo ahorro de recursos
         images: {
-          orderBy: { order: "asc" },
+          orderBy: [{ isMain: "desc" }, { order: "asc" }],
+          take: 1,
+          select: {
+            url: true,
+            caption: true,
+            isMain: true,
+          },
+        },
+        _count: {
+          select: { images: true },
         },
         agent: {
           select: {
@@ -123,14 +133,39 @@ export default async function HomePage({ searchParams }: PageProps) {
     propertiesCount: a._count.properties,
   }));
 
-  // Fotografias reales de propiedades para el carrusel de fondo del Hero
-  const heroBackgroundSlides = properties
+  // Fotografias reales de propiedades combinadas con el Monumento a la Virgen de la Paz para el carrusel de fondo del Hero
+  const propertySlides = properties
     .filter((p) => p.images.length > 0)
     .map((p) => ({
       url: p.images[0].url,
       caption: p.title,
     }))
-    .slice(0, 5);
+    .slice(0, 4);
+
+  const heroBackgroundSlides =
+    propertySlides.length > 0
+      ? [
+          propertySlides[0],
+          {
+            url: "/images/virgen_de_la_paz_0.jpg",
+            caption: "Monumento a la Virgen de la Paz, Trujillo",
+          },
+          ...propertySlides.slice(1),
+        ]
+      : [
+          {
+            url: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1920&q=80",
+            caption: "Residencia Contemporánea",
+          },
+          {
+            url: "/images/virgen_de_la_paz_0.jpg",
+            caption: "Monumento a la Virgen de la Paz, Trujillo",
+          },
+          {
+            url: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1920&q=80",
+            caption: "Townhouse con Jardín",
+          },
+        ];
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f8faf8]">
@@ -220,11 +255,11 @@ export default async function HomePage({ searchParams }: PageProps) {
           />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-8">
-          {/* Grilla de Propiedades o Estado Vacio */}
+        <div className="relative max-w-7xl 2xl:max-w-[1520px] mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-8">
+          {/* Grilla de Propiedades de 4 en 4 con mayor profundidad */}
           {properties.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
                 {properties.map((property, index) => (
                   <PropertyCard
                     key={property.id}
@@ -245,6 +280,8 @@ export default async function HomePage({ searchParams }: PageProps) {
                       areaSquareMeters: property.areaSquareMeters?.toString(),
                       city: property.city,
                       sector: property.sector,
+                      coverImageUrl: property.images[0]?.url || null,
+                      imagesCount: property._count.images,
                       images: property.images,
                       agent: property.agent,
                     }}

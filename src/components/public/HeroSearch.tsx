@@ -30,6 +30,10 @@ const DEFAULT_HERO_SLIDES: HeroSlide[] = [
     caption: "Residencia Contemporánea",
   },
   {
+    url: "/images/virgen_de_la_paz_0.jpg",
+    caption: "Monumento a la Virgen de la Paz, Trujillo",
+  },
+  {
     url: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1920&q=80",
     caption: "Townhouse con Jardín",
   },

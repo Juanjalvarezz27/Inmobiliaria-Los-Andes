@@ -6,6 +6,22 @@ export interface CompressOptions {
   targetFormat?: "image/webp" | "image/jpeg";
 }
 
+// Perfiles de calibracion optima para maxima reduccion de peso sin perdida de nitidez
+export const COMPRESSION_PRESETS = {
+  PROPERTY: {
+    maxWidth: 1440,
+    maxHeight: 1080,
+    quality: 0.80,
+    targetFormat: "image/webp" as const,
+  },
+  AVATAR: {
+    maxWidth: 640,
+    maxHeight: 640,
+    quality: 0.80,
+    targetFormat: "image/webp" as const,
+  },
+} as const;
+
 export interface CompressedImageResult {
   file: File;
   previewUrl: string;
@@ -52,9 +68,9 @@ export async function compressImage(
   options: CompressOptions = {}
 ): Promise<CompressedImageResult> {
   const {
-    maxWidth = 1200,
-    maxHeight = 1200,
-    quality = 0.85,
+    maxWidth = 1440,
+    maxHeight = 1080,
+    quality = 0.80,
     targetFormat = "image/webp",
   } = options;
 

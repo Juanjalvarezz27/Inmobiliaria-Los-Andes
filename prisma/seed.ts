@@ -11,18 +11,18 @@ async function main() {
   await prisma.property.deleteMany();
   await prisma.user.deleteMany();
 
-  const passwordHash = await bcrypt.hash("Admin123*LosAndes", 10);
+  const passwordHash = await bcrypt.hash("Losandes21.", 10);
 
-  // 1. Crear Administrador
+  // 1. Crear Administrador Central Oficial
   const admin = await prisma.user.create({
     data: {
-      email: "admin@inmobiliarialosandes.com",
+      email: "inv.inm.losandes@gmail.com",
       name: "Administrador",
       passwordHash,
       role: "ADMIN",
-      position: "Director de Operaciones",
+      position: "Dirección General",
       phone: "+584147000000",
-      avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+      avatarUrl: "/Logo redondo.png",
       isActive: true,
     },
   });

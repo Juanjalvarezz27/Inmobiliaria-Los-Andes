@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
@@ -8,7 +9,7 @@ import { Footer } from "@/components/public/Footer";
 import { PropertyGallery } from "@/components/public/PropertyGallery";
 import { PropertyActionsBar } from "@/components/public/PropertyActionsBar";
 import { PropertyCard } from "@/components/public/PropertyCard";
-import { formatCurrency } from "@/lib/utils/format";
+import { formatCurrency, getInitials } from "@/lib/utils/format";
 import { COMPANY_CONFIG } from "@/config/company";
 import {
   buildWhatsAppPropertyLink,
@@ -58,26 +59,33 @@ interface PageProps {
   }>;
 }
 
-// Metadatos dinámicos Open Graph optimizados para previsualización en WhatsApp y redes sociales
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const property = await prisma.property.findUnique({
+// Consulta memoizada para evitar duplicar viajes a Neon entre generateMetadata y el render de la pagina
+const getPropertyBySlug = cache(async (slug: string) => {
+  return prisma.property.findUnique({
     where: { slug },
-    select: {
-      title: true,
-      description: true,
-      operationType: true,
-      price: true,
-      currency: true,
-      city: true,
-      sector: true,
+    include: {
       images: {
         orderBy: [{ isMain: "desc" }, { order: "asc" }],
-        take: 1,
-        select: { url: true },
+      },
+      agent: {
+        select: {
+          id: true,
+          name: true,
+          phone: true,
+          position: true,
+          avatarUrl: true,
+          instagram: true,
+          isActive: true,
+        },
       },
     },
   });
+});
+
+// Metadatos dinámicos Open Graph optimizados para previsualización en WhatsApp y redes sociales
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const property = await getPropertyBySlug(slug);
 
   if (!property) {
     return {
@@ -127,16 +135,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-// Generador de iniciales en texto para avatar del asesor
-function getInitials(name: string): string {
-  if (!name) return "AS";
-  const parts = name.trim().split(/\s+/);
-  if (parts.length >= 2) {
-    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-  }
-  return name.substring(0, 2).toUpperCase();
-}
-
 const PROPERTY_TYPE_NAMES: Record<string, string> = {
   TOWNHOUSE: "Townhouse",
   HOUSE: "Casa",
@@ -151,15 +149,7 @@ const PROPERTY_TYPE_NAMES: Record<string, string> = {
 export default async function PropertyDetailPage({ params }: PageProps) {
   const { slug } = await params;
 
-  const property = await prisma.property.findUnique({
-    where: { slug },
-    include: {
-      images: {
-        orderBy: [{ isMain: "desc" }, { order: "asc" }],
-      },
-      agent: true,
-    },
-  });
+  const property = await getPropertyBySlug(slug);
 
   if (!property || property.status === "HIDDEN" || property.status === "ARCHIVED") {
     notFound();

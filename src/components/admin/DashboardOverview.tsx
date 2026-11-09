@@ -23,6 +23,8 @@ import {
   togglePropertyFeaturedAction,
   reorderPropertiesAction,
 } from "@/app/admin/actions";
+import { MovePositionModal, type MoveModalItem } from "@/components/admin/dashboard/MovePositionModal";
+import { FeaturedAgentsTab } from "@/components/admin/dashboard/FeaturedAgentsTab";
 
 export interface DashboardMetricData {
   totalProperties: number;
@@ -105,11 +107,7 @@ export function DashboardOverview({
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   // Estado para el modal rápido de "Mover a posición..." (solo inmuebles)
-  const [moveModalItem, setMoveModalItem] = useState<{
-    property: DashboardPropertyItem;
-    currentPosition: number;
-  } | null>(null);
-  const [targetPositionInput, setTargetPositionInput] = useState<string>("1");
+  const [moveModalItem, setMoveModalItem] = useState<MoveModalItem | null>(null);
 
   const showNotification = (
     title: string,
@@ -754,7 +752,6 @@ export function DashboardOverview({
                                 property,
                                 currentPosition: property.absolutePosition,
                               });
-                              setTargetPositionInput(property.absolutePosition.toString());
                             }}
                             disabled={isPending}
                             className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold text-neutral-700 bg-neutral-100 hover:bg-neutral-200/90 hover:text-neutral-900 border border-neutral-200/60 transition-colors cursor-pointer"
@@ -780,201 +777,25 @@ export function DashboardOverview({
 
           {/* SECCIÓN 2: CONTROL DE ASESORES */}
           {activeTab === "agents" && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-              {filteredAgents.map((agent) => (
-                <div
-                  key={agent.id}
-                  className={`p-4 rounded-2xl border transition-all flex items-center justify-between gap-3 ${
-                    agent.featured
-                      ? "bg-white border-neutral-200/90 shadow-2xs hover:border-brand-accent/40"
-                      : "bg-neutral-50/50 border-neutral-200/60 opacity-75 hover:opacity-100 hover:border-neutral-300"
-                  }`}
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="relative w-12 h-12 rounded-full overflow-hidden shrink-0 bg-neutral-100 ring-2 ring-neutral-200/80">
-                      {agent.avatarUrl ? (
-                        <Image
-                          src={agent.avatarUrl}
-                          alt={agent.name}
-                          fill
-                          sizes="48px"
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-neutral-400">
-                          <Users className="w-5 h-5" />
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="min-w-0 space-y-0.5">
-                      <h4 className="font-bold text-xs sm:text-sm text-brand-primary truncate">
-                        {agent.name}
-                      </h4>
-                      <p className="text-[11px] text-text-secondary truncate">
-                        {agent.position}
-                      </p>
-                      <span className="text-[10px] font-bold text-brand-accent block">
-                        {agent.propertiesCount} inmuebles asignados
-                      </span>
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => handleToggleAgentFeatured(agent.id)}
-                    disabled={isPending}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer active:scale-95 disabled:opacity-50 ${
-                      agent.featured
-                        ? "bg-emerald-50 text-emerald-800 border border-emerald-300 hover:bg-emerald-100 shadow-2xs"
-                        : featuredAgentsCount >= 8
-                        ? "bg-neutral-100 text-neutral-400 border border-neutral-200 hover:border-amber-300 hover:text-amber-700"
-                        : "bg-white text-neutral-500 border border-neutral-200 hover:border-neutral-300 hover:text-neutral-700"
-                    }`}
-                    title={
-                      agent.featured
-                        ? "Quitar de la página de inicio"
-                        : featuredAgentsCount >= 8
-                        ? "Límite de 8 alcanzado. Desmarca uno antes de agregar este."
-                        : "Mostrar en la página de inicio"
-                    }
-                  >
-                    <Star
-                      className={`w-3.5 h-3.5 ${
-                        agent.featured
-                          ? "text-amber-500 fill-amber-500"
-                          : featuredAgentsCount >= 8
-                          ? "text-neutral-300"
-                          : "text-neutral-400"
-                      }`}
-                    />
-                    <span>{agent.featured ? "En Inicio" : "No en Inicio"}</span>
-                  </button>
-                </div>
-              ))}
-
-              {filteredAgents.length === 0 && (
-                <div className="col-span-full py-12 text-center text-text-secondary text-xs bg-neutral-50 rounded-2xl border border-dashed border-neutral-200">
-                  No se encontraron asesores que coincidan con la búsqueda.
-                </div>
-              )}
-            </div>
+            <FeaturedAgentsTab
+              agents={filteredAgents}
+              featuredAgentsCount={featuredAgentsCount}
+              isPending={isPending}
+              onToggleFeatured={handleToggleAgentFeatured}
+            />
           )}
         </div>
       </div>
 
       {/* Modal Interactivo de Reubicación Rápida a Posición Específica (Inmuebles) */}
-      {moveModalItem && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 animate-in fade-in duration-150">
-          <div className="bg-white rounded-3xl border border-neutral-200 shadow-2xl max-w-md w-full p-6 space-y-5 animate-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between gap-3 border-b border-neutral-100 pb-3">
-              <div className="flex items-center gap-2">
-                <span className="w-8 h-8 rounded-xl bg-orange-100 text-brand-accent flex items-center justify-center font-bold text-sm">
-                  <Hash className="w-4 h-4" />
-                </span>
-                <div>
-                  <h3 className="font-heading font-black text-brand-primary text-base">
-                    Mover Inmueble a Posición
-                  </h3>
-                  <p className="text-xs text-text-secondary">
-                    Reordena y define en qué página del portal se mostrará
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setMoveModalItem(null)}
-                className="p-1 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Inmueble seleccionado */}
-            <div className="p-3 bg-neutral-50 rounded-2xl border border-neutral-200/80 flex items-center gap-3">
-              <div className="relative w-14 h-12 rounded-xl overflow-hidden shrink-0 bg-neutral-200">
-                {moveModalItem.property.coverUrl ? (
-                  <Image
-                    src={moveModalItem.property.coverUrl}
-                    alt={moveModalItem.property.title}
-                    fill
-                    sizes="56px"
-                    className="object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-neutral-400">
-                    <HomeIcon className="w-4 h-4" />
-                  </div>
-                )}
-              </div>
-              <div className="min-w-0 flex-1">
-                <h4 className="font-bold text-xs sm:text-sm text-text-primary truncate">
-                  {moveModalItem.property.title}
-                </h4>
-                <div className="flex items-center gap-2 text-[11px] text-text-secondary mt-0.5">
-                  <span>Posición actual: <strong>#{moveModalItem.currentPosition}</strong></span>
-                  <span>•</span>
-                  <span>Página {Math.ceil(moveModalItem.currentPosition / PUBLIC_PAGE_SIZE)}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Formulario de número de posición */}
-            <div className="space-y-3">
-              <label className="text-xs font-bold text-text-primary block">
-                Escribe la nueva posición (1 al {properties.length}):
-              </label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="number"
-                  min="1"
-                  max={properties.length}
-                  value={targetPositionInput}
-                  onChange={(e) => setTargetPositionInput(e.target.value)}
-                  className="flex-1 bg-white border-2 border-brand-accent/50 focus:border-brand-accent rounded-xl px-4 py-2.5 text-base font-black text-brand-primary text-center focus:outline-none focus:ring-2 focus:ring-brand-accent/20"
-                />
-              </div>
-
-              {/* Aclaratoria breve de una sola línea */}
-              {(() => {
-                const parsed = parseInt(targetPositionInput, 10);
-                if (isNaN(parsed) || parsed < 1 || parsed > properties.length) return null;
-                const current = moveModalItem.currentPosition;
-                if (parsed === current) return null;
-                const targetPage = Math.ceil(parsed / PUBLIC_PAGE_SIZE);
-                return (
-                  <p className="text-[11px] text-neutral-500 bg-neutral-50 border border-neutral-200/60 rounded-xl px-3 py-2 text-center animate-in fade-in duration-100">
-                    Se ubicará en la <strong className="text-text-primary">Página {targetPage}</strong> y los demás puestos se ajustarán en orden.
-                  </p>
-                );
-              })()}
-            </div>
-
-            {/* Botones de Acción */}
-            <div className="flex items-center justify-center gap-3 pt-3 border-t border-neutral-100">
-              <button
-                type="button"
-                onClick={() => setMoveModalItem(null)}
-                className="px-5 py-2.5 rounded-xl text-xs font-bold text-neutral-600 hover:bg-neutral-100 transition-colors cursor-pointer"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  const target = parseInt(targetPositionInput, 10);
-                  if (isNaN(target) || target < 1) return;
-                  handleMoveToPosition(moveModalItem.property.id, target);
-                }}
-                disabled={isPending}
-                className="px-6 py-2.5 rounded-xl text-xs font-black bg-brand-accent hover:bg-[#d64b1f] text-white shadow-md shadow-brand-accent/25 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
-              >
-                Confirmar y Guardar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <MovePositionModal
+        item={moveModalItem}
+        totalProperties={properties.length}
+        pageSize={PUBLIC_PAGE_SIZE}
+        isPending={isPending}
+        onClose={() => setMoveModalItem(null)}
+        onConfirm={handleMoveToPosition}
+      />
     </div>
   );
 }

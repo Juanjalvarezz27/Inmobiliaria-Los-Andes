@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { getCachedAvailableLocations, getCachedHomeAgents } from "@/lib/data/home";
 import { Navbar } from "@/components/public/Navbar";
 import { Footer } from "@/components/public/Footer";
 import { HeroSearch } from "@/components/public/HeroSearch";
@@ -71,16 +72,14 @@ export default async function HomePage({ searchParams }: PageProps) {
     orderByClause.push({ createdAt: "desc" });
   }
 
-  // Consultas concurrentes en base de datos
+  // Consultas optimizadas en base de datos con cache para datos comunes
   const [
     totalPropertiesCount,
-    totalAgentsCount,
     properties,
-    activeAgents,
-    locationRecords,
+    availableLocations,
+    { totalAgentsCount, activeAgents },
   ] = await Promise.all([
     prisma.property.count({ where: whereClause }),
-    prisma.user.count({ where: { role: "AGENT", isActive: true } }),
     prisma.property.findMany({
       where: whereClause,
       select: {
@@ -124,45 +123,9 @@ export default async function HomePage({ searchParams }: PageProps) {
       skip: (currentPage - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
     }),
-    prisma.user.findMany({
-      where: { role: "AGENT", isActive: true, featured: true },
-      select: {
-        id: true,
-        name: true,
-        phone: true,
-        avatarUrl: true,
-        position: true,
-        _count: {
-          select: { properties: true },
-        },
-      },
-      orderBy: [
-        { displayOrder: "asc" },
-        { createdAt: "desc" },
-      ],
-      take: 8,
-    }),
-    // Sectores y ciudades de inmuebles disponibles para el autocompletado en tiempo real
-    prisma.property.findMany({
-      where: { status: "AVAILABLE" },
-      select: { sector: true, city: true },
-      distinct: ["sector", "city"],
-    }),
+    getCachedAvailableLocations(),
+    getCachedHomeAgents(),
   ]);
-
-  // Consolidar sectores y ciudades unicas para sugerencias del buscador
-  const uniqueLocationsSet = new Set<string>();
-  for (const item of locationRecords) {
-    if (item.sector && item.sector.trim()) {
-      uniqueLocationsSet.add(item.sector.trim());
-    }
-  }
-  for (const item of locationRecords) {
-    if (item.city && item.city.trim()) {
-      uniqueLocationsSet.add(item.city.trim());
-    }
-  }
-  const availableLocations = Array.from(uniqueLocationsSet);
 
   const totalPages = Math.ceil(totalPropertiesCount / PAGE_SIZE);
 

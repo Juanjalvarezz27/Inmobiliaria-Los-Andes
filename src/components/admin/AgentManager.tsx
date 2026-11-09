@@ -23,6 +23,7 @@ import { AgentModal, AgentFormData } from "@/components/admin/AgentModal";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { toast } from "sonner";
 import { Pagination } from "@/components/admin/Pagination";
+import { buildWhatsAppUrl } from "@/lib/utils/whatsapp";
 import {
   TransferPropertiesModal,
   TransferableProperty,
@@ -360,8 +361,7 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {paginatedAgents.map((agent) => {
-            const cleanPhone = agent.phone ? agent.phone.replace(/[^0-9]/g, "") : null;
-            const whatsappUrl = cleanPhone ? `https://wa.me/${cleanPhone}` : null;
+            const whatsappUrl = agent.phone ? buildWhatsAppUrl(agent.phone) : null;
             const isToggling = loadingAgentId === agent.id;
 
             return (

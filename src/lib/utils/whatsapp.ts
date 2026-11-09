@@ -7,8 +7,18 @@ export const COMPANY_CENTRAL_PHONE =
 export const COMPANY_NAME = COMPANY_CONFIG.tradeName;
 
 // Sanitiza el numero telefonico dejando solo digitos
-export function cleanPhoneNumber(phone: string): string {
+export function cleanPhoneNumber(phone?: string | null): string {
+  if (!phone) return "";
   return phone.replace(/\D/g, "");
+}
+
+// Construye una URL directa a WhatsApp con telefono y mensaje opcional
+export function buildWhatsAppUrl(phone?: string | null, message?: string): string {
+  const targetPhone = cleanPhoneNumber(phone) || cleanPhoneNumber(COMPANY_CENTRAL_PHONE);
+  if (!message || !message.trim()) {
+    return `https://wa.me/${targetPhone}`;
+  }
+  return `https://wa.me/${targetPhone}?text=${encodeURIComponent(message.trim())}`;
 }
 
 // Construye la URL de WhatsApp con mensaje personalizado prellenado y redireccion central si el asesor esta pausado
@@ -32,12 +42,11 @@ export function buildWhatsAppPropertyLink({
   const targetPhone = useCentral ? COMPANY_CENTRAL_PHONE : phone;
   const targetName = useCentral ? COMPANY_NAME : agentName;
 
-  const sanitizedPhone = cleanPhoneNumber(targetPhone);
   const greeting = targetName ? `Hola ${targetName}, ` : "Hola, ";
   const linkText = propertyUrl ? ` Enlace: ${propertyUrl}` : "";
   const defaultMessage = `${greeting}estoy interesado(a) en la propiedad "${propertyTitle}".${linkText} ¿Podría darme más información?`;
   const message = customMessage || defaultMessage;
 
-  return `https://wa.me/${sanitizedPhone}?text=${encodeURIComponent(message)}`;
+  return buildWhatsAppUrl(targetPhone, message);
 }
 

@@ -1,8 +1,9 @@
 "use client";
 
 import { useActionState } from "react";
+import Image from "next/image";
 import { loginAction } from "@/app/admin/actions";
-import { Building2, Lock, Mail, ArrowRight, ShieldCheck } from "lucide-react";
+import { Lock, Mail, ArrowRight, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { COMPANY_CONFIG } from "@/config/company";
 import { AdminAtmosphereBackground } from "@/components/admin/AdminAtmosphereBackground";
@@ -17,17 +18,24 @@ export default function AdminLoginPage() {
       <AdminAtmosphereBackground />
 
       <div className="w-full max-w-md space-y-8 relative z-10">
-        {/* Cabecera y Logotipo */}
+        {/* Cabecera y Logotipo Oficial */}
         <div className="text-center space-y-3">
-          <Link href="/" className="inline-flex items-center gap-2.5 group">
-            <div className="w-12 h-12 rounded-2xl bg-brand-primary flex items-center justify-center text-white shadow-lg group-hover:bg-opacity-95 transition-all">
-              <Building2 className="w-6 h-6 text-brand-accent" />
+          <Link href="/" className="inline-flex items-center justify-center group" title="Ir al portal web">
+            <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-white p-2 shadow-xl border border-neutral-200/90 group-hover:scale-105 transition-all">
+              <Image
+                src="/Logo redondo.png"
+                alt={COMPANY_CONFIG.tradeName}
+                fill
+                sizes="80px"
+                className="object-contain p-1"
+                priority
+              />
             </div>
           </Link>
-          <h1 className="text-2xl font-extrabold text-brand-primary tracking-tight font-heading">
+          <h1 className="text-2xl font-black text-brand-primary tracking-tight font-heading">
             Acceso Administrativo
           </h1>
-          <p className="text-xs text-text-secondary uppercase tracking-widest font-semibold">
+          <p className="text-xs text-text-secondary uppercase tracking-widest font-bold">
             {COMPANY_CONFIG.tradeName}
           </p>
         </div>
@@ -56,9 +64,9 @@ export default function AdminLoginPage() {
                   type="email"
                   name="email"
                   required
-                  placeholder="admin@inmobiliarialosandes.com"
-                  defaultValue="admin@inmobiliarialosandes.com"
-                  className="w-full bg-neutral-50 border border-neutral-200 rounded-xl pl-10 pr-3.5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent"
+                  autoComplete="username"
+                  placeholder="correo@ejemplo.com"
+                  className="w-full bg-neutral-50 border border-neutral-200 rounded-xl pl-10 pr-3.5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent text-neutral-900"
                 />
               </div>
             </div>
@@ -73,9 +81,9 @@ export default function AdminLoginPage() {
                   type="password"
                   name="password"
                   required
+                  autoComplete="current-password"
                   placeholder="••••••••••••"
-                  defaultValue="Admin123*LosAndes"
-                  className="w-full bg-neutral-50 border border-neutral-200 rounded-xl pl-10 pr-3.5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent"
+                  className="w-full bg-neutral-50 border border-neutral-200 rounded-xl pl-10 pr-3.5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent text-neutral-900"
                 />
               </div>
             </div>
@@ -83,7 +91,7 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={isPending}
-              className="w-full py-3.5 px-4 bg-brand-primary hover:bg-[#12281a] text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 disabled:opacity-50"
+              className="w-full py-3.5 px-4 bg-brand-primary hover:bg-[#12281a] text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               <span>{isPending ? "Validando credenciales..." : "Iniciar Sesión"}</span>
               <ArrowRight className="w-4 h-4 text-brand-accent" />

@@ -20,7 +20,7 @@ export default async function EditPropertyPage({ params }: PageProps) {
       include: { images: { orderBy: { order: "asc" } } },
     }),
     prisma.user.findMany({
-      where: { isActive: true },
+      where: { role: "AGENT", isActive: true },
       select: { id: true, name: true, position: true, avatarUrl: true },
       orderBy: { name: "asc" },
     }),

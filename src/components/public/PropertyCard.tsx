@@ -10,7 +10,7 @@ import {
   MessageCircle,
   Building2,
 } from "lucide-react";
-import { formatCurrency, formatArea } from "@/lib/utils/format";
+import { formatCurrency, formatArea, getInitials } from "@/lib/utils/format";
 import { buildWhatsAppPropertyLink } from "@/lib/utils/whatsapp";
 
 export interface PropertyCardData {
@@ -50,16 +50,6 @@ const PROPERTY_TYPE_LABELS: Record<string, string> = {
   OFFICE: "Oficina",
   OTHER: "Inmueble",
 };
-
-// Generador de iniciales en texto para el avatar del asesor
-function getInitials(name: string): string {
-  if (!name) return "AS";
-  const parts = name.trim().split(/\s+/);
-  if (parts.length >= 2) {
-    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-  }
-  return name.substring(0, 2).toUpperCase();
-}
 
 // Tarjeta ejecutiva de propiedad para el catalogo publico con diseno editorial y contacto directo
 export function PropertyCard({

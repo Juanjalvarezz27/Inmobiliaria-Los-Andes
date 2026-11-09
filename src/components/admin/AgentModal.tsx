@@ -18,7 +18,7 @@ import {
   UserCog,
 } from "lucide-react";
 import { InstagramIcon } from "@/components/icons/InstagramIcon";
-import { compressImage } from "@/lib/imageCompression";
+import { compressImage, COMPRESSION_PRESETS } from "@/lib/imageCompression";
 import {
   createAgentAction,
   updateAgentAction,
@@ -89,20 +89,15 @@ function AgentFormContent({
     setFormError(null);
 
     try {
-      // Compresion silenciosa: reduce peso preservando nitidez visual en WebP HD
-      const compressed = await compressImage(file, {
-        maxWidth: 1200,
-        maxHeight: 1200,
-        quality: 0.85,
-        targetFormat: "image/webp",
-      });
-
+      // Compresion de avatar ultra ligera calibrada a 640px y 80% WebP
+      const compressed = await compressImage(file, COMPRESSION_PRESETS.AVATAR);
       setSelectedFile(compressed.file);
       setPreviewUrl(compressed.previewUrl);
     } catch (err: unknown) {
       console.error(err);
-      setSelectedFile(file);
-      setPreviewUrl(URL.createObjectURL(file));
+      setFormError("No se pudo procesar la fotografía. Verifique que el archivo sea una imagen válida.");
+      setSelectedFile(null);
+      setPreviewUrl(defaultAvatar);
     } finally {
       setIsCompressing(false);
     }

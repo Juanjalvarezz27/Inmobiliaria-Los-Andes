@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth";
+import { buildWhatsAppUrl } from "@/lib/utils/whatsapp";
 import {
   ArrowLeft,
   Phone,
@@ -101,11 +102,11 @@ export default async function AgentDetailPage({ params }: PageProps) {
   }));
 
   // Formato para WhatsApp
-  const cleanPhone = agent.phone ? agent.phone.replace(/[^0-9]/g, "") : null;
-  const whatsappUrl = cleanPhone
-    ? `https://wa.me/${cleanPhone}?text=Hola%20${encodeURIComponent(
-        agent.name
-      )},%20te%20contacto%20desde%20la%20administracion%20de%20Inmobiliaria%20Los%20Andes.`
+  const whatsappUrl = agent.phone
+    ? buildWhatsAppUrl(
+        agent.phone,
+        `Hola ${agent.name}, te contacto desde la administracion de Inmobiliaria Los Andes.`
+      )
     : null;
 
   return (

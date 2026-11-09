@@ -11,8 +11,8 @@ const JWT_SECRET = new TextEncoder().encode(
 
 const COOKIE_NAME = "losandes_session";
 
-// Duracion de la sesion: 8 horas (jornada laboral con expiracion estricta)
-export const SESSION_DURATION_SECONDS = 8 * 60 * 60;
+// Duracion de la sesion: 12 horas con expiracion estricta
+export const SESSION_DURATION_SECONDS = 12 * 60 * 60;
 
 export interface SessionUser {
   id: string;
@@ -61,6 +61,14 @@ export async function loginUser(
   const normalizedEmail = email.toLowerCase().trim();
   const user = await prisma.user.findUnique({
     where: { email: normalizedEmail },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      passwordHash: true,
+      role: true,
+      isActive: true,
+    },
   });
 
   // Proteccion contra timing attacks: siempre ejecuta compare aunque no exista el usuario

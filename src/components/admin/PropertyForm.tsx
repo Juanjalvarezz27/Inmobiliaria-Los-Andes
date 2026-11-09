@@ -9,7 +9,7 @@ import {
   updatePropertyAction,
   uploadPropertyImageAction,
 } from "@/app/admin/actions";
-import { compressImage } from "@/lib/imageCompression";
+import { compressImage, COMPRESSION_PRESETS } from "@/lib/imageCompression";
 import {
   UploadCloud,
   Loader2,
@@ -281,13 +281,8 @@ export function PropertyForm({
         const file = filesToUpload[i];
         setUploadProgress({ current: i + 1, total: filesToUpload.length });
 
-        // Compresion inteligente a WebP HD sin perdida de nitidez
-        const compressed = await compressImage(file, {
-          maxWidth: 1600,
-          maxHeight: 1600,
-          quality: 0.85,
-          targetFormat: "image/webp",
-        });
+        // Compresion optimizada a WebP calibrado (1440x1080 a 80% calidad)
+        const compressed = await compressImage(file, COMPRESSION_PRESETS.PROPERTY);
 
         const formData = new FormData();
         formData.append("file", compressed.file);

@@ -3,7 +3,8 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { MessageCircle } from "lucide-react";
-import { COMPANY_CONFIG } from "@/config/company";
+import { getInitials } from "@/lib/utils/format";
+import { buildWhatsAppUrl } from "@/lib/utils/whatsapp";
 
 export interface FeaturedAgentData {
   id: string;
@@ -17,16 +18,6 @@ export interface FeaturedAgentData {
 interface FeaturedAgentsSectionProps {
   agents: FeaturedAgentData[];
   totalAgents?: number;
-}
-
-// Generador de iniciales para avatar de respaldo
-function getInitials(name: string): string {
-  if (!name) return "AS";
-  const parts = name.trim().split(/\s+/);
-  if (parts.length >= 2) {
-    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-  }
-  return name.substring(0, 2).toUpperCase();
 }
 
 // Escaparate de asesores con fondo Parallax arquitectonico, tarjetas luminosas y carrusel 3D autonomo
@@ -281,10 +272,10 @@ export function FeaturedAgentsSection({ agents, totalAgents }: FeaturedAgentsSec
                   translateZ = -220;
                 }
 
-                const cleanPhone = (agent.phone || "").replace(/\D/g, "");
-                const waUrl = `https://wa.me/${cleanPhone || COMPANY_CONFIG.contact.phoneRaw}?text=${encodeURIComponent(
+                const waUrl = buildWhatsAppUrl(
+                  agent.phone,
                   `Hola ${agent.name}, deseo recibir asesoría inmobiliaria personalizada con Inmobiliaria Los Andes.`
-                )}`;
+                );
 
                 return (
                   <div

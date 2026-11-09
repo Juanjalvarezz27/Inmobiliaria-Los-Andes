@@ -17,7 +17,7 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { transferPropertiesAction } from "@/app/admin/actions";
-import { formatCurrency } from "@/lib/utils/format";
+import { formatCurrency, getInitials } from "@/lib/utils/format";
 
 export interface TransferableProperty {
   id: string;
@@ -52,16 +52,6 @@ interface TransferPropertiesModalProps {
   availableAgents: TransferAgentOption[];
   onSuccess?: () => void;
   isLoadingProperties?: boolean;
-}
-
-// Generador de iniciales en texto plano sin sobrecargar imagenes en el DOM
-function getInitials(name: string): string {
-  if (!name) return "AS";
-  const parts = name.trim().split(/\s+/);
-  if (parts.length >= 2) {
-    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-  }
-  return name.substring(0, 2).toUpperCase();
 }
 
 // Modal ultra-ligero para transferir cartera comercial entre asesores sin carga de imagenes

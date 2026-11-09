@@ -23,3 +23,13 @@ export function formatArea(areaM2?: number | string | { toString: () => string }
   return `${numericValue.toLocaleString("es-VE")} m²`;
 }
 
+// Generador de iniciales en texto para avatar (ej. "Carlos Mendoza" -> "CM")
+export function getInitials(name?: string | null): string {
+  if (!name || !name.trim()) return "AS";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  }
+  return name.substring(0, 2).toUpperCase();
+}
+

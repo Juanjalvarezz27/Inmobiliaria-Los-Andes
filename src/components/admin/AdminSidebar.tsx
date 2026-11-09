@@ -81,48 +81,48 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
 
   return (
     <>
-      {/* 1. BARRA SUPERIOR PARA MOVILES Y TABLETS (< lg) CON ALTURA OPTIMA */}
-      <header className="lg:hidden sticky top-0 z-40 bg-gradient-to-r from-[#132c1c] via-brand-primary to-[#0f2417] text-white border-b border-white/10 px-4 py-3.5 h-[66px] flex items-center justify-between shadow-md select-none">
+      {/* 1. BARRA SUPERIOR PARA MOVILES Y TABLETS (< lg) CON ALTURA EJECUTIVA ROBUSTA */}
+      <header className="lg:hidden sticky top-0 z-40 bg-gradient-to-r from-[#122b1c] via-brand-primary to-[#0e2115] text-white border-b border-white/10 px-4 sm:px-6 min-h-[78px] py-4 flex items-center justify-between shadow-[0_4px_20px_rgba(0,0,0,0.12)] select-none">
         {/* Identidad con Logo y Marca */}
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="relative w-10 h-10 rounded-full overflow-hidden shrink-0 ring-2 ring-brand-accent/40 shadow-sm bg-white/10 flex items-center justify-center">
+        <div className="flex items-center gap-3.5 min-w-0">
+          <div className="relative w-12 h-12 rounded-2xl overflow-hidden shrink-0 ring-2 ring-brand-accent/50 shadow-md bg-white/10 flex items-center justify-center">
             <Image
               src="/Logo redondo.png"
               alt={COMPANY_CONFIG.tradeName}
               fill
-              sizes="40px"
+              sizes="48px"
               className="object-cover"
               priority
             />
           </div>
           <div className="min-w-0">
-            <span className="font-bold text-sm block leading-tight text-white truncate font-heading tracking-tight">
+            <span className="font-black text-[15px] sm:text-base block leading-tight text-white truncate font-heading tracking-tight">
               Panel de Control
             </span>
-            <span className="text-[9.5px] text-brand-accent font-extrabold tracking-widest uppercase block truncate mt-0.5">
+            <span className="text-[10px] text-brand-accent font-extrabold tracking-widest uppercase block truncate mt-0.5">
               {COMPANY_CONFIG.tradeName}
             </span>
           </div>
         </div>
 
-        {/* Acciones rapidas: nuevo inmueble y hamburguesa */}
-        <div className="flex items-center gap-2">
+        {/* Acciones rapidas: nuevo inmueble y hamburguesa con mayor area de toque */}
+        <div className="flex items-center gap-2.5">
           <Link
             href="/admin/propiedades?nuevo=true"
             title="Cargar Inmueble"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-brand-accent hover:bg-[#c94b21] text-white text-xs font-bold shadow-sm transition-transform active:scale-95"
+            className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2.5 rounded-xl bg-brand-accent hover:bg-[#c94b21] text-white text-xs font-bold shadow-md shadow-brand-accent/30 transition-transform active:scale-95"
           >
-            <PlusCircle strokeWidth={2.5} className="w-3.5 h-3.5" />
-            <span>Nuevo</span>
+            <PlusCircle strokeWidth={2.5} className="w-4 h-4" />
+            <span className="font-extrabold">Nuevo</span>
           </Link>
 
           <button
             type="button"
             onClick={() => setIsMobileOpen(!isMobileOpen)}
-            className="p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
+            className="w-11 h-11 rounded-xl bg-white/10 hover:bg-white/20 active:bg-white/30 text-white flex items-center justify-center transition-colors cursor-pointer"
             aria-label={isMobileOpen ? "Cerrar menú" : "Abrir menú de navegación"}
           >
-            {isMobileOpen ? <X className="w-5 h-5 text-brand-accent" /> : <Menu className="w-5 h-5" />}
+            {isMobileOpen ? <X className="w-6 h-6 text-brand-accent" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
       </header>

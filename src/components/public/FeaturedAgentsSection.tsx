@@ -141,7 +141,7 @@ export function FeaturedAgentsSection({ agents, totalAgents }: FeaturedAgentsSec
     <section
       ref={sectionRef}
       id="asesores"
-      className="relative isolate overflow-hidden bg-[#122e1f] py-14 sm:py-18 lg:py-20"
+      className="relative isolate overflow-hidden bg-gradient-to-b from-[#1a1410] via-[#241711] to-[#160f0b] py-14 sm:py-18 lg:py-20"
     >
       {/* Capa de fondo con efecto Parallax desacoplado a 60fps */}
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -202,14 +202,14 @@ export function FeaturedAgentsSection({ agents, totalAgents }: FeaturedAgentsSec
           </div>
 
           <h2 className="relative z-10 font-heading text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-[-0.05em] leading-[1.02] drop-shadow-[0_2px_12px_rgba(255,255,255,0.7)]">
-            <span className="relative inline-block text-[#082a19] whitespace-nowrap">
+            <span className="relative inline-block text-white whitespace-nowrap">
               Nuestros
-              {/* Trazo organico artesanal en verde debajo de Nuestros */}
+              {/* Trazo organico artesanal debajo de Nuestros */}
               <svg
                 aria-hidden
                 viewBox="0 0 240 14"
                 preserveAspectRatio="none"
-                className="absolute -bottom-2 sm:-bottom-3.5 left-0 h-2.5 sm:h-3.5 w-full text-emerald-800/80"
+                className="absolute -bottom-2 sm:-bottom-3.5 left-0 h-2.5 sm:h-3.5 w-full text-brand-accent/80"
               >
                 <path
                   d="M2 9C55 3 130 3 238 8"

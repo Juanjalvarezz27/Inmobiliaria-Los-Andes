@@ -82,10 +82,10 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
   return (
     <>
       {/* 1. BARRA SUPERIOR PARA MOVILES Y TABLETS (< lg) CON ALTURA EJECUTIVA ROBUSTA */}
-      <header className="lg:hidden sticky top-0 z-40 bg-gradient-to-r from-[#122b1c] via-brand-primary to-[#0e2115] text-white border-b border-white/10 px-4 sm:px-6 min-h-[78px] py-4 flex items-center justify-between shadow-[0_4px_20px_rgba(0,0,0,0.12)] select-none">
+      <header className="lg:hidden sticky top-0 z-40 bg-gradient-to-r from-brand-header-from via-brand-header-via to-brand-header-to text-white border-b border-white/10 px-4 sm:px-6 min-h-[78px] py-4 flex items-center justify-between shadow-[0_4px_20px_rgba(0,0,0,0.12)] select-none">
         {/* Identidad con Logo y Marca */}
         <div className="flex items-center gap-3.5 min-w-0">
-          <div className="relative w-12 h-12 rounded-2xl overflow-hidden shrink-0 ring-2 ring-brand-accent/50 shadow-md bg-white/10 flex items-center justify-center">
+          <div className="relative w-12 h-12 rounded-2xl overflow-hidden shrink-0 ring-2 ring-white/40 shadow-md bg-white/10 flex items-center justify-center">
             <Image
               src="/Logo redondo.png"
               alt={COMPANY_CONFIG.tradeName}
@@ -99,7 +99,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
             <span className="font-black text-[15px] sm:text-base block leading-tight text-white truncate font-heading tracking-tight">
               Panel de Control
             </span>
-            <span className="text-[10px] text-brand-accent font-extrabold tracking-widest uppercase block truncate mt-0.5">
+            <span className="text-[10px] text-orange-200 font-extrabold tracking-widest uppercase block truncate mt-0.5">
               {COMPANY_CONFIG.tradeName}
             </span>
           </div>
@@ -110,7 +110,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
           <Link
             href="/admin/propiedades?nuevo=true"
             title="Cargar Inmueble"
-            className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2.5 rounded-xl bg-brand-accent hover:bg-[#c94b21] text-white text-xs font-bold shadow-md shadow-brand-accent/30 transition-transform active:scale-95"
+            className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2.5 rounded-xl bg-white/20 hover:bg-white/30 text-white border border-white/30 text-xs font-bold shadow-md transition-transform active:scale-95"
           >
             <PlusCircle strokeWidth={2.5} className="w-4 h-4" />
             <span className="font-extrabold">Nuevo</span>
@@ -119,10 +119,10 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
           <button
             type="button"
             onClick={() => setIsMobileOpen(!isMobileOpen)}
-            className="w-11 h-11 rounded-xl bg-white/10 hover:bg-white/20 active:bg-white/30 text-white flex items-center justify-center transition-colors cursor-pointer"
+            className="w-11 h-11 rounded-xl bg-white/15 hover:bg-white/25 active:bg-white/30 text-white flex items-center justify-center transition-colors cursor-pointer"
             aria-label={isMobileOpen ? "Cerrar menú" : "Abrir menú de navegación"}
           >
-            {isMobileOpen ? <X className="w-6 h-6 text-brand-accent" /> : <Menu className="w-6 h-6" />}
+            {isMobileOpen ? <X className="w-6 h-6 text-white" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
       </header>
@@ -137,7 +137,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
       )}
 
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] bg-gradient-to-b from-[#132c1c] via-brand-primary to-[#0f2417] text-white flex flex-col shadow-2xl transition-transform duration-300 ease-out lg:hidden select-none ${
+        className={`fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] bg-gradient-to-b from-brand-header-from via-brand-header-via to-brand-header-to text-white flex flex-col shadow-2xl transition-transform duration-300 ease-out lg:hidden select-none ${
           isMobileOpen
             ? "translate-x-0 pointer-events-auto visible"
             : "-translate-x-full pointer-events-none invisible"
@@ -282,7 +282,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
 
       {/* 3. SIDEBAR PERSISTENTE PARA ESCRITORIO (>= lg) */}
       <aside
-        className={`hidden lg:flex sticky top-0 h-screen bg-gradient-to-b from-[#132c1c] via-brand-primary to-[#0f2417] text-white flex-col shrink-0 border-r border-white/[0.08] shadow-2xl transition-[width] duration-300 ease-in-out z-30 select-none ${
+        className={`hidden lg:flex sticky top-0 h-screen bg-gradient-to-b from-brand-header-from via-brand-header-via to-brand-header-to text-white flex-col shrink-0 border-r border-white/[0.08] shadow-2xl transition-[width] duration-300 ease-in-out z-30 select-none ${
           isCollapsed ? "w-20" : "w-64"
         }`}
       >
@@ -291,7 +291,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
           type="button"
           onClick={() => setIsCollapsed(!isCollapsed)}
           title={isCollapsed ? "Expandir menú" : "Colapsar menú"}
-          className="absolute -right-3.5 top-7 z-40 w-7 h-7 rounded-full bg-brand-accent hover:bg-[#c94b21] text-white border-2 border-[#132c1c] flex items-center justify-center shadow-xl transition-transform hover:scale-110 active:scale-95 cursor-pointer"
+          className="absolute -right-3.5 top-7 z-40 w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 text-white border-2 border-brand-header-from flex items-center justify-center shadow-xl transition-transform hover:scale-110 active:scale-95 cursor-pointer"
         >
           {isCollapsed ? (
             <ChevronRight strokeWidth={2.5} className="w-3.5 h-3.5" />

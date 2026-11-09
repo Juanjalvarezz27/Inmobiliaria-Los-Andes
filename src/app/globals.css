@@ -1,12 +1,89 @@
 @import "tailwindcss";
 
-@theme {
-  --color-brand-primary: #1a3b26;
-  --color-brand-accent: #de582a;
-  --color-ui-background: #f3f4f6;
+:root {
+  /* ==========================================================================
+     SISTEMA DE VARIABLES DE COLOR GLOBALES — INMOBILIARIA LOS ANDES
+     Edita los valores aquí para cambiar los tonos de la marca en toda la web:
+     ========================================================================== */
+
+  /* 🧱 COLOR PROTAGÓNICO DE MARCA: Naranja Ladrillo Colonial Andino */
+  /* Tono arcilla / teja cocida andina (cálido, elegante, no chillón) */
+  --brand-brick: #c25227;              /* Naranja ladrillo terracota base */
+  --brand-brick-dark: #a03c17;         /* Ladrillo tostado para hover y bordes */
+  --brand-brick-deep: #782b10;         /* Ladrillo profundo para degradados y textos clave */
+  --brand-brick-light: #df6435;        /* Ladrillo claro para acentos luminosos */
+  --brand-brick-soft: #fbeee8;         /* Fondo crema terracota para chips y badges */
+  --brand-brick-border: #f0cfc2;       /* Borde suave terracota */
+
+  /* 🌲 COLOR SECUNDARIO DE APOYO: Verde Bosque Institucional */
+  /* Toques sobrios de prestigio y contraste complementario */
+  --brand-forest: #1b3d27;             /* Verde bosque andino */
+  --brand-forest-dark: #102618;        /* Verde muy oscuro para fondos nocturnos */
+  --brand-forest-light: #285839;       /* Verde bosque medio */
+  --brand-forest-soft: #edf5f0;        /* Verde menta tenue */
+
+  /* 🎨 MAPEO SEMÁNTICO (El Naranja Ladrillo asume el protagonismo total) */
+  --color-brand-primary: var(--brand-brick);
+  --color-brand-primary-hover: var(--brand-brick-dark);
+  --color-brand-primary-deep: var(--brand-brick-deep);
+  --color-brand-primary-light: var(--brand-brick-light);
+  --color-brand-primary-soft: var(--brand-brick-soft);
+
+  --color-brand-accent: var(--brand-brick);
+  --color-brand-accent-hover: var(--brand-brick-dark);
+  --color-brand-accent-light: var(--brand-brick-light);
+  --color-brand-accent-soft: var(--brand-brick-soft);
+
+  --color-brand-secondary: var(--brand-forest);
+  --color-brand-secondary-hover: var(--brand-forest-dark);
+
+  /* 🏛️ BARRAS SUPERIORES Y SIDEBAR (Degradado Ladrillo Andino) */
+  --color-brand-header-from: #872e0e;  /* Ladrillo profundo */
+  --color-brand-header-via: #c25227;   /* Ladrillo terracota medio */
+  --color-brand-header-to: #6e240a;    /* Ladrillo tostado base */
+
+  /* 🏢 SUPERFICIES Y FONDOS */
+  --color-ui-background: #faf7f2;
   --color-ui-surface: #ffffff;
   --color-text-primary: #1f2937;
   --color-text-secondary: #6b7280;
+}
+
+@theme {
+  --color-brand-primary: var(--color-brand-primary);
+  --color-brand-primary-hover: var(--color-brand-primary-hover);
+  --color-brand-primary-deep: var(--color-brand-primary-deep);
+  --color-brand-primary-light: var(--color-brand-primary-light);
+  --color-brand-primary-soft: var(--color-brand-primary-soft);
+
+  --color-brand-accent: var(--color-brand-accent);
+  --color-brand-accent-hover: var(--color-brand-accent-hover);
+  --color-brand-accent-light: var(--color-brand-accent-light);
+  --color-brand-accent-soft: var(--color-brand-accent-soft);
+
+  --color-brand-secondary: var(--color-brand-secondary);
+  --color-brand-secondary-hover: var(--color-brand-secondary-hover);
+
+  --color-brand-brick: var(--brand-brick);
+  --color-brand-brick-dark: var(--brand-brick-dark);
+  --color-brand-brick-deep: var(--brand-brick-deep);
+  --color-brand-brick-light: var(--brand-brick-light);
+  --color-brand-brick-soft: var(--brand-brick-soft);
+  --color-brand-brick-border: var(--brand-brick-border);
+
+  --color-brand-forest: var(--brand-forest);
+  --color-brand-forest-dark: var(--brand-forest-dark);
+  --color-brand-forest-light: var(--brand-forest-light);
+  --color-brand-forest-soft: var(--brand-forest-soft);
+
+  --color-brand-header-from: var(--color-brand-header-from);
+  --color-brand-header-via: var(--color-brand-header-via);
+  --color-brand-header-to: var(--color-brand-header-to);
+
+  --color-ui-background: var(--color-ui-background);
+  --color-ui-surface: var(--color-ui-surface);
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
   --color-font-sans: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --color-font-heading: var(--font-plus-jakarta), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
@@ -121,10 +198,10 @@ h6 {
   font-family: var(--font-plus-jakarta), sans-serif !important;
   border-radius: 20px !important;
   padding: 16px 18px !important;
-  box-shadow: 0 16px 40px -8px rgba(26, 59, 38, 0.16), 0 4px 12px rgba(0, 0, 0, 0.04) !important;
-  border: 1px solid #e7dfd5 !important;
+  box-shadow: 0 16px 40px -8px rgba(120, 43, 16, 0.16), 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+  border: 1px solid #ebdcd3 !important;
   background: #ffffff !important;
-  color: #1a3b26 !important;
+  color: var(--brand-brick-deep) !important;
 }
 
 /* Reubicar boton de cierre en la esquina superior derecha interna */
@@ -136,22 +213,22 @@ h6 {
   top: 12px !important;
   transform: none !important;
   border-radius: 8px !important;
-  background: #f8faf7 !important;
-  border: 1px solid #e2e8e0 !important;
+  background: #fbf5f2 !important;
+  border: 1px solid #f0dfd5 !important;
   color: #64748b !important;
   transition: all 0.2s ease !important;
 }
 
 [data-sonner-toast] [data-close-button]:hover {
-  background: #edf2ed !important;
-  color: #1a3b26 !important;
+  background: #faece6 !important;
+  color: var(--brand-brick) !important;
 }
 
 /* Tipografia de encabezado y cuerpo */
 [data-sonner-toast] [data-title] {
   font-weight: 800 !important;
   font-size: 13.5px !important;
-  color: #1a3b26 !important;
+  color: var(--brand-brick-deep) !important;
   letter-spacing: -0.015em !important;
 }
 

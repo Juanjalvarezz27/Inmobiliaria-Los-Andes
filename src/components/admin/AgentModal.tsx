@@ -152,8 +152,8 @@ function AgentFormContent({
   };
 
   return (
-    <div className="bg-brand-primary w-full h-full sm:h-auto max-w-2xl rounded-none sm:rounded-3xl shadow-2xl shadow-black/50 overflow-hidden border-0 animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-dvh sm:max-h-[90vh]">
-      {/* Cabecera de un solo tono verde de marca */}
+    <div className="bg-gradient-to-b from-brand-header-from to-brand-header-to w-full h-full sm:h-auto max-w-2xl rounded-none sm:rounded-3xl shadow-2xl shadow-black/50 overflow-hidden border-0 animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-dvh sm:max-h-[90vh]">
+      {/* Cabecera terracota ladrillo andino */}
       <div className="p-4 sm:p-6 text-white flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3.5">
           <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white/10 flex items-center justify-center text-brand-accent shrink-0">

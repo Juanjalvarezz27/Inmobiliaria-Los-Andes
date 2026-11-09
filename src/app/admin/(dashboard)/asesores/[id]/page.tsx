@@ -122,8 +122,8 @@ export default async function AgentDetailPage({ params }: PageProps) {
         </Link>
       </div>
 
-      {/* Tarjeta Ejecutiva Hero del Asesor con el verde corporativo de la marca */}
-      <div className="relative bg-gradient-to-br from-[#122b1c] via-brand-primary to-[#0e2115] text-white rounded-3xl border border-emerald-500/25 shadow-[0_16px_40px_-12px_rgba(18,43,28,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] p-6 sm:p-7 overflow-hidden">
+      {/* Tarjeta Ejecutiva Hero del Asesor con la paleta de marca */}
+      <div className="relative bg-gradient-to-br from-brand-header-from via-brand-header-via to-brand-header-to text-white rounded-3xl border border-white/20 shadow-xl p-6 sm:p-7 overflow-hidden">
         {/* Sutil resalte de cabecera */}
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/30 to-transparent pointer-events-none" />
 

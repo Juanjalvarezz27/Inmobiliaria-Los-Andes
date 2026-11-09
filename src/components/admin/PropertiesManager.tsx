@@ -653,7 +653,7 @@ export function PropertiesManager({
             return (
               <div
                 key={p.id}
-                className="bg-ui-surface rounded-3xl border border-neutral-200/90 shadow-xs hover:shadow-xl hover:border-brand-accent/40 transition-[transform,box-shadow,border-color] duration-200 ease-out overflow-hidden flex flex-col justify-between group will-change-transform"
+                className="bg-ui-surface rounded-3xl border border-neutral-200/90 shadow-xs hover:shadow-xl hover:border-brand-accent/40 transition-[transform,box-shadow,border-color] duration-200 ease-out overflow-hidden flex flex-col justify-between group"
               >
                 <div>
                   {/* Portada del Inmueble y Badges Flotantes */}
@@ -666,7 +666,7 @@ export function PropertiesManager({
                       loading="lazy"
                       decoding="async"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="object-cover group-hover:scale-105 transition-transform duration-300 ease-out will-change-transform"
+                      className="object-cover group-hover:scale-105 transition-transform duration-300 ease-out"
                     />
 
                     {/* Gradiente sutil para legibilidad de badges */}

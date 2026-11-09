@@ -86,7 +86,7 @@ export function PropertyCard({
   });
 
   return (
-    <article className="group relative flex flex-col bg-white rounded-[26px] overflow-hidden border border-neutral-200/90 shadow-[0_4px_20px_-4px_rgba(20,35,25,0.07),0_2px_6px_rgba(0,0,0,0.03)] ring-1 ring-black/[0.03] hover:shadow-[0_22px_45px_-12px_rgba(18,46,31,0.22),0_8px_20px_-6px_rgba(242,90,43,0.12)] hover:border-brand-accent/40 hover:-translate-y-2 transition-all duration-300 ease-out will-change-transform">
+    <article className="group relative flex flex-col bg-white rounded-[26px] overflow-hidden border border-neutral-200/90 shadow-[0_4px_20px_-4px_rgba(20,35,25,0.07),0_2px_6px_rgba(0,0,0,0.03)] ring-1 ring-black/[0.03] hover:shadow-[0_22px_45px_-12px_rgba(18,46,31,0.22),0_8px_20px_-6px_rgba(242,90,43,0.12)] hover:border-brand-accent/40 hover:-translate-y-2 transition-all duration-300 ease-out">
       {/* Contenedor Fotografico con Enlace y Proporcion Editorial */}
       <Link
         href={`/propiedades/${property.slug}`}
@@ -99,7 +99,7 @@ export function PropertyCard({
           loading={eager ? "eager" : "lazy"}
           decoding="async"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
-          className={`object-cover group-hover:scale-108 transition-transform duration-500 ease-out will-change-transform ${
+          className={`object-cover group-hover:scale-108 transition-transform duration-500 ease-out ${
             isSoldOrRented ? "grayscale opacity-80" : ""
           }`}
         />

@@ -27,6 +27,7 @@ export function FeaturedAgentsSection({ agents, totalAgents }: FeaturedAgentsSec
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isInViewport, setIsInViewport] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const touchDeltaX = useRef<number>(0);
   const total = agents.length;
@@ -41,8 +42,25 @@ export function FeaturedAgentsSection({ agents, totalAgents }: FeaturedAgentsSec
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Efecto Parallax desacoplado a 60fps acelerado por hardware
+  // Observador de visibilidad para pausar carrusel y animaciones si la seccion no esta en pantalla
   useEffect(() => {
+    const el = sectionRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInViewport(entry.isIntersecting);
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Efecto Parallax desacoplado a 60fps (solo en pantallas grandes para no sobrecargar CPU en moviles)
+  useEffect(() => {
+    if (window.innerWidth < 768) return;
+
     let ticking = false;
 
     const handleScroll = () => {
@@ -82,14 +100,16 @@ export function FeaturedAgentsSection({ agents, totalAgents }: FeaturedAgentsSec
     setActiveIndex(idx);
   };
 
-  // Rotacion automatica a 3.5s pausada en hover o toque
+  // Rotacion automatica a 3.5s pausada en hover, toque o cuando la seccion esta fuera de pantalla
   useEffect(() => {
-    if (isPaused || total <= 1) return;
+    if (isPaused || total <= 1 || !isInViewport) return;
     const timer = setInterval(() => {
-      nextSlide();
+      if (typeof document !== "undefined" && !document.hidden) {
+        nextSlide();
+      }
     }, 3500);
     return () => clearInterval(timer);
-  }, [isPaused, nextSlide, total]);
+  }, [isPaused, nextSlide, total, isInViewport]);
 
   // Manejadores de gestos tactiles para swipe en moviles
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -127,7 +147,7 @@ export function FeaturedAgentsSection({ agents, totalAgents }: FeaturedAgentsSec
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
         <div
           ref={parallaxRef}
-          className="absolute -top-24 inset-x-0 h-[calc(100%+12rem)] w-full will-change-transform"
+          className="absolute -top-24 inset-x-0 h-[calc(100%+12rem)] w-full"
         >
           <Image
             src="/images/andes-venezuela.webp"

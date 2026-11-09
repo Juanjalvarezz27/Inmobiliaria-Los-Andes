@@ -88,15 +88,35 @@ export function HeroSearch({ slides, availableLocations }: HeroSearchProps) {
   // Galeria de imagenes combinando las de base de datos con respaldo de alta resolucion
   const heroImages = slides && slides.length > 0 ? slides : DEFAULT_HERO_SLIDES;
   const [currentSlide, setCurrentSlide] = useState(0);
+  const heroRef = useRef<HTMLElement>(null);
+  const [isHeroVisible, setIsHeroVisible] = useState(true);
 
-  // Intervalo automatico de transicion suave cada 6 segundos
+  // Pausar carrusel cuando el Hero sale del viewport para ahorrar GPU y bateria en moviles
   useEffect(() => {
-    if (heroImages.length <= 1) return;
+    const el = heroRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsHeroVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Intervalo automatico de transicion suave cada 6 segundos (pausado si no esta en pantalla)
+  useEffect(() => {
+    if (heroImages.length <= 1 || !isHeroVisible) return;
+
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroImages.length);
+      if (typeof document !== "undefined" && !document.hidden) {
+        setCurrentSlide((prev) => (prev + 1) % heroImages.length);
+      }
     }, 6000);
     return () => clearInterval(timer);
-  }, [heroImages.length]);
+  }, [heroImages.length, isHeroVisible]);
 
   const [operation, setOperation] = useState<string>(searchParams.get("operacion") || "ALL");
   const [propertyType, setPropertyType] = useState<string>(searchParams.get("tipo") || "ALL");
@@ -207,7 +227,7 @@ export function HeroSearch({ slides, availableLocations }: HeroSearchProps) {
   };
 
   return (
-    <section className="relative z-30 text-white pt-28 sm:pt-36 pb-24 px-4 sm:px-6 lg:px-8 min-h-[580px] flex items-center justify-center">
+    <section ref={heroRef} className="relative z-30 text-white pt-28 sm:pt-36 pb-24 px-4 sm:px-6 lg:px-8 min-h-[580px] flex items-center justify-center">
       {/* Carrusel de Fotografias de Fondo con Movimiento Lento (Efecto Ken Burns) */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
         {heroImages.map((slide, idx) => {
@@ -224,8 +244,9 @@ export function HeroSearch({ slides, availableLocations }: HeroSearchProps) {
                 alt={slide.caption || "Inmueble de lujo"}
                 fill
                 preload={idx === 0}
+                loading={idx === 0 ? "eager" : "lazy"}
                 sizes="100vw"
-                className={`object-cover transform transition-transform duration-[7000ms] ease-out will-change-transform ${
+                className={`object-cover transform transition-transform duration-[7000ms] ease-out ${
                   isActive ? "scale-110 translate-x-1 -translate-y-1" : "scale-100 translate-x-0 translate-y-0"
                 }`}
               />

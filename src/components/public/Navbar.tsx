@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ShieldCheck, Menu, X } from "lucide-react";
@@ -10,7 +10,8 @@ import { COMPANY_CONFIG } from "@/config/company";
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const lastScrollY = useRef(0);
+  const isVisibleRef = useRef(true);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -18,30 +19,39 @@ export function Navbar() {
 
       // Cerca del tope siempre visible
       if (currentScrollY < 60) {
-        setIsVisible(true);
-        setLastScrollY(currentScrollY);
+        if (!isVisibleRef.current) {
+          isVisibleRef.current = true;
+          setIsVisible(true);
+        }
+        lastScrollY.current = currentScrollY;
         return;
       }
 
       // Si el menu movil esta abierto, mantener visible
       if (mobileMenuOpen) {
-        setIsVisible(true);
+        if (!isVisibleRef.current) {
+          isVisibleRef.current = true;
+          setIsVisible(true);
+        }
         return;
       }
 
-      // Umbral antiparpadeo para scroll
-      if (currentScrollY > lastScrollY && currentScrollY - lastScrollY > 6) {
+      // Umbral antiparpadeo para scroll (solo actualiza el estado al cambiar de sentido)
+      const diff = currentScrollY - lastScrollY.current;
+      if (diff > 8 && isVisibleRef.current) {
+        isVisibleRef.current = false;
         setIsVisible(false);
-      } else if (currentScrollY < lastScrollY && lastScrollY - currentScrollY > 6) {
+      } else if (diff < -8 && !isVisibleRef.current) {
+        isVisibleRef.current = true;
         setIsVisible(true);
       }
 
-      setLastScrollY(currentScrollY);
+      lastScrollY.current = currentScrollY;
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY, mobileMenuOpen]);
+  }, [mobileMenuOpen]);
 
   return (
     <div
@@ -136,41 +146,41 @@ export function Navbar() {
       {/* Menu Desplegable Movil Flotante */}
       {mobileMenuOpen && (
         <div className="pointer-events-auto w-full max-w-6xl mt-2.5 p-4 bg-white rounded-2xl border border-neutral-200/90 shadow-2xl space-y-1.5 animate-in slide-in-from-top-2 duration-150">
-          <Link
+          <a
             href="/"
             onClick={() => setMobileMenuOpen(false)}
             className="block px-3.5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider text-neutral-700 hover:text-brand-accent transition-colors"
           >
             Inicio
-          </Link>
-          <Link
+          </a>
+          <a
             href="/#catalogo"
             onClick={() => setMobileMenuOpen(false)}
             className="block px-3.5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider text-neutral-700 hover:text-brand-accent transition-colors"
           >
             Catálogo
-          </Link>
-          <Link
+          </a>
+          <a
             href="/#asesores"
             onClick={() => setMobileMenuOpen(false)}
             className="block px-3.5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider text-neutral-700 hover:text-brand-accent transition-colors"
           >
             Nuestros Asesores
-          </Link>
-          <Link
+          </a>
+          <a
             href="/#nosotros"
             onClick={() => setMobileMenuOpen(false)}
             className="block px-3.5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider text-neutral-700 hover:text-brand-accent transition-colors"
           >
             Nosotros
-          </Link>
-          <Link
+          </a>
+          <a
             href="/#contacto"
             onClick={() => setMobileMenuOpen(false)}
             className="block px-3.5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider text-neutral-700 hover:text-brand-accent transition-colors"
           >
             Contacto
-          </Link>
+          </a>
 
           {/* Enlace directo y destacado a Login Administrativo en menu movil */}
           <div className="pt-2 border-t border-neutral-200/80 mt-2">

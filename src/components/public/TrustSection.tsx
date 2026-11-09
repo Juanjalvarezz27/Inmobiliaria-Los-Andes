@@ -51,11 +51,28 @@ const PILLARS: PillarItem[] = [
 
 // Carrusel 3D autonomo y continuo con transiciones agiles y fotografia limpia
 export function TrustSection() {
+  const sectionRef = useRef<HTMLElement>(null);
   const [activeIndex, setActiveIndex] = useState(2);
   const [isPaused, setIsPaused] = useState(false);
+  const [isInViewport, setIsInViewport] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const touchDeltaX = useRef<number>(0);
   const total = PILLARS.length;
+
+  // Pausar carrusel cuando la seccion esta fuera de pantalla para ahorrar recursos
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInViewport(entry.isIntersecting);
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const nextSlide = useCallback(() => {
     setActiveIndex((prev) => (prev + 1) % total);
@@ -69,14 +86,16 @@ export function TrustSection() {
     setActiveIndex(idx);
   };
 
-  // Rotacion automatica agil a 3.2 segundos pausada al pasar el cursor o tocar
+  // Rotacion automatica agil a 3.2 segundos (solo si esta en pantalla y pestana activa)
   useEffect(() => {
-    if (isPaused) return;
+    if (isPaused || !isInViewport) return;
     const timer = setInterval(() => {
-      nextSlide();
+      if (typeof document !== "undefined" && !document.hidden) {
+        nextSlide();
+      }
     }, 3200);
     return () => clearInterval(timer);
-  }, [isPaused, nextSlide]);
+  }, [isPaused, nextSlide, isInViewport]);
 
   // Manejadores de gestos tactiles para navegacion fluida en moviles
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -105,6 +124,7 @@ export function TrustSection() {
 
   return (
     <section
+      ref={sectionRef}
       id="nosotros"
       className="relative isolate overflow-hidden border-t border-b border-neutral-300/80 bg-gradient-to-b from-[#faf7f3] via-[#faede4] to-[#f6e5d8] py-16 sm:py-20 lg:py-24"
     >

@@ -178,7 +178,7 @@ export function AgentPropertiesGrid({
               return (
                 <div
                   key={property.id}
-                  className="bg-white rounded-[26px] border border-neutral-200/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,1)] hover:shadow-[0_14px_32px_-8px_rgba(26,59,38,0.14)] hover:-translate-y-1 hover:border-brand-primary/30 transition-[transform,box-shadow,border-color] duration-200 ease-out overflow-hidden flex flex-col justify-between group will-change-transform"
+                  className="bg-white rounded-[26px] border border-neutral-200/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,1)] hover:shadow-[0_14px_32px_-8px_rgba(26,59,38,0.14)] hover:-translate-y-1 hover:border-brand-primary/30 transition-[transform,box-shadow,border-color] duration-200 ease-out overflow-hidden flex flex-col justify-between group"
                 >
                   <div>
                     {/* Imagen de Portada y Badges flotantes */}
@@ -190,7 +190,7 @@ export function AgentPropertiesGrid({
                         loading="lazy"
                         decoding="async"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        className="object-cover group-hover:scale-105 transition-transform duration-300 ease-out will-change-transform"
+                        className="object-cover group-hover:scale-105 transition-transform duration-300 ease-out"
                       />
                       <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
                         <span

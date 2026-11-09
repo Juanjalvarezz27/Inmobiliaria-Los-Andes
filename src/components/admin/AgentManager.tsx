@@ -367,7 +367,7 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
             return (
               <div
                 key={agent.id}
-                className={`group relative bg-white rounded-[28px] p-3.5 border transition-[transform,box-shadow,border-color] duration-200 ease-out flex flex-col justify-between will-change-transform ${
+                className={`group relative bg-white rounded-[28px] p-3.5 border transition-[transform,box-shadow,border-color] duration-200 ease-out flex flex-col justify-between ${
                   agent.isActive
                     ? "text-neutral-900 border-neutral-200/90 shadow-[0_4px_20px_-4px_rgba(26,59,38,0.06),0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-xl hover:border-brand-primary/30 hover:-translate-y-1"
                     : "text-neutral-600 border-neutral-200/80 shadow-xs opacity-90 hover:opacity-100 hover:shadow-md"
@@ -387,7 +387,7 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
                       sizes="(max-width: 768px) 100vw, 380px"
                       loading="lazy"
                       decoding="async"
-                      className={`object-cover object-top rounded-[22px] transition-all duration-300 ease-out will-change-transform ${
+                      className={`object-cover object-top rounded-[22px] transition-all duration-300 ease-out ${
                         agent.isActive
                           ? "group-hover:scale-105"
                           : "grayscale contrast-95 opacity-80 group-hover:opacity-90"

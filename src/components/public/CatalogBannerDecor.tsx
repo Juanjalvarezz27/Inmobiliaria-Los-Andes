@@ -61,6 +61,11 @@ export function CatalogBannerDecor() {
 
     paint(0.5);
 
+    // En dispositivos moviles, renderizar estatico para no sobrecargar el hilo del compositor
+    if (window.innerWidth < 768) {
+      return;
+    }
+
     const tick = () => {
       current += (target - current) * 0.09;
 

@@ -199,19 +199,15 @@ export default async function HomePage({ searchParams }: PageProps) {
           aria-hidden="true"
           className="absolute inset-0 -z-10 pointer-events-none overflow-hidden"
         >
-          {/* Orbes de luz ambiental calida muy difusos para dar profundidad */}
-          <div className="absolute -top-28 -right-24 w-[480px] h-[480px] rounded-full blur-[130px] opacity-[0.12] bg-[#F27441]" />
-          <div className="absolute top-1/2 -left-32 -translate-y-1/2 w-[520px] h-[520px] rounded-full blur-[130px] opacity-[0.15] bg-[#D9B382]" />
-          <div className="absolute -bottom-28 right-1/4 w-[450px] h-[450px] rounded-full blur-[130px] opacity-[0.12] bg-[#F27441]" />
+          {/* Orbes de luz ambiental calida con gradientes radiales nativos de alto rendimiento (sin blur pesado) */}
+          <div className="absolute -top-28 -right-24 w-[480px] h-[480px] rounded-full bg-[radial-gradient(circle,rgba(242,116,65,0.08)_0%,transparent_70%)]" />
+          <div className="absolute top-1/2 -left-32 -translate-y-1/2 w-[520px] h-[520px] rounded-full bg-[radial-gradient(circle,rgba(217,179,130,0.10)_0%,transparent_70%)]" />
+          <div className="absolute -bottom-28 right-1/4 w-[450px] h-[450px] rounded-full bg-[radial-gradient(circle,rgba(242,116,65,0.08)_0%,transparent_70%)]" />
 
           {/* Patron SVG de curvas de nivel topograficas andinas estilo grabado cartografico */}
           <svg
-            className="absolute inset-0 w-full h-full"
+            className="absolute inset-0 w-full h-full opacity-30"
             xmlns="http://www.w3.org/2000/svg"
-            style={{
-              maskImage: "radial-gradient(ellipse at center, black 65%, transparent 96%)",
-              WebkitMaskImage: "radial-gradient(ellipse at center, black 65%, transparent 96%)",
-            }}
           >
             <defs>
               <pattern

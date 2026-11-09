@@ -311,7 +311,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
 
           {/* Insignia Flotante Satelital en el Mapa */}
           <div className="absolute bottom-3 left-3 pointer-events-none">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-950/80 backdrop-blur-md border border-white/20 text-white text-[11px] font-bold shadow-lg">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-950/90 border border-white/20 text-white text-[11px] font-bold shadow-lg">
               <MapPin className="w-3.5 h-3.5 text-brand-accent shrink-0" />
               <span className="truncate max-w-[200px] sm:max-w-xs">{property.sector || property.city}</span>
             </div>
@@ -352,19 +352,15 @@ export default async function PropertyDetailPage({ params }: PageProps) {
         aria-hidden="true"
         className="absolute inset-0 -z-10 pointer-events-none overflow-hidden"
       >
-        {/* Orbes de luz ambiental calida muy difusos para dar profundidad */}
-        <div className="absolute -top-28 -right-24 w-[480px] h-[480px] rounded-full blur-[130px] opacity-[0.12] bg-[#F27441]" />
-        <div className="absolute top-1/2 -left-32 -translate-y-1/2 w-[520px] h-[520px] rounded-full blur-[130px] opacity-[0.15] bg-[#D9B382]" />
-        <div className="absolute -bottom-28 right-1/4 w-[450px] h-[450px] rounded-full blur-[130px] opacity-[0.12] bg-[#F27441]" />
+        {/* Orbes de luz ambiental calida con gradientes radiales nativos (sin blur pesado) */}
+        <div className="absolute -top-28 -right-24 w-[480px] h-[480px] rounded-full bg-[radial-gradient(circle,rgba(242,116,65,0.08)_0%,transparent_70%)]" />
+        <div className="absolute top-1/2 -left-32 -translate-y-1/2 w-[520px] h-[520px] rounded-full bg-[radial-gradient(circle,rgba(217,179,130,0.10)_0%,transparent_70%)]" />
+        <div className="absolute -bottom-28 right-1/4 w-[450px] h-[450px] rounded-full bg-[radial-gradient(circle,rgba(242,116,65,0.08)_0%,transparent_70%)]" />
 
         {/* Patron SVG de curvas de nivel topograficas andinas estilo grabado cartografico */}
         <svg
-          className="absolute inset-0 w-full h-full"
+          className="absolute inset-0 w-full h-full opacity-30"
           xmlns="http://www.w3.org/2000/svg"
-          style={{
-            maskImage: "radial-gradient(ellipse at center, black 65%, transparent 96%)",
-            WebkitMaskImage: "radial-gradient(ellipse at center, black 65%, transparent 96%)",
-          }}
         >
           <defs>
             <pattern
@@ -770,7 +766,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
       </main>
 
       {/* Barra de Conversion Flotante Inferior en Moviles con Mayor Profundidad y Safe Area */}
-      <div className="sm:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-xl border-t border-[#DFD1B8] px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] flex items-center justify-between gap-3 shadow-[0_-12px_36px_rgba(26,59,38,0.15)] ring-1 ring-black/[0.04]">
+      <div className="sm:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-[#DFD1B8] px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] flex items-center justify-between gap-3 shadow-[0_-12px_36px_rgba(26,59,38,0.15)] ring-1 ring-black/[0.04]">
         <div>
           <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
             {property.operationType === "SALE" ? "Venta" : "Alquiler"}

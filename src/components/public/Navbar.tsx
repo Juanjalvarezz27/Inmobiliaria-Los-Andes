@@ -50,7 +50,7 @@ export function Navbar() {
       }`}
     >
       {/* Capsula Flotante Principal */}
-      <header className="pointer-events-auto w-full max-w-6xl bg-white/95 backdrop-blur-xl text-text-primary rounded-2xl sm:rounded-full border border-neutral-200/90 shadow-[0_12px_36px_-10px_rgba(0,0,0,0.15),0_2px_8px_rgba(0,0,0,0.04)] px-4 sm:px-6 h-16 sm:h-[70px] flex items-center justify-between gap-4 transition-all">
+      <header className="pointer-events-auto w-full max-w-6xl bg-white text-text-primary rounded-2xl sm:rounded-full border border-neutral-200/90 shadow-[0_12px_36px_-10px_rgba(0,0,0,0.15),0_2px_8px_rgba(0,0,0,0.04)] px-4 sm:px-6 h-16 sm:h-[70px] flex items-center justify-between gap-4 transition-all">
         {/* Identidad con Logotipo Oficial y Marco Naranja */}
         <Link href="/" className="flex items-center gap-3 group shrink-0">
           <div className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden shrink-0 ring-2 ring-brand-accent/40 group-hover:ring-brand-accent shadow-xs group-hover:shadow-md group-hover:shadow-brand-accent/20 transition-all duration-300 bg-white">
@@ -135,7 +135,7 @@ export function Navbar() {
 
       {/* Menu Desplegable Movil Flotante */}
       {mobileMenuOpen && (
-        <div className="pointer-events-auto w-full max-w-6xl mt-2.5 p-4 bg-white/95 backdrop-blur-xl rounded-2xl border border-neutral-200/90 shadow-2xl space-y-1.5 animate-in slide-in-from-top-2 duration-150">
+        <div className="pointer-events-auto w-full max-w-6xl mt-2.5 p-4 bg-white rounded-2xl border border-neutral-200/90 shadow-2xl space-y-1.5 animate-in slide-in-from-top-2 duration-150">
           <Link
             href="/"
             onClick={() => setMobileMenuOpen(false)}

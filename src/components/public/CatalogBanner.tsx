@@ -55,9 +55,6 @@ export function CatalogBanner({ totalProperties, totalAgents }: CatalogBannerPro
             <div className="grid grid-cols-2 divide-x divide-neutral-300/70 items-center">
               {/* Columna 1: Inmuebles Disponibles */}
               <div className="group relative flex flex-col items-center justify-center text-center px-3 sm:px-6 lg:px-8 transition-transform duration-300 hover:-translate-y-1">
-                {/* Resplandor ambiental suave en hover */}
-                <div className="pointer-events-none absolute -inset-4 rounded-3xl bg-brand-accent/[0.08] opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-100" />
-
                 <div className="relative flex flex-col items-center">
                   {/* Elemento 1: Bloque unificado (Icono + Título centrado) */}
                   <div className="flex items-center justify-center gap-2 sm:gap-3">
@@ -71,7 +68,6 @@ export function CatalogBanner({ totalProperties, totalAgents }: CatalogBannerPro
 
                   {/* Elemento 2: Cifra Monumental en naranja con aura lumínica centrada */}
                   <div className="relative mt-3 sm:mt-4 leading-none text-center">
-                    <div className="pointer-events-none absolute left-1/2 -top-2 -translate-x-1/2 h-20 w-24 rounded-full bg-brand-accent/15 blur-2xl" />
                     <div className="relative font-heading text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight text-brand-accent tabular-nums drop-shadow-[0_8px_24px_rgba(222,88,42,0.3)] text-center">
                       <AnimatedCount value={totalProperties} />
                     </div>
@@ -81,9 +77,6 @@ export function CatalogBanner({ totalProperties, totalAgents }: CatalogBannerPro
 
               {/* Columna 2: Asesores Expertos */}
               <div className="group relative flex flex-col items-center justify-center text-center px-3 sm:px-6 lg:px-8 transition-transform duration-300 hover:-translate-y-1">
-                {/* Resplandor ambiental suave en hover */}
-                <div className="pointer-events-none absolute -inset-4 rounded-3xl bg-brand-primary/[0.08] opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-100" />
-
                 <div className="relative flex flex-col items-center">
                   {/* Elemento 1: Bloque unificado (Icono + Título centrado) */}
                   <div className="flex items-center justify-center gap-2 sm:gap-3">
@@ -97,7 +90,6 @@ export function CatalogBanner({ totalProperties, totalAgents }: CatalogBannerPro
 
                   {/* Elemento 2: Cifra Monumental en naranja con aura lumínica centrada */}
                   <div className="relative mt-3 sm:mt-4 leading-none text-center">
-                    <div className="pointer-events-none absolute left-1/2 -top-2 -translate-x-1/2 h-20 w-24 rounded-full bg-brand-accent/15 blur-2xl" />
                     <div className="relative font-heading text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight text-brand-accent tabular-nums drop-shadow-[0_8px_24px_rgba(222,88,42,0.3)] text-center">
                       <AnimatedCount value={totalAgents} />
                     </div>

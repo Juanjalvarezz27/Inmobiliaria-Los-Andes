@@ -371,7 +371,7 @@ export function DashboardOverview({
         <div
           role="status"
           aria-live="polite"
-          className="fixed top-6 right-6 z-50 max-w-sm w-[calc(100vw-3rem)] sm:w-auto bg-white/95 backdrop-blur-md rounded-2xl border border-neutral-200/90 shadow-[0_12px_36px_-6px_rgba(0,0,0,0.12),0_4px_12px_rgba(0,0,0,0.04)] p-3.5 flex items-start gap-3 animate-in fade-in slide-in-from-top-3 duration-200"
+          className="fixed top-6 right-6 z-50 max-w-sm w-[calc(100vw-3rem)] sm:w-auto bg-white rounded-2xl border border-neutral-200/90 shadow-[0_12px_36px_-6px_rgba(0,0,0,0.12),0_4px_12px_rgba(0,0,0,0.04)] p-3.5 flex items-start gap-3 animate-in fade-in slide-in-from-top-3 duration-200"
         >
           <div
             className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
@@ -412,7 +412,7 @@ export function DashboardOverview({
       {/* 4 Tarjetas de Metricas Ejecutivas Simetricas */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         {/* Inventario Total */}
-        <div className="bg-white/95 backdrop-blur-md p-5 rounded-2xl border border-neutral-200/90 shadow-2xs hover:shadow-md transition-all relative overflow-hidden group">
+        <div className="bg-white p-5 rounded-2xl border border-neutral-200/90 shadow-2xs hover:shadow-md transition-all relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-orange-100/40 via-amber-50/20 to-transparent rounded-bl-full pointer-events-none -mr-4 -mt-4 transition-transform group-hover:scale-110" />
           <div className="flex items-center justify-between gap-3 relative z-10">
             <span className="text-xs uppercase font-black text-brand-primary tracking-wider">
@@ -431,7 +431,7 @@ export function DashboardOverview({
         </div>
 
         {/* En Venta */}
-        <div className="bg-white/95 backdrop-blur-md p-5 rounded-2xl border border-neutral-200/90 shadow-2xs hover:shadow-md transition-all relative overflow-hidden group">
+        <div className="bg-white p-5 rounded-2xl border border-neutral-200/90 shadow-2xs hover:shadow-md transition-all relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-emerald-100/40 via-emerald-50/20 to-transparent rounded-bl-full pointer-events-none -mr-4 -mt-4 transition-transform group-hover:scale-110" />
           <div className="flex items-center justify-between gap-3 relative z-10">
             <span className="text-xs uppercase font-black text-brand-primary tracking-wider">
@@ -450,7 +450,7 @@ export function DashboardOverview({
         </div>
 
         {/* En Alquiler */}
-        <div className="bg-white/95 backdrop-blur-md p-5 rounded-2xl border border-neutral-200/90 shadow-2xs hover:shadow-md transition-all relative overflow-hidden group">
+        <div className="bg-white p-5 rounded-2xl border border-neutral-200/90 shadow-2xs hover:shadow-md transition-all relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-blue-100/40 via-blue-50/20 to-transparent rounded-bl-full pointer-events-none -mr-4 -mt-4 transition-transform group-hover:scale-110" />
           <div className="flex items-center justify-between gap-3 relative z-10">
             <span className="text-xs uppercase font-black text-brand-primary tracking-wider">
@@ -469,7 +469,7 @@ export function DashboardOverview({
         </div>
 
         {/* Asesores Activos */}
-        <div className="bg-white/95 backdrop-blur-md p-5 rounded-2xl border border-neutral-200/90 shadow-2xs hover:shadow-md transition-all relative overflow-hidden group">
+        <div className="bg-white p-5 rounded-2xl border border-neutral-200/90 shadow-2xs hover:shadow-md transition-all relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-purple-100/40 via-purple-50/20 to-transparent rounded-bl-full pointer-events-none -mr-4 -mt-4 transition-transform group-hover:scale-110" />
           <div className="flex items-center justify-between gap-3 relative z-10">
             <span className="text-xs uppercase font-black text-brand-primary tracking-wider">
@@ -715,14 +715,14 @@ export function DashboardOverview({
                           <span className="bg-brand-accent text-white px-2.5 py-0.5 rounded-lg text-xs font-black shadow-md shadow-brand-accent/30 font-heading tracking-tight">
                             #{property.absolutePosition}
                           </span>
-                          <span className="bg-neutral-900/80 text-white backdrop-blur-md px-2 py-0.5 rounded-lg text-xs font-bold shadow-xs">
+                          <span className="bg-neutral-900/90 text-white px-2 py-0.5 rounded-lg text-xs font-bold shadow-xs">
                             Pág. {property.targetPage}
                           </span>
                         </div>
 
                         {/* Barra Inferior sobre la foto: Operación y Precio */}
                         <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent p-2.5 pt-6 flex items-center justify-between text-white pointer-events-none">
-                          <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-white/20 backdrop-blur-xs">
+                          <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-black/40">
                             {property.operationType === "SALE" ? "Venta" : "Alquiler"}
                           </span>
                           <span className="text-xs font-black drop-shadow-xs font-heading">

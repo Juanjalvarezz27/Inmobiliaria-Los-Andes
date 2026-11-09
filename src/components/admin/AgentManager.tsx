@@ -194,7 +194,7 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
         <div className="group relative bg-white p-5 sm:p-6 rounded-3xl border border-neutral-200/80 shadow-[0_4px_20px_-4px_rgba(26,59,38,0.06),0_2px_6px_-1px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,1)] hover:shadow-[0_12px_28px_-6px_rgba(26,59,38,0.14),inset_0_1px_0_rgba(255,255,255,1)] hover:-translate-y-0.5 hover:border-brand-primary/30 transition-[transform,box-shadow,border-color] duration-150 ease-out overflow-hidden">
           {/* Luz ambiental cenital organica (reemplaza la linea dura por iluminacion ambiental difusa) */}
           <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-brand-primary/[0.05] to-transparent pointer-events-none group-hover:from-brand-primary/[0.09] transition-colors duration-200" />
-          <div className="absolute -right-6 -top-6 w-32 h-32 bg-brand-primary/[0.05] rounded-full blur-xl pointer-events-none" />
+          <div className="absolute -right-6 -top-6 w-32 h-32 bg-brand-primary/[0.05] rounded-full pointer-events-none" />
           <Users className="absolute -right-3 -bottom-3 w-24 h-24 text-brand-primary/[0.03] pointer-events-none" />
 
           <div className="flex items-start justify-between gap-3 relative z-10">
@@ -218,7 +218,7 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
         <div className="group relative bg-white p-5 sm:p-6 rounded-3xl border border-neutral-200/80 shadow-[0_4px_20px_-4px_rgba(5,150,105,0.08),0_2px_6px_-1px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,1)] hover:shadow-[0_12px_28px_-6px_rgba(5,150,105,0.16),inset_0_1px_0_rgba(255,255,255,1)] hover:-translate-y-0.5 hover:border-emerald-500/40 transition-[transform,box-shadow,border-color] duration-150 ease-out overflow-hidden">
           {/* Luz ambiental cenital organica */}
           <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-emerald-500/[0.07] to-transparent pointer-events-none group-hover:from-emerald-500/[0.12] transition-colors duration-200" />
-          <div className="absolute -right-6 -top-6 w-32 h-32 bg-emerald-500/[0.07] rounded-full blur-xl pointer-events-none" />
+          <div className="absolute -right-6 -top-6 w-32 h-32 bg-emerald-500/[0.07] rounded-full pointer-events-none" />
           <UserCheck className="absolute -right-3 -bottom-3 w-24 h-24 text-emerald-600/[0.03] pointer-events-none" />
 
           <div className="flex items-start justify-between gap-3 relative z-10">
@@ -242,7 +242,7 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
         <div className="group relative bg-white p-5 sm:p-6 rounded-3xl border border-neutral-200/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05),0_2px_6px_-1px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,1)] hover:shadow-[0_12px_28px_-6px_rgba(0,0,0,0.10),inset_0_1px_0_rgba(255,255,255,1)] hover:-translate-y-0.5 hover:border-neutral-400/30 transition-[transform,box-shadow,border-color] duration-150 ease-out overflow-hidden">
           {/* Luz ambiental cenital organica */}
           <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-neutral-200/40 to-transparent pointer-events-none group-hover:from-neutral-300/50 transition-colors duration-200" />
-          <div className="absolute -right-6 -top-6 w-32 h-32 bg-neutral-400/[0.05] rounded-full blur-xl pointer-events-none" />
+          <div className="absolute -right-6 -top-6 w-32 h-32 bg-neutral-400/[0.05] rounded-full pointer-events-none" />
           <UserX className="absolute -right-3 -bottom-3 w-24 h-24 text-neutral-500/[0.03] pointer-events-none" />
 
           <div className="flex items-start justify-between gap-3 relative z-10">
@@ -266,7 +266,7 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
         <div className="group relative bg-white p-5 sm:p-6 rounded-3xl border border-neutral-200/80 shadow-[0_4px_20px_-4px_rgba(222,88,42,0.09),0_2px_6px_-1px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,1)] hover:shadow-[0_12px_28px_-6px_rgba(222,88,42,0.18),inset_0_1px_0_rgba(255,255,255,1)] hover:-translate-y-0.5 hover:border-brand-accent/40 transition-[transform,box-shadow,border-color] duration-150 ease-out overflow-hidden">
           {/* Luz ambiental cenital organica */}
           <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-brand-accent/[0.07] to-transparent pointer-events-none group-hover:from-brand-accent/[0.12] transition-colors duration-200" />
-          <div className="absolute -right-6 -top-6 w-32 h-32 bg-brand-accent/[0.08] rounded-full blur-xl pointer-events-none" />
+          <div className="absolute -right-6 -top-6 w-32 h-32 bg-brand-accent/[0.08] rounded-full pointer-events-none" />
           <Home className="absolute -right-3 -bottom-3 w-24 h-24 text-brand-accent/[0.03] pointer-events-none" />
 
           <div className="flex items-start justify-between gap-3 relative z-10">

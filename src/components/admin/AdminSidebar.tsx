@@ -132,7 +132,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
         <div
           role="presentation"
           onClick={() => setIsMobileOpen(false)}
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs lg:hidden animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 bg-black/60 lg:hidden animate-in fade-in duration-200"
         />
       )}
 

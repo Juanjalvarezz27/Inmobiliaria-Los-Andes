@@ -140,8 +140,8 @@ export function FeaturedAgentsSection({ agents, totalAgents }: FeaturedAgentsSec
           {/* Velo botánico translúcido: preserva la nitidez del paisaje andino con tono esmeralda natural */}
           <div className="absolute inset-0 bg-gradient-to-b from-white/35 via-emerald-900/15 to-[#082a19]/35" />
           {/* Destellos ambientales esmeralda profundo integrados al parallax */}
-          <div className="absolute top-1/4 left-1/4 h-[32rem] w-[32rem] rounded-full bg-[radial-gradient(circle,rgba(16,185,129,0.18),transparent_70%)] blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 h-[32rem] w-[32rem] rounded-full bg-[radial-gradient(circle,rgba(5,150,105,0.15),transparent_70%)] blur-3xl" />
+          <div className="absolute top-1/4 left-1/4 h-[32rem] w-[32rem] rounded-full bg-[radial-gradient(circle,rgba(16,185,129,0.12),transparent_70%)]" />
+          <div className="absolute bottom-1/4 right-1/4 h-[32rem] w-[32rem] rounded-full bg-[radial-gradient(circle,rgba(5,150,105,0.10),transparent_70%)]" />
         </div>
       </div>
 
@@ -153,36 +153,31 @@ export function FeaturedAgentsSection({ agents, totalAgents }: FeaturedAgentsSec
             {/* Flanco lateral izquierdo: Destello esmeralda vivo expandido */}
             <div
               className="absolute top-1/2 -left-12 sm:left-[-2rem] md:left-[2%] -translate-y-1/2 h-52 w-80 sm:h-64 sm:w-[26rem] lg:w-[32rem] rounded-full
-                bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.22),rgba(5,150,105,0.10),transparent_70%)]
-                blur-3xl"
+                bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.15),rgba(5,150,105,0.06),transparent_70%)]"
             />
 
             {/* Flanco lateral derecho: Resplandor menta y teal expandido */}
             <div
               className="absolute top-1/2 -right-12 sm:right-[-2rem] md:right-[2%] -translate-y-1/2 h-52 w-80 sm:h-64 sm:w-[26rem] lg:w-[32rem] rounded-full
-                bg-[radial-gradient(circle_at_center,rgba(20,184,166,0.20),rgba(16,185,129,0.10),transparent_70%)]
-                blur-3xl"
+                bg-[radial-gradient(circle_at_center,rgba(20,184,166,0.12),rgba(16,185,129,0.06),transparent_70%)]"
             />
 
             {/* Extremo exterior izquierdo: Halo sutil que abraza la cabecera */}
             <div
               className="absolute -top-10 left-[8%] h-40 w-72 rounded-full
-                bg-[radial-gradient(circle_at_center,rgba(52,211,153,0.18),transparent_70%)]
-                blur-2xl"
+                bg-[radial-gradient(circle_at_center,rgba(52,211,153,0.10),transparent_70%)]"
             />
 
             {/* Extremo exterior derecho: Halo sutil que abraza el extremo derecho */}
             <div
               className="absolute -bottom-8 right-[8%] h-40 w-72 rounded-full
-                bg-[radial-gradient(circle_at_center,rgba(45,212,191,0.18),transparent_70%)]
-                blur-2xl"
+                bg-[radial-gradient(circle_at_center,rgba(45,212,191,0.10),transparent_70%)]"
             />
 
             {/* Halo difusor de contraste: resalta el texto sin opacar el paisaje andino */}
             <div
               className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-36 w-full max-w-3xl rounded-full
-                bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.65)_0%,rgba(240,253,244,0.30)_55%,transparent_75%)]
-                blur-2xl"
+                bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.65)_0%,rgba(240,253,244,0.30)_55%,transparent_75%)]"
             />
           </div>
 

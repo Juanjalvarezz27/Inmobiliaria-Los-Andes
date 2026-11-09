@@ -26,9 +26,6 @@ export function AdminPageHeader({
       <div className="flex items-start sm:items-center gap-4 sm:gap-5">
         {/* Contenedor del Icono con Relieve e Iluminación de Marca (Fondo Naranja Terracota con Icono Blanco Nítido) */}
         <div className="relative group shrink-0">
-          {/* Halo sutil de resplandor ambiental */}
-          <div className="absolute -inset-1 bg-gradient-to-r from-brand-accent/30 to-brand-primary/20 rounded-2xl blur-md opacity-75 group-hover:opacity-100 transition-opacity" />
-
           <div className="relative w-13 h-13 sm:w-15 sm:h-15 rounded-2xl bg-gradient-to-br from-[#e85d30] via-brand-accent to-[#c4441b] border border-orange-300/40 flex items-center justify-center shadow-lg shadow-brand-accent/25 transition-transform group-hover:scale-[1.02]">
             <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-white drop-shadow-sm" strokeWidth={2.4} />
           </div>

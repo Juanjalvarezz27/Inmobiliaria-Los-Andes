@@ -90,7 +90,7 @@ export function PropertyGallery({ images, title }: PropertyGalleryProps) {
 
         {/* Píldora de Contador y Boton de Pantalla Completa */}
         <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md text-white text-xs font-bold border border-white/20 shadow-md">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/80 text-white text-xs font-bold border border-white/20 shadow-md">
             <Camera className="w-3.5 h-3.5 text-orange-300" />
             <span>
               {selectedIndex + 1} / {total}
@@ -100,7 +100,7 @@ export function PropertyGallery({ images, title }: PropertyGalleryProps) {
           <button
             type="button"
             onClick={() => setIsLightboxOpen(true)}
-            className="p-2 rounded-full bg-black/60 hover:bg-black/85 backdrop-blur-md text-white border border-white/20 shadow-md transition-all active:scale-95 cursor-pointer"
+            className="p-2 rounded-full bg-black/80 hover:bg-black text-white border border-white/20 shadow-md transition-all active:scale-95 cursor-pointer"
             title="Ver en pantalla completa"
           >
             <Maximize2 className="w-4 h-4" />
@@ -171,7 +171,7 @@ export function PropertyGallery({ images, title }: PropertyGalleryProps) {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-xl flex flex-col justify-between p-4 sm:p-6 animate-in fade-in duration-200 select-none"
+          className="fixed inset-0 z-50 bg-black/98 flex flex-col justify-between p-4 sm:p-6 animate-in fade-in duration-200 select-none"
         >
           {/* Barra Superior del Lightbox */}
           <div className="flex items-center justify-between text-white pb-3 border-b border-white/10">

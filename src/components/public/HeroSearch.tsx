@@ -255,7 +255,7 @@ export function HeroSearch({ slides, availableLocations }: HeroSearchProps) {
         {/* Buscador Flotante de Alta Gama */}
         <div className="pt-4 max-w-4xl mx-auto">
           {/* Selector de Pestañas de Operacion (3 Opciones de Igual Tamaño en Una Sola Línea) */}
-          <div className="grid grid-cols-3 p-1.5 bg-black/60 backdrop-blur-xl rounded-2xl border border-white/20 mb-5 shadow-xl max-w-xl sm:max-w-2xl mx-auto w-full gap-1.5">
+          <div className="grid grid-cols-3 p-1.5 bg-black/80 rounded-2xl border border-white/20 mb-5 shadow-xl max-w-xl sm:max-w-2xl mx-auto w-full gap-1.5">
             <button
               type="button"
               onClick={() => setOperation("ALL")}
@@ -301,7 +301,7 @@ export function HeroSearch({ slides, availableLocations }: HeroSearchProps) {
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-black/60 hover:bg-black/80 text-orange-200 hover:text-white border border-white/20 hover:border-orange-400/50 text-[11px] sm:text-xs font-bold rounded-full shadow-lg backdrop-blur-md transition-all cursor-pointer transform hover:scale-105 active:scale-95 group"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-black/80 hover:bg-black text-orange-200 hover:text-white border border-white/20 hover:border-orange-400/50 text-[11px] sm:text-xs font-bold rounded-full shadow-lg transition-all cursor-pointer transform hover:scale-105 active:scale-95 group"
                   title="Restablecer todos los filtros"
                 >
                   <RotateCcw className="w-3 h-3 text-orange-400 group-hover:-rotate-90 transition-transform duration-300" />

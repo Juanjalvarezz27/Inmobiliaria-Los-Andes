@@ -18,10 +18,10 @@ export default function NotFound() {
       <main className="flex-1 flex items-center justify-center px-4 py-20 sm:py-28 relative overflow-hidden">
         {/* Fondo sutil con relieve topográfico */}
         <div className="absolute inset-0 bg-[radial-gradient(#1a3b26_1px,transparent_1px)] [background-size:24px_24px] opacity-[0.03] pointer-events-none" />
-        <div className="absolute -top-32 -right-32 w-96 h-96 bg-brand-accent/5 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-brand-primary/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-32 -right-32 w-96 h-96 bg-brand-accent/5 rounded-full pointer-events-none" />
+        <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-brand-primary/5 rounded-full pointer-events-none" />
 
-        <div className="relative z-10 max-w-lg w-full text-center space-y-6 bg-white/90 backdrop-blur-md p-8 sm:p-10 rounded-3xl border border-neutral-200/80 shadow-xl shadow-brand-primary/5">
+        <div className="relative z-10 max-w-lg w-full text-center space-y-6 bg-white p-8 sm:p-10 rounded-3xl border border-neutral-200/80 shadow-xl shadow-brand-primary/5">
           <div className="w-16 h-16 rounded-2xl bg-orange-100 text-brand-accent flex items-center justify-center mx-auto shadow-md shadow-brand-accent/20">
             <Building2 className="w-8 h-8" />
           </div>

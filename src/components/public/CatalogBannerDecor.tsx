@@ -115,8 +115,7 @@ export function CatalogBannerDecor() {
         ref={flareTopRightRef}
         style={{ willChange: "transform" }}
         className="absolute -top-32 right-[-6rem] h-[32rem] w-[32rem] rounded-full
-          bg-[radial-gradient(circle_at_50%_50%,rgba(222,88,42,0.38),rgba(249,115,22,0.22),transparent_70%)]
-          blur-3xl"
+          bg-[radial-gradient(circle_at_50%_50%,rgba(222,88,42,0.18),rgba(249,115,22,0.10),transparent_70%)]"
       />
 
       {/* Destello 2: Ambar dorado y fuego inferior izquierdo, reactivo en contra-fase */}
@@ -124,8 +123,7 @@ export function CatalogBannerDecor() {
         ref={flareBottomLeftRef}
         style={{ willChange: "transform" }}
         className="absolute -bottom-36 left-[-6rem] h-[34rem] w-[34rem] rounded-full
-          bg-[radial-gradient(circle_at_50%_50%,rgba(245,158,11,0.40),rgba(222,88,42,0.28),transparent_70%)]
-          blur-3xl"
+          bg-[radial-gradient(circle_at_50%_50%,rgba(245,158,11,0.20),rgba(222,88,42,0.12),transparent_70%)]"
       />
 
       {/* Destello 3: Nucleo central naranja soleado que florece al pasar por el centro */}
@@ -133,8 +131,8 @@ export function CatalogBannerDecor() {
         ref={flareCenterRef}
         style={{ willChange: "transform, opacity" }}
         className="absolute top-1/4 left-1/2 h-[26rem] w-[26rem] -translate-x-1/2 rounded-full
-          bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.85),rgba(254,215,170,0.6),rgba(222,88,42,0.38),transparent_70%)]
-          blur-2xl opacity-50"
+          bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.7),rgba(254,215,170,0.35),rgba(222,88,42,0.18),transparent_70%)]
+          opacity-50"
       />
 
       {/* Destello 4: Resplandor calido lateral derecho que ilumina la zona de estadisticas */}
@@ -142,8 +140,7 @@ export function CatalogBannerDecor() {
         ref={flareRightEdgeRef}
         style={{ willChange: "transform" }}
         className="absolute top-1/3 right-[15%] h-80 w-80 rounded-full
-          bg-[radial-gradient(circle_at_50%_50%,rgba(249,115,22,0.32),rgba(222,88,42,0.20),transparent_70%)]
-          blur-3xl"
+          bg-[radial-gradient(circle_at_50%_50%,rgba(249,115,22,0.16),rgba(222,88,42,0.10),transparent_70%)]"
       />
 
       {/* Haz suave de luz horizontal calida que barre segun bajamos o subimos */}
@@ -152,8 +149,7 @@ export function CatalogBannerDecor() {
         style={{
           willChange: "transform, opacity",
           background:
-            "linear-gradient(90deg, transparent 0%, rgba(255,240,225,0.7) 45%, rgba(254,215,170,0.5) 55%, transparent 100%)",
-          filter: "blur(22px)",
+            "linear-gradient(90deg, transparent 0%, rgba(255,240,225,0.4) 45%, rgba(254,215,170,0.3) 55%, transparent 100%)",
         }}
         className="absolute inset-y-0 left-0 w-[50%] opacity-40"
       />

@@ -126,7 +126,7 @@ export function PropertyCard({
 
           {/* Contador de Fotografias */}
           {totalPhotos > 0 && (
-            <div className="bg-black/65 backdrop-blur-xs text-white text-[10px] font-bold px-2 py-1 rounded-full border border-white/20 flex items-center gap-1 shadow-sm">
+            <div className="bg-black/80 text-white text-[10px] font-bold px-2 py-1 rounded-full border border-white/20 flex items-center gap-1 shadow-sm">
               <Camera className="w-3 h-3 text-orange-300" />
               <span>{totalPhotos}</span>
             </div>
@@ -151,7 +151,7 @@ export function PropertyCard({
 
         {/* Capsula Flotante de Precio con Mayor Relieve y Profundidad */}
         <div className="absolute bottom-3 left-3 pointer-events-none">
-          <div className="inline-flex items-baseline gap-1.5 px-3 py-1 rounded-2xl bg-neutral-950/85 backdrop-blur-md border border-white/20 text-white shadow-[0_8px_20px_-4px_rgba(0,0,0,0.5)]">
+          <div className="inline-flex items-baseline gap-1.5 px-3 py-1 rounded-2xl bg-neutral-950/90 border border-white/20 text-white shadow-[0_8px_20px_-4px_rgba(0,0,0,0.5)]">
             <span className="text-base sm:text-lg font-black font-heading tracking-tight text-white drop-shadow-sm">
               {formatCurrency(property.price, property.currency)}
             </span>

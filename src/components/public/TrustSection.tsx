@@ -114,11 +114,11 @@ export function TrustSection() {
         className="pointer-events-none absolute inset-0 overflow-hidden"
       >
         {/* Luz calida dorada superior */}
-        <div className="absolute -top-32 left-1/2 -translate-x-1/2 h-[36rem] w-[60rem] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(222,88,42,0.18),rgba(245,158,11,0.12),transparent_70%)] blur-3xl opacity-85" />
+        <div className="absolute -top-32 left-1/2 -translate-x-1/2 h-[36rem] w-[60rem] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(222,88,42,0.12),rgba(245,158,11,0.06),transparent_70%)] opacity-85" />
         {/* Resplandor ambiental inferior calido que abraza la base con luz limpia */}
-        <div className="absolute -bottom-24 left-1/2 -translate-x-1/2 h-64 w-[64rem] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(249,115,22,0.14),rgba(222,88,42,0.08),transparent_70%)] blur-3xl" />
-        <div className="absolute -bottom-24 -left-20 h-96 w-96 rounded-full bg-brand-primary/[0.04] blur-3xl" />
-        <div className="absolute -top-24 -right-20 h-96 w-96 rounded-full bg-brand-accent/[0.10] blur-3xl" />
+        <div className="absolute -bottom-24 left-1/2 -translate-x-1/2 h-64 w-[64rem] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(249,115,22,0.10),rgba(222,88,42,0.05),transparent_70%)]" />
+        <div className="absolute -bottom-24 -left-20 h-96 w-96 rounded-full bg-brand-primary/[0.04]" />
+        <div className="absolute -top-24 -right-20 h-96 w-96 rounded-full bg-brand-accent/[0.08]" />
       </div>
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -129,36 +129,31 @@ export function TrustSection() {
             {/* Flanco lateral izquierdo: Destello calido ambar y naranja expandido */}
             <div
               className="absolute top-1/2 -left-12 sm:left-[-2rem] md:left-[2%] -translate-y-1/2 h-52 w-80 sm:h-64 sm:w-[26rem] lg:w-[32rem] rounded-full
-                bg-[radial-gradient(circle_at_center,rgba(245,158,11,0.32),rgba(222,88,42,0.18),transparent_70%)]
-                blur-3xl"
+                bg-[radial-gradient(circle_at_center,rgba(245,158,11,0.20),rgba(222,88,42,0.10),transparent_70%)]"
             />
 
             {/* Flanco lateral derecho: Resplandor calido terracota y coral expandido */}
             <div
               className="absolute top-1/2 -right-12 sm:right-[-2rem] md:right-[2%] -translate-y-1/2 h-52 w-80 sm:h-64 sm:w-[26rem] lg:w-[32rem] rounded-full
-                bg-[radial-gradient(circle_at_center,rgba(222,88,42,0.34),rgba(249,115,22,0.20),transparent_70%)]
-                blur-3xl"
+                bg-[radial-gradient(circle_at_center,rgba(222,88,42,0.22),rgba(249,115,22,0.12),transparent_70%)]"
             />
 
             {/* Extremo exterior izquierdo: Halo sutil que abraza la cabecera */}
             <div
               className="absolute -top-10 left-[8%] h-40 w-72 rounded-full
-                bg-[radial-gradient(circle_at_center,rgba(254,215,170,0.35),rgba(245,158,11,0.15),transparent_70%)]
-                blur-2xl"
+                bg-[radial-gradient(circle_at_center,rgba(254,215,170,0.22),rgba(245,158,11,0.08),transparent_70%)]"
             />
 
             {/* Extremo exterior derecho: Halo sutil que abraza el signo final */}
             <div
               className="absolute -bottom-8 right-[8%] h-40 w-72 rounded-full
-                bg-[radial-gradient(circle_at_center,rgba(249,115,22,0.25),rgba(222,88,42,0.12),transparent_70%)]
-                blur-2xl"
+                bg-[radial-gradient(circle_at_center,rgba(249,115,22,0.18),rgba(222,88,42,0.08),transparent_70%)]"
             />
 
             {/* Centro atenuado: Bruma suave de baja opacidad para no formar mancha concentrada */}
             <div
               className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-36 w-72 sm:w-96 rounded-full
-                bg-[radial-gradient(ellipse_at_center,rgba(222,88,42,0.10),transparent_70%)]
-                blur-3xl"
+                bg-[radial-gradient(ellipse_at_center,rgba(222,88,42,0.06),transparent_70%)]"
             />
           </div>
 

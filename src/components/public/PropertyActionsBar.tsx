@@ -34,7 +34,7 @@ export function PropertyActionsBar({ propertyTitle, propertyType }: PropertyActi
       <div className="flex items-center gap-2 text-xs font-bold text-neutral-500">
         <Link
           href="/#catalogo"
-          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md hover:bg-white text-neutral-700 hover:text-brand-primary border border-[#DFD1B8] shadow-[0_4px_14px_-3px_rgba(26,59,38,0.08),0_1px_3px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_20px_-4px_rgba(26,59,38,0.14)] transition-all active:scale-95 group"
+          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white text-neutral-700 hover:text-brand-primary border border-[#DFD1B8] shadow-[0_4px_14px_-3px_rgba(26,59,38,0.08),0_1px_3px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_20px_-4px_rgba(26,59,38,0.14)] transition-all active:scale-95 group"
         >
           <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
           <span>Volver al Catálogo</span>
@@ -45,7 +45,7 @@ export function PropertyActionsBar({ propertyTitle, propertyType }: PropertyActi
       <button
         type="button"
         onClick={handleCopyLink}
-        className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/95 backdrop-blur-md hover:bg-white text-neutral-700 hover:text-brand-accent border border-[#DFD1B8] shadow-[0_4px_14px_-3px_rgba(26,59,38,0.08),0_1px_3px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_20px_-4px_rgba(222,88,42,0.15)] transition-all active:scale-95 cursor-pointer text-xs font-bold"
+        className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white text-neutral-700 hover:text-brand-accent border border-[#DFD1B8] shadow-[0_4px_14px_-3px_rgba(26,59,38,0.08),0_1px_3px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_20px_-4px_rgba(222,88,42,0.15)] transition-all active:scale-95 cursor-pointer text-xs font-bold"
         title="Copiar enlace de esta propiedad"
       >
         {copied ? (

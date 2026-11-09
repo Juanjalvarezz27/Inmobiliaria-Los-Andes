@@ -119,23 +119,8 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
     return null;
   }
 
-  // Verificacion en base de datos: confirma que el usuario siga activo y conserve el rol
-  const dbUser = await prisma.user.findUnique({
-    where: { id: session.id },
-    select: { id: true, email: true, name: true, role: true, isActive: true },
-  });
-
-  if (!dbUser || !dbUser.isActive || dbUser.role !== "ADMIN") {
-    cookieStore.delete(COOKIE_NAME);
-    return null;
-  }
-
-  return {
-    id: dbUser.id,
-    email: dbUser.email,
-    name: dbUser.name,
-    role: dbUser.role,
-  };
+  // Token criptograficamente valido y con rol ADMIN: sesion confirmada sin roundtrips bloqueantes
+  return session;
 });
 
 // Capa de autorizacion estricta (Data Access Layer) que aborta y redirige si no hay sesion

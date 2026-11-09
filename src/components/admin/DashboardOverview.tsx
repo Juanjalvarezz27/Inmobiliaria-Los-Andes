@@ -696,21 +696,19 @@ export function DashboardOverview({
                           <span>Mover a #{property.absolutePosition}</span>
                         </div>
                       )}
-                      {/* Portada Limpia */}
-                      <div className="relative aspect-[16/10] w-full overflow-hidden bg-neutral-100">
+                      {/* Portada con renderizado directo de CDN y placeholder visual */}
+                      <div className="relative aspect-[16/10] w-full overflow-hidden bg-gradient-to-br from-neutral-200 via-neutral-100 to-neutral-200 flex items-center justify-center">
+                        <HomeIcon className="w-8 h-8 text-neutral-300 pointer-events-none absolute" />
                         {property.coverUrl ? (
                           <Image
                             src={property.coverUrl}
                             alt={property.title}
                             fill
+                            unoptimized
                             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                            className="object-cover group-hover:scale-105 transition-transform duration-300 pointer-events-none"
+                            className="object-cover group-hover:scale-105 transition-transform duration-300 pointer-events-none relative z-1"
                           />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-neutral-400">
-                            <HomeIcon className="w-7 h-7" />
-                          </div>
-                        )}
+                        ) : null}
 
                         {/* Insignia de Posición Naranja y Página */}
                         <div className="absolute top-2 left-2 z-10 flex items-center gap-1.5">

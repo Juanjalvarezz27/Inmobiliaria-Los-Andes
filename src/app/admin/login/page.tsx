@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import Image from "next/image";
-import { loginAction } from "@/app/admin/actions";
+import { loginAction } from "@/app/admin/actions/auth";
 import { Lock, Mail, ArrowRight, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { COMPANY_CONFIG } from "@/config/company";

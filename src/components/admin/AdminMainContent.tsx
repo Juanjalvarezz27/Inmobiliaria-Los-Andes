@@ -24,7 +24,7 @@ export function AdminMainContent({ children }: AdminMainContentProps) {
   return (
     <main
       ref={mainRef}
-      className="flex-1 min-w-0 lg:h-full lg:overflow-y-auto p-3.5 sm:p-6 lg:p-10 pb-24 lg:pb-10 relative z-10"
+      className="flex-1 min-w-0 lg:h-full lg:overflow-y-auto p-3.5 sm:p-6 lg:p-10 pb-10 relative z-10"
     >
       <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8">{children}</div>
     </main>

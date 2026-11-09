@@ -11,54 +11,65 @@ export const dynamic = "force-dynamic";
 export default async function AdminDashboardPage() {
   await requireAuth();
 
-  // Consulta optimizada: solo 2 peticiones con campos estrictos (ahorro de latencia y payload)
-  const [allProperties, allAgents] = await Promise.all([
-    prisma.property.findMany({
-      orderBy: [{ displayOrder: "asc" }, { createdAt: "desc" }],
-      select: {
-        id: true,
-        title: true,
-        slug: true,
-        operationType: true,
-        propertyType: true,
-        customPropertyType: true,
-        status: true,
-        price: true,
-        currency: true,
-        featured: true,
-        displayOrder: true,
-        city: true,
-        sector: true,
-        createdAt: true,
-        agent: {
-          select: {
-            name: true,
+  let allProperties: any[] = [];
+  let allAgents: any[] = [];
+  let fetchError: string | null = null;
+
+  try {
+    // Consulta optimizada: solo 2 peticiones con campos estrictos (ahorro de latencia y payload)
+    const results = await Promise.all([
+      prisma.property.findMany({
+        orderBy: [{ displayOrder: "asc" }, { createdAt: "desc" }],
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          operationType: true,
+          propertyType: true,
+          customPropertyType: true,
+          status: true,
+          price: true,
+          currency: true,
+          featured: true,
+          displayOrder: true,
+          city: true,
+          sector: true,
+          createdAt: true,
+          agent: {
+            select: {
+              name: true,
+            },
+          },
+          images: {
+            orderBy: [{ isMain: "desc" }, { order: "asc" }],
+            take: 1,
+            select: { url: true },
           },
         },
-        images: {
-          orderBy: [{ isMain: "desc" }, { order: "asc" }],
-          take: 1,
-          select: { url: true },
+      }),
+      prisma.user.findMany({
+        where: { role: "AGENT", isActive: true },
+        select: {
+          id: true,
+          name: true,
+          position: true,
+          avatarUrl: true,
+          phone: true,
+          featured: true,
+          displayOrder: true,
+          _count: {
+            select: { properties: true },
+          },
         },
-      },
-    }),
-    prisma.user.findMany({
-      where: { role: "AGENT", isActive: true },
-      select: {
-        id: true,
-        name: true,
-        position: true,
-        avatarUrl: true,
-        phone: true,
-        featured: true,
-        displayOrder: true,
-        _count: {
-          select: { properties: true },
-        },
-      },
-      orderBy: [{ displayOrder: "asc" }, { name: "asc" }],
-    }),
-  ]);
+        orderBy: [{ displayOrder: "asc" }, { name: "asc" }],
+      }),
+    ]);
+    allProperties = results[0];
+    allAgents = results[1];
+  } catch (error) {
+    console.error("Error al obtener datos en /admin:", error);
+    fetchError = "No se pudieron obtener los datos actualizados de la base de datos. Por favor recarga.";
+  }
 
   // Metricas calculadas en memoria al instante (0 roundtrips adicionales)
   const metrics = {

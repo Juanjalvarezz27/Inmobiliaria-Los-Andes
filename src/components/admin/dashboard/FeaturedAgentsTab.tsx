@@ -54,6 +54,7 @@ export function FeaturedAgentsTab({
                   src={agent.avatarUrl}
                   alt={agent.name}
                   fill
+                  unoptimized
                   sizes="48px"
                   className="object-cover"
                 />

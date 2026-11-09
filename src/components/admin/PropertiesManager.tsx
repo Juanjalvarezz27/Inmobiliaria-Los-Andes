@@ -662,6 +662,7 @@ export function PropertiesManager({
                       src={coverImage}
                       alt={p.title}
                       fill
+                      unoptimized
                       loading="lazy"
                       decoding="async"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

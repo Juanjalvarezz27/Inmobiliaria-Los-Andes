@@ -488,7 +488,7 @@ export function PropertyForm({
       <div
         className={
           hideHeader
-            ? "flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 overscroll-contain relative z-10 bg-transparent"
+            ? "flex-1 min-h-0 overflow-y-auto p-3 sm:p-6 space-y-4 sm:space-y-6 overscroll-contain relative z-10 bg-transparent"
             : "space-y-6 relative isolate"
         }
       >
@@ -507,7 +507,7 @@ export function PropertyForm({
         )}
 
       {/* 1. Galería de Fotografías */}
-      <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-5 sm:p-6 space-y-4">
+      <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-3.5 sm:p-6 space-y-4">
         <div className="flex items-center justify-between flex-wrap gap-2 pb-3.5 border-b border-neutral-100">
           <div className="flex items-center gap-3">
             <span className="w-8 h-8 rounded-xl bg-orange-50 border border-orange-200/80 text-brand-accent text-xs font-black flex items-center justify-center shrink-0 shadow-2xs">
@@ -686,7 +686,7 @@ export function PropertyForm({
       </div>
 
       {/* 2. Datos Principales de la Publicacion */}
-      <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-5 sm:p-6 space-y-4">
+      <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-3.5 sm:p-6 space-y-4">
         <div className="flex items-center gap-3 pb-3.5 border-b border-neutral-100">
           <span className="w-8 h-8 rounded-xl bg-orange-50 border border-orange-200/80 text-brand-accent text-xs font-black flex items-center justify-center shrink-0 shadow-2xs">
             02
@@ -807,7 +807,7 @@ export function PropertyForm({
       </div>
 
       {/* 3. Ubicacion Geografica */}
-      <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-5 sm:p-6 space-y-4">
+      <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-3.5 sm:p-6 space-y-4">
         <div className="flex items-center gap-3 pb-3.5 border-b border-neutral-100">
           <span className="w-8 h-8 rounded-xl bg-orange-50 border border-orange-200/80 text-brand-accent text-xs font-black flex items-center justify-center shrink-0 shadow-2xs">
             03
@@ -925,7 +925,7 @@ export function PropertyForm({
       </div>
 
       {/* 4. Distribucion y Dimensiones */}
-      <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-5 sm:p-6 space-y-4">
+      <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-3.5 sm:p-6 space-y-4">
         <div className="flex items-center gap-3 pb-3.5 border-b border-neutral-100">
           <span className="w-8 h-8 rounded-xl bg-orange-50 border border-orange-200/80 text-brand-accent text-xs font-black flex items-center justify-center shrink-0 shadow-2xs">
             04
@@ -1001,7 +1001,7 @@ export function PropertyForm({
       </div>
 
       {/* 5. Descripcion y Amenidades */}
-      <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-5 sm:p-6 space-y-4">
+      <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-3.5 sm:p-6 space-y-4">
         <div className="flex items-center gap-3 pb-3.5 border-b border-neutral-100">
           <span className="w-8 h-8 rounded-xl bg-orange-50 border border-orange-200/80 text-brand-accent text-xs font-black flex items-center justify-center shrink-0 shadow-2xs">
             05
@@ -1040,18 +1040,18 @@ export function PropertyForm({
           <div className="flex gap-2">
             <input
               type="text"
-              placeholder="Ej. Tanque de agua 10.000L, Planta eléctrica, Portón eléctrico..."
+              placeholder="Ej. Tanque de agua, Planta eléctrica..."
               value={newAmenity}
               onChange={(e) => setNewAmenity(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddAmenity())}
-              className="flex-1 bg-white border border-neutral-300 rounded-xl px-4 py-2.5 text-sm font-medium text-text-primary focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:border-brand-accent shadow-2xs placeholder-neutral-400"
+              className="flex-1 min-w-0 bg-white border border-neutral-300 rounded-xl px-3.5 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-medium text-text-primary focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:border-brand-accent shadow-2xs placeholder-neutral-400"
             />
             <button
               type="button"
               onClick={handleAddAmenity}
-              className="px-4 py-2.5 bg-brand-primary hover:bg-[#122b1c] text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shrink-0 transition-colors shadow-xs"
+              className="px-3.5 sm:px-4 py-2 sm:py-2.5 bg-brand-primary hover:bg-[#122b1c] text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shrink-0 transition-colors shadow-xs active:scale-95 cursor-pointer"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4 shrink-0" />
               <span>Agregar</span>
             </button>
           </div>
@@ -1076,7 +1076,7 @@ export function PropertyForm({
                   key={suggestion}
                   type="button"
                   onClick={() => setAmenities((prev) => [...prev, suggestion])}
-                  className="text-[11px] font-medium px-2.5 py-1 rounded-lg bg-neutral-100 hover:bg-orange-50 hover:text-brand-accent hover:border-brand-accent/30 border border-neutral-200/70 text-text-secondary transition-all"
+                  className="text-[11px] font-medium px-2.5 py-1 rounded-lg bg-neutral-100 hover:bg-orange-50 hover:text-brand-accent hover:border-brand-accent/30 border border-neutral-200/70 text-text-secondary transition-all active:scale-95 cursor-pointer"
                 >
                   + {suggestion}
                 </button>
@@ -1089,13 +1089,13 @@ export function PropertyForm({
               {amenities.map((item, idx) => (
                 <span
                   key={idx}
-                  className="inline-flex items-center gap-1.5 bg-orange-50/70 hover:bg-orange-100/70 text-brand-primary text-xs font-semibold px-3 py-1.5 rounded-xl border border-orange-200/80 transition-colors"
+                  className="inline-flex items-center gap-1.5 bg-orange-50/70 hover:bg-orange-100/70 text-brand-primary text-xs font-semibold px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl border border-orange-200/80 transition-colors max-w-full"
                 >
-                  <span>{item}</span>
+                  <span className="truncate">{item}</span>
                   <button
                     type="button"
                     onClick={() => handleRemoveAmenity(idx)}
-                    className="text-neutral-400 hover:text-red-500 p-0.5 rounded-md"
+                    className="text-neutral-400 hover:text-red-500 p-0.5 rounded-md shrink-0 cursor-pointer"
                     title="Eliminar amenidad"
                   >
                     <X className="w-3.5 h-3.5" />
@@ -1108,7 +1108,7 @@ export function PropertyForm({
       </div>
 
       {/* 6. Asesor Inmobiliario Responsable */}
-      <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-5 sm:p-6 space-y-4">
+      <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-3.5 sm:p-6 space-y-4">
         <div className="flex items-center gap-3 pb-3.5 border-b border-neutral-100">
           <span className="w-8 h-8 rounded-xl bg-orange-50 border border-orange-200/80 text-brand-accent text-xs font-black flex items-center justify-center shrink-0 shadow-2xs">
             06
@@ -1275,20 +1275,20 @@ export function PropertyForm({
       <div
         className={
           hideHeader
-            ? "shrink-0 bg-white/95 backdrop-blur-md border-t border-neutral-200/90 px-5 sm:px-6 py-4 flex items-center justify-between flex-wrap gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] z-20"
+            ? "shrink-0 bg-white/95 backdrop-blur-md border-t border-neutral-200/90 px-3.5 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] z-20 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))]"
             : "pt-4 border-t border-neutral-200/90 flex items-center justify-end gap-3"
         }
       >
-        <p className="text-xs text-neutral-500 font-medium hidden sm:block">
+        <p className="text-xs text-neutral-500 font-medium hidden md:block">
           * Campos obligatorios para publicación inmediata.
         </p>
-        <div className="flex items-center gap-3 ml-auto">
+        <div className="flex items-center gap-2.5 sm:gap-3 w-full sm:w-auto sm:ml-auto">
           {onCancel && (
             <button
               type="button"
               onClick={onCancel}
               disabled={isSubmitting || isUploading}
-              className="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-neutral-600 hover:bg-neutral-100 border border-neutral-300 transition-colors disabled:opacity-50"
+              className="flex-1 sm:flex-initial px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-neutral-600 hover:bg-neutral-100 border border-neutral-300 transition-colors disabled:opacity-50 text-center"
             >
               Cancelar
             </button>
@@ -1296,16 +1296,16 @@ export function PropertyForm({
           <button
             type="submit"
             disabled={isSubmitting || isUploading}
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-[#e85d30] via-brand-accent to-[#c4441b] hover:shadow-lg hover:shadow-brand-accent/30 text-white font-bold px-7 py-2.5 rounded-xl shadow-md shadow-brand-accent/20 transition-all active:scale-95 text-xs sm:text-sm disabled:opacity-50"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#e85d30] via-brand-accent to-[#c4441b] hover:shadow-lg hover:shadow-brand-accent/30 text-white font-bold px-5 sm:px-7 py-2.5 rounded-xl shadow-md shadow-brand-accent/20 transition-all active:scale-95 text-xs sm:text-sm disabled:opacity-50 text-center"
           >
             {isSubmitting ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Guardando Inmueble...</span>
+                <Loader2 className="w-4 h-4 animate-spin shrink-0" />
+                <span>Guardando...</span>
               </>
             ) : (
               <>
-                <Save className="w-4 h-4" />
+                <Save className="w-4 h-4 shrink-0" />
                 <span>{isEditing ? "Guardar Cambios" : "Registrar Inmueble"}</span>
               </>
             )}

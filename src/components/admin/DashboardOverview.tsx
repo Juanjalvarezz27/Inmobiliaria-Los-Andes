@@ -491,7 +491,7 @@ export function DashboardOverview({
       {/* Contenedor Principal: 2 Pestañas (Orden de Inmuebles y Asesores) */}
       <div className="bg-white rounded-3xl border border-neutral-200/90 shadow-[0_4px_20px_rgba(0,0,0,0.03)] overflow-hidden">
         {/* Pestañas de Navegacion */}
-        <div className="flex items-center gap-2 px-5 sm:px-7 border-b border-neutral-200/80 bg-neutral-50/60">
+        <div className="flex items-center gap-2 px-3 sm:px-7 border-b border-neutral-200/80 bg-neutral-50/60 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           <button
             type="button"
             onClick={() => {
@@ -499,14 +499,15 @@ export function DashboardOverview({
               setSearchTerm("");
               setPageFilter("ALL");
             }}
-            className={`py-4 px-4 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center gap-2 ${
+            className={`py-3.5 sm:py-4 px-3 sm:px-4 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap shrink-0 ${
               activeTab === "properties"
                 ? "border-brand-accent text-brand-primary bg-white shadow-2xs rounded-t-xl"
                 : "border-transparent text-text-secondary hover:text-brand-primary"
             }`}
           >
-            <Building2 className="w-4 h-4 text-brand-accent" />
-            <span>Orden de Inmuebles en la Portada</span>
+            <Building2 className="w-4 h-4 text-brand-accent shrink-0" />
+            <span className="hidden sm:inline">Orden de Inmuebles en la Portada</span>
+            <span className="sm:hidden">Inmuebles Portada</span>
             <span className="text-[11px] font-black bg-orange-100 text-brand-accent px-2 py-0.5 rounded-full">
               {properties.length}
             </span>
@@ -518,14 +519,15 @@ export function DashboardOverview({
               setActiveTab("agents");
               setSearchTerm("");
             }}
-            className={`py-4 px-4 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center gap-2 ${
+            className={`py-3.5 sm:py-4 px-3 sm:px-4 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap shrink-0 ${
               activeTab === "agents"
                 ? "border-brand-accent text-brand-primary bg-white shadow-2xs rounded-t-xl"
                 : "border-transparent text-text-secondary hover:text-brand-primary"
             }`}
           >
-            <Users className="w-4 h-4 text-brand-accent" />
-            <span>Sección de Asesores</span>
+            <Users className="w-4 h-4 text-brand-accent shrink-0" />
+            <span className="hidden sm:inline">Sección de Asesores</span>
+            <span className="sm:hidden">Asesores</span>
             <span className="text-[11px] font-black bg-orange-100 text-brand-accent px-2 py-0.5 rounded-full">
               {agents.length}
             </span>
@@ -551,7 +553,7 @@ export function DashboardOverview({
             </div>
 
             {activeTab === "properties" && (
-              <div className="flex items-center gap-2 self-end sm:self-auto flex-wrap">
+              <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
                 <button
                   type="button"
                   onClick={() => setPageFilter("ALL")}
@@ -591,7 +593,7 @@ export function DashboardOverview({
             )}
 
             {activeTab === "agents" && (
-              <div className="flex items-center gap-2 self-end sm:self-auto flex-wrap">
+              <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
                 <button
                   type="button"
                   onClick={() => setAgentFilter("ALL")}

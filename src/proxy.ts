@@ -54,15 +54,8 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(dashboardUrl);
   }
 
-  // Pasa cabecera interna con el pathname para que los layouts de servidor lo conozcan
-  const requestHeaders = new Headers(request.headers);
-  requestHeaders.set("x-pathname", pathname);
-
-  return NextResponse.next({
-    request: {
-      headers: requestHeaders,
-    },
-  });
+  // Permite el paso a la ruta solicitada
+  return NextResponse.next();
 }
 
 export const config = {

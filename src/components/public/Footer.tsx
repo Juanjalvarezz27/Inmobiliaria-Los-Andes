@@ -3,13 +3,13 @@ import { ArrowUpRight, MessageCircle, Phone, Mail, MapPin } from "lucide-react";
 import { COMPANY_CONFIG } from "@/config/company";
 import { InstagramIcon } from "@/components/icons/InstagramIcon";
 
-// Pie de pagina editorial compacto con colores de marca y tipografia monumental
+// Pie de pagina editorial de alto nivel, optimizado para desktop y responsive movil
 export function Footer() {
   return (
     <footer id="contacto" className="w-full border-t border-neutral-200/90 bg-[#f4f5f2] text-neutral-900 overflow-hidden pt-8 sm:pt-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Cabecera superior compacta: Titular de marca y Boton de Contacto */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 sm:pb-8 border-b border-neutral-300/60">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 pb-6 sm:pb-8 border-b border-neutral-300/60">
           <div>
             <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-accent block mb-1">
               Bienes Raíces
@@ -19,12 +19,12 @@ export function Footer() {
             </h2>
           </div>
 
-          <div className="shrink-0">
+          <div className="w-full sm:w-auto shrink-0">
             <a
               href={`https://wa.me/${COMPANY_CONFIG.contact.phoneRaw}?text=${encodeURIComponent("Hola, deseo asesoría inmobiliaria")}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex items-center justify-center gap-2 rounded-full bg-brand-primary px-7 py-3 text-sm sm:text-base font-bold text-white transition-all duration-300 hover:bg-brand-accent active:scale-95 shadow-md shadow-brand-primary/10"
+              className="group flex w-full sm:inline-flex sm:w-auto items-center justify-center gap-2 rounded-full bg-brand-primary px-7 py-3.5 sm:py-3 text-sm sm:text-base font-bold text-white transition-all duration-300 hover:bg-brand-accent active:scale-95 shadow-md shadow-brand-primary/10"
             >
               <span>Contacto</span>
               <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
@@ -125,7 +125,9 @@ export function Footer() {
                     className="inline-flex items-center gap-2 text-neutral-600 hover:text-brand-primary transition-colors"
                   >
                     <Mail className="h-4 w-4 text-neutral-500 shrink-0" />
-                    <span className="truncate max-w-[210px] sm:max-w-none">{COMPANY_CONFIG.contact.email}</span>
+                    <span className="truncate max-w-[130px] sm:max-w-none" title={COMPANY_CONFIG.contact.email}>
+                      {COMPANY_CONFIG.contact.email}
+                    </span>
                   </a>
                 </li>
                 <li>
@@ -136,7 +138,9 @@ export function Footer() {
                     className="inline-flex items-center gap-2 text-neutral-600 hover:text-pink-600 transition-colors group"
                   >
                     <InstagramIcon className="h-4 w-4 text-pink-600 shrink-0 group-hover:scale-110 transition-transform" />
-                    <span>@{COMPANY_CONFIG.social.instagram}</span>
+                    <span className="truncate max-w-[130px] sm:max-w-none">
+                      @{COMPANY_CONFIG.social.instagram}
+                    </span>
                   </a>
                 </li>
               </ul>
@@ -161,10 +165,10 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Tipografía Monumental Gigante Naranja en la base */}
+      {/* Tipografía Monumental Gigante Naranja con efecto arquitectónico de corte */}
       <div className="relative overflow-hidden select-none pointer-events-none mt-2 sm:mt-4">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex justify-center sm:justify-start">
-          <span className="font-heading text-[17.5vw] font-black leading-[0.74] tracking-[-0.05em] text-brand-accent block translate-y-[8%]">
+          <span className="font-heading text-[20.6vw] sm:text-[21.2vw] font-black leading-[0.74] tracking-[-0.05em] text-brand-accent block whitespace-nowrap translate-y-[8%]">
             los andes
           </span>
         </div>

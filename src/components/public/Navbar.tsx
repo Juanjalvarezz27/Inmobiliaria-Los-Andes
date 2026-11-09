@@ -111,14 +111,14 @@ export function Navbar() {
         </nav>
 
         {/* Acceso al Panel Admin y Menu Movil */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2">
           <Link
-            href="/admin"
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-800 hover:text-brand-accent bg-orange-50/80 hover:bg-orange-100/90 border border-orange-200/80 hover:border-brand-accent/50 px-4 py-2 rounded-full transition-all shadow-2xs active:scale-95 cursor-pointer"
+            href="/admin/login"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-800 hover:text-brand-accent bg-orange-50/90 hover:bg-orange-100 border border-orange-200/80 hover:border-brand-accent/50 px-3 sm:px-4 py-2 rounded-full transition-all shadow-2xs active:scale-95 cursor-pointer"
             title="Acceso al panel administrativo"
           >
             <ShieldCheck className="w-4 h-4 text-brand-accent shrink-0" />
-            <span className="hidden sm:inline">Panel Admin</span>
+            <span className="inline text-[11px] sm:text-xs">Admin</span>
           </Link>
 
           {/* Boton Hamburguesa para Pantallas Moviles */}
@@ -171,6 +171,18 @@ export function Navbar() {
           >
             Contacto
           </Link>
+
+          {/* Enlace directo y destacado a Login Administrativo en menu movil */}
+          <div className="pt-2 border-t border-neutral-200/80 mt-2">
+            <Link
+              href="/admin/login"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-center gap-2 px-3.5 py-3 rounded-xl text-xs font-bold uppercase tracking-wider bg-brand-primary text-white hover:bg-brand-accent transition-colors shadow-sm"
+            >
+              <ShieldCheck className="w-4 h-4 text-brand-accent" />
+              <span>Acceso Administrativo</span>
+            </Link>
+          </div>
         </div>
       )}
     </div>

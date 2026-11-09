@@ -58,12 +58,12 @@ export function PropertyModal({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-in fade-in duration-100"
+      className="fixed inset-0 z-[100] bg-black/60 flex sm:items-center sm:justify-center sm:p-6 overflow-hidden animate-in fade-in duration-100"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="relative w-full max-w-4xl bg-gradient-to-b from-[#FAF7F2] via-[#F3ECE0] to-[#EBE0D2] rounded-3xl shadow-2xl shadow-black/50 overflow-hidden flex flex-col h-[90vh] max-h-[92vh] border-0 animate-in fade-in zoom-in-[0.98] duration-100 ease-out transform-gpu my-auto">
+      <div className="relative w-full h-full h-dvh sm:h-[90vh] sm:max-h-[92vh] sm:max-w-4xl bg-gradient-to-b from-[#FAF7F2] via-[#F3ECE0] to-[#EBE0D2] rounded-none sm:rounded-3xl shadow-2xl shadow-black/50 overflow-hidden flex flex-col border-0 animate-in fade-in zoom-in-[0.98] duration-100 ease-out transform-gpu">
         {/* Capa de fondo con relieve topográfico andino persistente en todo el modal */}
         <div
           aria-hidden="true"
@@ -123,16 +123,16 @@ export function PropertyModal({
         </div>
 
         {/* Cabecera sólida verde de marca */}
-        <div className="bg-gradient-to-r from-[#122b1c] via-[#1a3b26] to-[#0e2115] text-white p-5 sm:p-6 flex items-center justify-between shrink-0 z-10 shadow-md">
-          <div className="flex items-center gap-3.5 min-w-0">
-            <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-emerald-400 border border-white/10 shrink-0">
-              {isEditing ? <Edit3 className="w-5 h-5 text-brand-accent" /> : <Building2 className="w-5 h-5 text-emerald-400" />}
+        <div className="bg-gradient-to-r from-[#122b1c] via-[#1a3b26] to-[#0e2115] text-white p-3.5 sm:p-6 flex items-center justify-between shrink-0 z-20 shadow-md">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-white/10 flex items-center justify-center text-emerald-400 border border-white/10 shrink-0">
+              {isEditing ? <Edit3 className="w-4 h-4 sm:w-5 sm:h-5 text-brand-accent" /> : <Building2 className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400" />}
             </div>
             <div className="min-w-0">
-              <h2 className="text-lg sm:text-xl font-black text-white font-heading tracking-tight truncate">
+              <h2 className="text-sm sm:text-xl font-black text-white font-heading tracking-tight truncate">
                 {isEditing ? "Editar Ficha de Inmueble" : "Registrar Nuevo Inmueble"}
               </h2>
-              <p className="text-xs text-white/70 truncate">
+              <p className="text-[11px] sm:text-xs text-white/70 truncate">
                 {property?.title || "Completa los datos técnicos y fotografías de la propiedad."}
               </p>
             </div>
@@ -141,7 +141,7 @@ export function PropertyModal({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-colors shrink-0 ml-3"
+            className="p-1.5 sm:p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-colors shrink-0 ml-2 cursor-pointer"
             aria-label="Cerrar modal"
           >
             <X className="w-5 h-5" />

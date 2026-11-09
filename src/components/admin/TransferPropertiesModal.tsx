@@ -195,9 +195,9 @@ export function TransferPropertiesModal({
           onClose();
         }
       }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 animate-in fade-in duration-100"
+      className="fixed inset-0 z-50 flex sm:items-center sm:justify-center p-0 sm:p-4 bg-black/60 overflow-hidden animate-in fade-in duration-100"
     >
-      <div className="bg-white rounded-3xl border border-neutral-200 shadow-2xl w-full max-w-2xl max-h-[92vh] flex flex-col overflow-hidden animate-in zoom-in-[0.98] duration-100 ease-out transform-gpu">
+      <div className="bg-white rounded-none sm:rounded-3xl border border-neutral-200 shadow-2xl w-full h-full sm:h-auto max-w-2xl sm:max-h-[92vh] flex flex-col overflow-hidden animate-in zoom-in-[0.98] duration-100 ease-out transform-gpu">
         {/* Encabezado del Modal */}
         <div className="p-5 sm:p-6 border-b border-neutral-100 flex items-center justify-between bg-gradient-to-r from-orange-50/60 to-transparent">
           <div className="flex items-center gap-3.5">

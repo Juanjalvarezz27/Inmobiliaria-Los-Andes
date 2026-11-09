@@ -50,17 +50,17 @@ export function CatalogBanner({ totalProperties, totalAgents }: CatalogBannerPro
             </p>
           </div>
 
-          {/* Estadísticas: exactamente 2 unidades visuales (Cabecera unificada con icono + Cifra monumental) */}
-          <div className="animate-brand-fade-up" style={{ animationDelay: "0.14s" }}>
-            <div className="grid grid-cols-2 divide-x divide-neutral-300/70">
+          {/* Estadísticas: exactamente 2 unidades visuales (Cabecera unificada con icono + Cifra monumental centrada) */}
+          <div className="animate-brand-fade-up max-w-lg mx-auto w-full lg:max-w-none" style={{ animationDelay: "0.14s" }}>
+            <div className="grid grid-cols-2 divide-x divide-neutral-300/70 items-center">
               {/* Columna 1: Inmuebles Disponibles */}
-              <div className="group relative flex flex-col justify-center pr-4 sm:pr-8 lg:pr-10 transition-transform duration-300 hover:-translate-y-1">
+              <div className="group relative flex flex-col items-center justify-center text-center px-3 sm:px-6 lg:px-8 transition-transform duration-300 hover:-translate-y-1">
                 {/* Resplandor ambiental suave en hover */}
                 <div className="pointer-events-none absolute -inset-4 rounded-3xl bg-brand-accent/[0.08] opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-100" />
 
-                <div className="relative">
-                  {/* Elemento 1: Bloque unificado (Icono + Título) */}
-                  <div className="flex items-center gap-2.5 sm:gap-3">
+                <div className="relative flex flex-col items-center">
+                  {/* Elemento 1: Bloque unificado (Icono + Título centrado) */}
+                  <div className="flex items-center justify-center gap-2 sm:gap-3">
                     <div className="flex h-9 w-9 sm:h-11 sm:w-11 lg:h-12 lg:w-12 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-white/90 text-brand-accent shadow-sm ring-1 ring-brand-accent/20 transition-transform duration-300 group-hover:scale-105">
                       <Building2 className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 stroke-[1.8]" />
                     </div>
@@ -69,10 +69,10 @@ export function CatalogBanner({ totalProperties, totalAgents }: CatalogBannerPro
                     </h3>
                   </div>
 
-                  {/* Elemento 2: Cifra Monumental en naranja con aura lumínica */}
-                  <div className="relative mt-3 sm:mt-4 leading-none">
-                    <div className="pointer-events-none absolute -left-4 -top-2 h-20 w-24 rounded-full bg-brand-accent/15 blur-2xl" />
-                    <div className="relative font-heading text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight text-brand-accent tabular-nums drop-shadow-[0_8px_24px_rgba(222,88,42,0.3)]">
+                  {/* Elemento 2: Cifra Monumental en naranja con aura lumínica centrada */}
+                  <div className="relative mt-3 sm:mt-4 leading-none text-center">
+                    <div className="pointer-events-none absolute left-1/2 -top-2 -translate-x-1/2 h-20 w-24 rounded-full bg-brand-accent/15 blur-2xl" />
+                    <div className="relative font-heading text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight text-brand-accent tabular-nums drop-shadow-[0_8px_24px_rgba(222,88,42,0.3)] text-center">
                       <AnimatedCount value={totalProperties} />
                     </div>
                   </div>
@@ -80,13 +80,13 @@ export function CatalogBanner({ totalProperties, totalAgents }: CatalogBannerPro
               </div>
 
               {/* Columna 2: Asesores Expertos */}
-              <div className="group relative flex flex-col justify-center pl-4 sm:pl-8 lg:pl-10 transition-transform duration-300 hover:-translate-y-1">
+              <div className="group relative flex flex-col items-center justify-center text-center px-3 sm:px-6 lg:px-8 transition-transform duration-300 hover:-translate-y-1">
                 {/* Resplandor ambiental suave en hover */}
                 <div className="pointer-events-none absolute -inset-4 rounded-3xl bg-brand-primary/[0.08] opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-100" />
 
-                <div className="relative">
-                  {/* Elemento 1: Bloque unificado (Icono + Título) */}
-                  <div className="flex items-center gap-2.5 sm:gap-3">
+                <div className="relative flex flex-col items-center">
+                  {/* Elemento 1: Bloque unificado (Icono + Título centrado) */}
+                  <div className="flex items-center justify-center gap-2 sm:gap-3">
                     <div className="flex h-9 w-9 sm:h-11 sm:w-11 lg:h-12 lg:w-12 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-white/90 text-brand-primary shadow-sm ring-1 ring-brand-primary/20 transition-transform duration-300 group-hover:scale-105">
                       <Users className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 stroke-[1.8]" />
                     </div>
@@ -95,10 +95,10 @@ export function CatalogBanner({ totalProperties, totalAgents }: CatalogBannerPro
                     </h3>
                   </div>
 
-                  {/* Elemento 2: Cifra Monumental en naranja con aura lumínica */}
-                  <div className="relative mt-3 sm:mt-4 leading-none">
-                    <div className="pointer-events-none absolute -left-4 -top-2 h-20 w-24 rounded-full bg-brand-accent/15 blur-2xl" />
-                    <div className="relative font-heading text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight text-brand-accent tabular-nums drop-shadow-[0_8px_24px_rgba(222,88,42,0.3)]">
+                  {/* Elemento 2: Cifra Monumental en naranja con aura lumínica centrada */}
+                  <div className="relative mt-3 sm:mt-4 leading-none text-center">
+                    <div className="pointer-events-none absolute left-1/2 -top-2 -translate-x-1/2 h-20 w-24 rounded-full bg-brand-accent/15 blur-2xl" />
+                    <div className="relative font-heading text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight text-brand-accent tabular-nums drop-shadow-[0_8px_24px_rgba(222,88,42,0.3)] text-center">
                       <AnimatedCount value={totalAgents} />
                     </div>
                   </div>

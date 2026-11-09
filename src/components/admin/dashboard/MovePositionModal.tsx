@@ -46,8 +46,8 @@ export function MovePositionModal({
   const targetPage = isValidPosition ? Math.ceil(parsed / pageSize) : null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 animate-in fade-in duration-150">
-      <div className="bg-white rounded-3xl border border-neutral-200 shadow-2xl max-w-md w-full p-6 space-y-5 animate-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-150 overflow-hidden">
+      <div className="bg-white rounded-3xl border border-neutral-200 shadow-2xl max-w-md w-full p-4 sm:p-6 space-y-4 sm:space-y-5 animate-in zoom-in-95 duration-150 max-h-[92vh] overflow-y-auto">
         <div className="flex items-center justify-between gap-3 border-b border-neutral-100 pb-3">
           <div className="flex items-center gap-2">
             <span className="w-8 h-8 rounded-xl bg-orange-100 text-brand-accent flex items-center justify-center font-bold text-sm">

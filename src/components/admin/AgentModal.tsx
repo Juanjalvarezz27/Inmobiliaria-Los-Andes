@@ -152,18 +152,18 @@ function AgentFormContent({
   };
 
   return (
-    <div className="bg-brand-primary w-full max-w-2xl rounded-3xl shadow-2xl shadow-black/50 overflow-hidden my-6 border-0 animate-in fade-in zoom-in-95 duration-200">
+    <div className="bg-brand-primary w-full h-full sm:h-auto max-w-2xl rounded-none sm:rounded-3xl shadow-2xl shadow-black/50 overflow-hidden border-0 animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-dvh sm:max-h-[90vh]">
       {/* Cabecera de un solo tono verde de marca */}
-      <div className="p-6 text-white flex items-center justify-between">
+      <div className="p-4 sm:p-6 text-white flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center text-brand-accent shrink-0">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white/10 flex items-center justify-center text-brand-accent shrink-0">
             <UserCog className="w-5 h-5 text-brand-accent" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white font-heading tracking-tight leading-tight">
+            <h2 className="text-base sm:text-xl font-bold text-white font-heading tracking-tight leading-tight">
               {agent ? "Editar Datos del Asesor" : "Registrar Nuevo Asesor"}
             </h2>
-            <p className="text-xs text-emerald-100/80 mt-0.5">
+            <p className="text-[11px] sm:text-xs text-emerald-100/80 mt-0.5">
               {agent
                 ? "Actualiza la fotografía, canales de contacto y disponibilidad."
                 : "Agrega un nuevo asesor inmobiliario al equipo comercial."}
@@ -174,7 +174,7 @@ function AgentFormContent({
         <button
           type="button"
           onClick={onClose}
-          className="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-emerald-100 hover:text-white flex items-center justify-center transition-colors shrink-0"
+          className="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-emerald-100 hover:text-white flex items-center justify-center transition-colors shrink-0 cursor-pointer"
           title="Cerrar ventana"
         >
           <X className="w-4 h-4" />
@@ -182,7 +182,7 @@ function AgentFormContent({
       </div>
 
       {/* Cuerpo del formulario con fondo blanco */}
-      <form onSubmit={handleSubmit} className="bg-white p-6 sm:p-7 space-y-6 max-h-[80vh] overflow-y-auto">
+      <form onSubmit={handleSubmit} className="bg-white p-4 sm:p-7 space-y-5 flex-1 min-h-0 overflow-y-auto">
         {formError && (
           <div className="p-4 bg-red-50 text-red-700 text-xs font-semibold rounded-2xl border border-red-200 flex items-center gap-2">
             <span>{formError}</span>
@@ -399,12 +399,12 @@ function AgentFormContent({
         </div>
 
         {/* Pie del modal con acciones */}
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-neutral-100">
+        <div className="flex items-center justify-end gap-3 pt-4 border-t border-neutral-100 pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))]">
           <button
             type="button"
             onClick={onClose}
             disabled={isSubmitting}
-            className="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-neutral-600 hover:bg-neutral-100 transition-colors disabled:opacity-50"
+            className="flex-1 sm:flex-initial px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-neutral-600 hover:bg-neutral-100 transition-colors disabled:opacity-50 text-center"
           >
             Cancelar
           </button>
@@ -412,21 +412,21 @@ function AgentFormContent({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="inline-flex items-center gap-2 bg-brand-accent hover:bg-[#c94b21] text-white text-xs sm:text-sm font-bold px-7 py-2.5 rounded-xl shadow-md shadow-brand-accent/25 transition-all active:scale-95 disabled:opacity-50"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-brand-accent hover:bg-[#c94b21] text-white text-xs sm:text-sm font-bold px-5 sm:px-7 py-2.5 rounded-xl shadow-md shadow-brand-accent/25 transition-all active:scale-95 disabled:opacity-50 text-center"
           >
             {isSubmitting ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin shrink-0" />
                 <span>Guardando...</span>
               </>
             ) : agent ? (
               <>
-                <Save className="w-4 h-4" />
+                <Save className="w-4 h-4 shrink-0" />
                 <span>Actualizar Asesor</span>
               </>
             ) : (
               <>
-                <UserPlus className="w-4 h-4" />
+                <UserPlus className="w-4 h-4 shrink-0" />
                 <span>Crear Asesor</span>
               </>
             )}
@@ -463,7 +463,7 @@ export function AgentModal({ isOpen, onClose, agent }: AgentModalProps) {
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-in fade-in duration-100"
+      className="fixed inset-0 z-[100] bg-black/60 flex sm:items-center sm:justify-center sm:p-6 overflow-hidden animate-in fade-in duration-100"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}

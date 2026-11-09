@@ -243,6 +243,108 @@ export default async function PropertyDetailPage({ params }: PageProps) {
 
   const mapEmbedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(locationQuery)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
 
+  // Secciones editoriales (descripcion, mapa interactivo y amenidades) para renderizado responsivo
+  const propertyEditorialSections = (
+    <>
+      {/* Descripcion Editorial de la Propiedad con Sombra y Profundidad Real */}
+      <section className="bg-white rounded-[28px] p-6 sm:p-7 border border-[#DFD1B8] shadow-[0_12px_36px_rgba(24,38,28,0.10),0_2px_8px_rgba(0,0,0,0.04)] ring-1 ring-black/[0.03] space-y-3">
+        <h2 className="text-xs font-black uppercase tracking-widest text-neutral-400 font-heading flex items-center gap-2">
+          <FileText className="w-4 h-4 text-brand-accent" />
+          <span>Sobre esta propiedad</span>
+        </h2>
+        <div className="text-neutral-700 text-sm sm:text-base leading-relaxed whitespace-pre-line font-normal">
+          {property.description}
+        </div>
+      </section>
+
+      {/* Card Monumental de Ubicacion Satelital y Google Maps */}
+      <section
+        id="ubicacion"
+        className="bg-white rounded-[28px] p-6 sm:p-7 border border-[#DFD1B8] shadow-[0_12px_36px_rgba(24,38,28,0.10),0_2px_8px_rgba(0,0,0,0.04)] ring-1 ring-black/[0.03] space-y-4 scroll-mt-28"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-neutral-100">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-lg bg-orange-100/70 text-brand-accent flex items-center justify-center shrink-0">
+                <MapPin className="w-3.5 h-3.5" />
+              </div>
+              <h2 className="text-xs font-black uppercase tracking-widest text-neutral-400 font-heading">
+                Ubicación y Entorno
+              </h2>
+            </div>
+            <h3 className="text-base sm:text-lg font-black text-brand-primary font-heading pl-8">
+              {property.sector ? `${property.sector}, ` : ""}{property.city}
+            </h3>
+            <p className="text-xs sm:text-sm text-neutral-600 font-medium pl-8">
+              {property.address}
+            </p>
+          </div>
+
+          <div className="shrink-0 pl-8 sm:pl-0">
+            <a
+              href={googleMapsExternalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-brand-primary to-[#255236] hover:from-[#132d1d] hover:to-[#1b3e28] text-white text-xs font-bold shadow-md shadow-brand-primary/15 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all cursor-pointer group"
+              title="Abrir ubicación en Google Maps"
+            >
+              <Navigation className="w-3.5 h-3.5 text-orange-300 group-hover:rotate-45 transition-transform" />
+              <span>Cómo llegar</span>
+              <ExternalLink className="w-3 h-3 opacity-80" />
+            </a>
+          </div>
+        </div>
+
+        {/* Visor Cartografico Embebido con Relieve Editorial */}
+        <div className="relative w-full aspect-[16/10] sm:aspect-[21/9] rounded-2xl overflow-hidden border border-[#DFD1B8] shadow-inner bg-neutral-100">
+          <iframe
+            src={mapEmbedUrl}
+            width="100%"
+            height="100%"
+            style={{ border: 0 }}
+            allowFullScreen={false}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            title={`Mapa de ubicación para ${property.title}`}
+            className="w-full h-full min-h-[260px] sm:min-h-[300px] rounded-2xl"
+          />
+
+          {/* Insignia Flotante Satelital en el Mapa */}
+          <div className="absolute bottom-3 left-3 pointer-events-none">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-950/80 backdrop-blur-md border border-white/20 text-white text-[11px] font-bold shadow-lg">
+              <MapPin className="w-3.5 h-3.5 text-brand-accent shrink-0" />
+              <span className="truncate max-w-[200px] sm:max-w-xs">{property.sector || property.city}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Amenidades y Equipamiento en Chips Modernos con Sombra y Profundidad */}
+      {property.amenities.length > 0 && (
+        <section className="bg-white rounded-[28px] p-6 sm:p-7 border border-[#DFD1B8] shadow-[0_12px_36px_rgba(24,38,28,0.10),0_2px_8px_rgba(0,0,0,0.04)] ring-1 ring-black/[0.03] space-y-3.5">
+          <h2 className="text-xs font-black uppercase tracking-widest text-neutral-400 font-heading flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <span>Amenidades y Equipamiento ({property.amenities.length})</span>
+          </h2>
+
+          <div className="flex flex-wrap gap-2 pt-1">
+            {property.amenities.map((item, index) => (
+              <div
+                key={index}
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-b from-white to-[#FAF8F4] border border-[#DFD1B8] text-xs sm:text-sm font-bold text-neutral-800 shadow-[0_2px_8px_-2px_rgba(26,59,38,0.06),0_1px_2px_rgba(0,0,0,0.02)] hover:border-brand-accent/50 hover:shadow-md hover:-translate-y-0.5 transition-all"
+              >
+                <div className="w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 shadow-xs">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                </div>
+                <span>{item}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+    </>
+  );
+
   return (
     <div className="relative isolate z-10 min-h-screen flex flex-col bg-gradient-to-b from-[#FAF7F2] via-[#F3ECE0] to-[#EBE0D2] text-text-primary">
       {/* Capa decorativa: relieve topografico andino refinado con iluminacion calida */}
@@ -322,7 +424,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
 
       <Navbar />
 
-      <main className="flex-1 w-full max-w-7xl 2xl:max-w-[1420px] mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 pb-16 space-y-6">
+      <main className="flex-1 w-full max-w-7xl 2xl:max-w-[1420px] mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 pb-24 sm:pb-16 space-y-6">
         {/* Barra Superior con Navegacion y Compartir */}
         <PropertyActionsBar propertyTitle={property.title} propertyType={propertyTypeLabel} />
 
@@ -350,102 +452,10 @@ export default async function PropertyDetailPage({ params }: PageProps) {
             {/* 1. Galeria Interactiva de Fotografias (El elemento visual protagonista) */}
             <PropertyGallery images={property.images} title={property.title} />
 
-            {/* 2. Descripcion Editorial de la Propiedad con Sombra y Profundidad Real */}
-            <section className="bg-white rounded-[28px] p-6 sm:p-7 border border-[#DFD1B8] shadow-[0_12px_36px_rgba(24,38,28,0.10),0_2px_8px_rgba(0,0,0,0.04)] ring-1 ring-black/[0.03] space-y-3">
-              <h2 className="text-xs font-black uppercase tracking-widest text-neutral-400 font-heading flex items-center gap-2">
-                <FileText className="w-4 h-4 text-brand-accent" />
-                <span>Sobre esta propiedad</span>
-              </h2>
-              <div className="text-neutral-700 text-sm sm:text-base leading-relaxed whitespace-pre-line font-normal">
-                {property.description}
-              </div>
-            </section>
-
-            {/* 3. Card Monumental de Ubicacion Satelital y Google Maps */}
-            <section
-              id="ubicacion"
-              className="bg-white rounded-[28px] p-6 sm:p-7 border border-[#DFD1B8] shadow-[0_12px_36px_rgba(24,38,28,0.10),0_2px_8px_rgba(0,0,0,0.04)] ring-1 ring-black/[0.03] space-y-4 scroll-mt-28"
-            >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-neutral-100">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-lg bg-orange-100/70 text-brand-accent flex items-center justify-center shrink-0">
-                      <MapPin className="w-3.5 h-3.5" />
-                    </div>
-                    <h2 className="text-xs font-black uppercase tracking-widest text-neutral-400 font-heading">
-                      Ubicación y Entorno
-                    </h2>
-                  </div>
-                  <h3 className="text-base sm:text-lg font-black text-brand-primary font-heading pl-8">
-                    {property.sector ? `${property.sector}, ` : ""}{property.city}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-neutral-600 font-medium pl-8">
-                    {property.address}
-                  </p>
-                </div>
-
-                <div className="shrink-0 pl-8 sm:pl-0">
-                  <a
-                    href={googleMapsExternalUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-brand-primary to-[#255236] hover:from-[#132d1d] hover:to-[#1b3e28] text-white text-xs font-bold shadow-md shadow-brand-primary/15 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all cursor-pointer group"
-                    title="Abrir ubicación en Google Maps"
-                  >
-                    <Navigation className="w-3.5 h-3.5 text-orange-300 group-hover:rotate-45 transition-transform" />
-                    <span>Cómo llegar</span>
-                    <ExternalLink className="w-3 h-3 opacity-80" />
-                  </a>
-                </div>
-              </div>
-
-              {/* Visor Cartografico Embebido con Relieve Editorial */}
-              <div className="relative w-full aspect-[16/10] sm:aspect-[21/9] rounded-2xl overflow-hidden border border-[#DFD1B8] shadow-inner bg-neutral-100">
-                <iframe
-                  src={mapEmbedUrl}
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen={false}
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title={`Mapa de ubicación para ${property.title}`}
-                  className="w-full h-full min-h-[260px] sm:min-h-[300px] rounded-2xl"
-                />
-
-                {/* Insignia Flotante Satelital en el Mapa */}
-                <div className="absolute bottom-3 left-3 pointer-events-none">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-950/80 backdrop-blur-md border border-white/20 text-white text-[11px] font-bold shadow-lg">
-                    <MapPin className="w-3.5 h-3.5 text-brand-accent shrink-0" />
-                    <span className="truncate max-w-[200px] sm:max-w-xs">{property.sector || property.city}</span>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* 3. Amenidades y Equipamiento en Chips Modernos con Sombra y Profundidad */}
-            {property.amenities.length > 0 && (
-              <section className="bg-white rounded-[28px] p-6 sm:p-7 border border-[#DFD1B8] shadow-[0_12px_36px_rgba(24,38,28,0.10),0_2px_8px_rgba(0,0,0,0.04)] ring-1 ring-black/[0.03] space-y-3.5">
-                <h2 className="text-xs font-black uppercase tracking-widest text-neutral-400 font-heading flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  <span>Amenidades y Equipamiento ({property.amenities.length})</span>
-                </h2>
-
-                <div className="flex flex-wrap gap-2 pt-1">
-                  {property.amenities.map((item, index) => (
-                    <div
-                      key={index}
-                      className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-b from-white to-[#FAF8F4] border border-[#DFD1B8] text-xs sm:text-sm font-bold text-neutral-800 shadow-[0_2px_8px_-2px_rgba(26,59,38,0.06),0_1px_2px_rgba(0,0,0,0.02)] hover:border-brand-accent/50 hover:shadow-md hover:-translate-y-0.5 transition-all"
-                    >
-                      <div className="w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 shadow-xs">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                      </div>
-                      <span>{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
+            {/* Contenido editorial en pantallas de escritorio (lg+) */}
+            <div className="hidden lg:block space-y-6">
+              {propertyEditorialSections}
+            </div>
           </div>
 
           {/* COLUMNA DERECHA (5 de 12 cols): Panel Maestro de Decision, Precio, Especificaciones y Asesor */}
@@ -705,6 +715,11 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                 </div>
               </div>
             </div>
+
+            {/* Contenido editorial en pantallas moviles y tablets (< lg), ordenado intuitivamente tras la ficha de precio */}
+            <div className="lg:hidden space-y-6">
+              {propertyEditorialSections}
+            </div>
           </div>
         </div>
 
@@ -754,8 +769,8 @@ export default async function PropertyDetailPage({ params }: PageProps) {
         )}
       </main>
 
-      {/* Barra de Conversion Flotante Inferior en Moviles con Mayor Profundidad */}
-      <div className="sm:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-xl border-t border-[#DFD1B8] p-3 flex items-center justify-between gap-3 shadow-[0_-12px_36px_rgba(26,59,38,0.15)] ring-1 ring-black/[0.04]">
+      {/* Barra de Conversion Flotante Inferior en Moviles con Mayor Profundidad y Safe Area */}
+      <div className="sm:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-xl border-t border-[#DFD1B8] px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] flex items-center justify-between gap-3 shadow-[0_-12px_36px_rgba(26,59,38,0.15)] ring-1 ring-black/[0.04]">
         <div>
           <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
             {property.operationType === "SALE" ? "Venta" : "Alquiler"}

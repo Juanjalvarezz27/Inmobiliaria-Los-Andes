@@ -181,7 +181,7 @@ export function CustomSelect<T extends string = string>({
           role="listbox"
           className={`absolute top-full mt-1.5 ${
             dropdownAlign === "right" ? "right-0" : "left-0"
-          } bg-white rounded-2xl border border-neutral-200/90 shadow-2xl z-50 p-1.5 space-y-1 animate-in fade-in zoom-in-95 duration-150 ${
+          } bg-white rounded-2xl border border-neutral-200/90 shadow-2xl z-50 p-1.5 space-y-1 animate-in fade-in zoom-in-95 duration-150 max-w-[calc(100vw-2rem)] ${
             dropdownClassName || "min-w-full sm:min-w-[200px]"
           }`}
         >

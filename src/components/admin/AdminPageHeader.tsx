@@ -66,7 +66,11 @@ export function AdminPageHeader({
         </div>
       </div>
 
-      {children && <div className="flex items-center gap-3 shrink-0 self-start md:self-center">{children}</div>}
+      {children && (
+        <div className="flex items-center gap-2.5 sm:gap-3 shrink-0 self-start md:self-center flex-wrap">
+          {children}
+        </div>
+      )}
     </div>
   );
 }

@@ -500,11 +500,11 @@ export function PropertiesManager({
         <div className="pt-3.5 border-t border-neutral-100 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
           {/* Pestanas de Operacion con Colores Tematicos */}
           <div className="flex items-center gap-2 flex-wrap">
-            <div className="flex items-center p-1 bg-neutral-100 rounded-2xl gap-1 border border-neutral-200/50">
+            <div className="flex items-center p-1 bg-neutral-100 rounded-2xl gap-1 border border-neutral-200/50 max-w-full overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
               <button
                 type="button"
                 onClick={() => setOperationFilter("ALL")}
-                className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer whitespace-nowrap ${
                   operationFilter === "ALL"
                     ? "bg-brand-primary text-white shadow-sm shadow-brand-primary/20"
                     : "text-text-secondary hover:text-text-primary hover:bg-white/60"
@@ -515,7 +515,7 @@ export function PropertiesManager({
               <button
                 type="button"
                 onClick={() => setOperationFilter("SALE")}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer whitespace-nowrap ${
                   operationFilter === "SALE"
                     ? "bg-gradient-to-r from-emerald-600 to-emerald-700 text-white shadow-sm shadow-emerald-600/30"
                     : "text-emerald-700 hover:bg-emerald-50/80"
@@ -527,7 +527,7 @@ export function PropertiesManager({
               <button
                 type="button"
                 onClick={() => setOperationFilter("RENT")}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer whitespace-nowrap ${
                   operationFilter === "RENT"
                     ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-sm shadow-blue-600/30"
                     : "text-blue-700 hover:bg-blue-50/80"
@@ -540,9 +540,9 @@ export function PropertiesManager({
           </div>
 
           {/* Desplegables con Iconos Tematicos y Destello de Estado Activo */}
-          <div className="flex items-center gap-2.5 flex-wrap">
+          <div className="flex items-center gap-2.5 flex-wrap w-full lg:w-auto">
             {/* Filtro por Estado */}
-            <div className="w-44">
+            <div className="w-full sm:w-44 flex-1 min-w-[130px]">
               <CustomSelect
                 value={statusFilter}
                 onChange={(val) => setStatusFilter(val)}
@@ -553,7 +553,7 @@ export function PropertiesManager({
             </div>
 
             {/* Filtro por Tipo de Inmueble */}
-            <div className="w-44">
+            <div className="w-full sm:w-44 flex-1 min-w-[130px]">
               <CustomSelect
                 value={typeFilter}
                 onChange={(val) => setTypeFilter(val)}
@@ -564,7 +564,7 @@ export function PropertiesManager({
             </div>
 
             {/* Filtro por Asesor Asignado con Buscador, Paginacion y Desplegable Amplio */}
-            <div className="w-56 sm:w-64">
+            <div className="w-full sm:w-64 flex-1 min-w-[170px]">
               <CustomSelect
                 value={agentFilter}
                 onChange={(val) => setAgentFilter(val)}

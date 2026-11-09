@@ -81,25 +81,25 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
 
   return (
     <>
-      {/* 1. BARRA SUPERIOR PARA MOVILES Y TABLETS (< lg) */}
-      <header className="lg:hidden sticky top-0 z-40 bg-gradient-to-r from-[#132c1c] via-brand-primary to-[#0f2417] text-white border-b border-white/10 px-4 py-3 flex items-center justify-between shadow-md select-none">
+      {/* 1. BARRA SUPERIOR PARA MOVILES Y TABLETS (< lg) CON ALTURA OPTIMA */}
+      <header className="lg:hidden sticky top-0 z-40 bg-gradient-to-r from-[#132c1c] via-brand-primary to-[#0f2417] text-white border-b border-white/10 px-4 py-3.5 h-[66px] flex items-center justify-between shadow-md select-none">
         {/* Identidad con Logo y Marca */}
         <div className="flex items-center gap-3 min-w-0">
-          <div className="relative w-9 h-9 rounded-full overflow-hidden shrink-0 ring-2 ring-brand-accent/40 shadow-sm bg-white/10 flex items-center justify-center">
+          <div className="relative w-10 h-10 rounded-full overflow-hidden shrink-0 ring-2 ring-brand-accent/40 shadow-sm bg-white/10 flex items-center justify-center">
             <Image
               src="/Logo redondo.png"
               alt={COMPANY_CONFIG.tradeName}
               fill
-              sizes="36px"
+              sizes="40px"
               className="object-cover"
               priority
             />
           </div>
           <div className="min-w-0">
-            <span className="font-bold text-xs block leading-tight text-white truncate font-heading tracking-tight">
+            <span className="font-bold text-sm block leading-tight text-white truncate font-heading tracking-tight">
               Panel de Control
             </span>
-            <span className="text-[9px] text-brand-accent font-extrabold tracking-widest uppercase block truncate mt-0.5">
+            <span className="text-[9.5px] text-brand-accent font-extrabold tracking-widest uppercase block truncate mt-0.5">
               {COMPANY_CONFIG.tradeName}
             </span>
           </div>
@@ -110,16 +110,16 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
           <Link
             href="/admin/propiedades?nuevo=true"
             title="Cargar Inmueble"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-accent hover:bg-[#c94b21] text-white text-xs font-bold shadow-sm transition-transform active:scale-95"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-brand-accent hover:bg-[#c94b21] text-white text-xs font-bold shadow-sm transition-transform active:scale-95"
           >
             <PlusCircle strokeWidth={2.5} className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Nuevo</span>
+            <span>Nuevo</span>
           </Link>
 
           <button
             type="button"
             onClick={() => setIsMobileOpen(!isMobileOpen)}
-            className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
+            className="p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
             aria-label={isMobileOpen ? "Cerrar menú" : "Abrir menú de navegación"}
           >
             {isMobileOpen ? <X className="w-5 h-5 text-brand-accent" /> : <Menu className="w-5 h-5" />}

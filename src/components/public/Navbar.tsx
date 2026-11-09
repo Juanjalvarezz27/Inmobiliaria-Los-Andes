@@ -59,25 +59,25 @@ export function Navbar() {
         isVisible ? "translate-y-0" : "-translate-y-[160%]"
       }`}
     >
-      {/* Capsula Flotante Principal */}
-      <header className="pointer-events-auto w-full max-w-6xl bg-white text-text-primary rounded-2xl sm:rounded-full border border-neutral-200/90 shadow-[0_12px_36px_-10px_rgba(0,0,0,0.15),0_2px_8px_rgba(0,0,0,0.04)] px-4 sm:px-6 h-16 sm:h-[70px] flex items-center justify-between gap-4 transition-all">
+      {/* Capsula Flotante Principal con mayor altura en móvil para comodidad táctil */}
+      <header className="pointer-events-auto w-full max-w-6xl bg-white text-text-primary rounded-2xl sm:rounded-full border border-neutral-200/90 shadow-[0_12px_36px_-10px_rgba(0,0,0,0.15),0_2px_8px_rgba(0,0,0,0.04)] px-4 sm:px-6 h-[72px] sm:h-[74px] flex items-center justify-between gap-4 transition-all">
         {/* Identidad con Logotipo Oficial y Marco Naranja */}
         <Link href="/" className="flex items-center gap-3 group shrink-0">
-          <div className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden shrink-0 ring-2 ring-brand-accent/40 group-hover:ring-brand-accent shadow-xs group-hover:shadow-md group-hover:shadow-brand-accent/20 transition-all duration-300 bg-white">
+          <div className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-full overflow-hidden shrink-0 ring-2 ring-brand-accent/40 group-hover:ring-brand-accent shadow-xs group-hover:shadow-md group-hover:shadow-brand-accent/20 transition-all duration-300 bg-white">
             <Image
               src="/Logo redondo.png"
               alt={COMPANY_CONFIG.tradeName}
               fill
-              sizes="44px"
+              sizes="48px"
               className="object-cover"
               priority
             />
           </div>
           <div className="flex flex-col">
-            <span className="text-sm sm:text-base font-black tracking-tight text-brand-primary font-heading leading-tight group-hover:text-neutral-900 transition-colors">
+            <span className="text-[15px] sm:text-base font-black tracking-tight text-brand-primary font-heading leading-tight group-hover:text-neutral-900 transition-colors">
               {COMPANY_CONFIG.tradeName}
             </span>
-            <div className="flex items-center gap-1.5 text-[9px] sm:text-[10px] font-extrabold tracking-wider uppercase text-neutral-500">
+            <div className="flex items-center gap-1.5 text-[9.5px] sm:text-[10px] font-extrabold tracking-wider uppercase text-neutral-500">
               <span className="w-1.5 h-1.5 rounded-full bg-brand-accent inline-block shrink-0" />
               <span>
                 <strong className="text-brand-accent font-black">RIF</strong> {COMPANY_CONFIG.rifFormatted}
@@ -120,22 +120,22 @@ export function Navbar() {
           </Link>
         </nav>
 
-        {/* Acceso al Panel Admin y Menu Movil */}
+        {/* Acceso al Panel Admin y Menu Movil con mayor area de toque tactil */}
         <div className="flex items-center gap-2">
           <a
             href="/admin/login"
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-800 hover:text-brand-accent bg-orange-50/90 hover:bg-orange-100 border border-orange-200/80 hover:border-brand-accent/50 px-3 sm:px-4 py-2 rounded-full transition-all shadow-2xs active:scale-95 cursor-pointer"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-800 hover:text-brand-accent bg-orange-50/90 hover:bg-orange-100 border border-orange-200/80 hover:border-brand-accent/50 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-full transition-all shadow-2xs active:scale-95 cursor-pointer"
             title="Acceso al panel administrativo"
           >
             <ShieldCheck className="w-4 h-4 text-brand-accent shrink-0" />
-            <span className="inline text-[11px] sm:text-xs">Admin</span>
+            <span className="inline text-xs">Admin</span>
           </a>
 
           {/* Boton Hamburguesa para Pantallas Moviles */}
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-neutral-600 hover:text-brand-accent hover:bg-orange-50 rounded-xl transition-colors cursor-pointer"
+            className="md:hidden p-2.5 text-neutral-700 hover:text-brand-accent hover:bg-orange-50 rounded-xl transition-colors cursor-pointer"
             aria-label="Abrir menú"
           >
             {mobileMenuOpen ? <X className="w-5 h-5 text-brand-accent" /> : <Menu className="w-5 h-5" />}

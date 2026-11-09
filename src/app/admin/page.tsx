@@ -1,157 +1,124 @@
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth";
 import Link from "next/link";
-import {
-  Home,
-  Users,
-  PlusCircle,
-  Tag,
-  Key,
-  ArrowRight,
-  LayoutDashboard,
-} from "lucide-react";
-import { formatCurrency } from "@/lib/utils/format";
+import { LayoutDashboard } from "lucide-react";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { DashboardOverview } from "@/components/admin/DashboardOverview";
 
-// Pagina principal de metricas y resumen del panel administrativo
+export const dynamic = "force-dynamic";
+
+// Pagina principal de metricas, resumen y centro de control de la vista inicial (Home)
 export default async function AdminDashboardPage() {
   await requireAuth();
 
-  const [totalProperties, saleProperties, rentProperties, totalAgents, recentProperties] =
-    await Promise.all([
-      prisma.property.count(),
-      prisma.property.count({ where: { operationType: "SALE" } }),
-      prisma.property.count({ where: { operationType: "RENT" } }),
-      prisma.user.count({ where: { role: "AGENT" } }),
-      prisma.property.findMany({
-        take: 5,
-        orderBy: { createdAt: "desc" },
-        include: { agent: true },
-      }),
-    ]);
+  // Consulta optimizada: solo 2 peticiones con campos estrictos (ahorro de latencia y payload)
+  const [allProperties, allAgents] = await Promise.all([
+    prisma.property.findMany({
+      orderBy: [{ displayOrder: "asc" }, { createdAt: "desc" }],
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        operationType: true,
+        propertyType: true,
+        customPropertyType: true,
+        status: true,
+        price: true,
+        currency: true,
+        featured: true,
+        displayOrder: true,
+        city: true,
+        sector: true,
+        createdAt: true,
+        agent: {
+          select: {
+            name: true,
+          },
+        },
+        images: {
+          orderBy: [{ isMain: "desc" }, { order: "asc" }],
+          take: 1,
+          select: { url: true },
+        },
+      },
+    }),
+    prisma.user.findMany({
+      where: { role: "AGENT", isActive: true },
+      select: {
+        id: true,
+        name: true,
+        position: true,
+        avatarUrl: true,
+        phone: true,
+        featured: true,
+        displayOrder: true,
+        _count: {
+          select: { properties: true },
+        },
+      },
+      orderBy: [{ displayOrder: "asc" }, { name: "asc" }],
+    }),
+  ]);
+
+  // Metricas calculadas en memoria al instante (0 roundtrips adicionales)
+  const metrics = {
+    totalProperties: allProperties.length,
+    saleProperties: allProperties.filter((p) => p.operationType === "SALE").length,
+    rentProperties: allProperties.filter((p) => p.operationType === "RENT").length,
+    availableProperties: allProperties.filter((p) => p.status === "AVAILABLE").length,
+    reservedProperties: allProperties.filter((p) => p.status === "RESERVED").length,
+    soldRentedProperties: allProperties.filter((p) => p.status === "SOLD" || p.status === "RENTED").length,
+    totalAgents: allAgents.length,
+    featuredPropertiesCount: allProperties.filter((p) => p.featured).length,
+    featuredAgentsCount: allAgents.filter((a) => a.featured).length,
+  };
+
+  const serializedProperties = allProperties.map((p) => ({
+    id: p.id,
+    title: p.title,
+    slug: p.slug,
+    operationType: p.operationType as "SALE" | "RENT",
+    propertyType: p.propertyType,
+    customPropertyType: p.customPropertyType,
+    status: p.status,
+    price: Number(p.price),
+    currency: p.currency,
+    featured: p.featured,
+    displayOrder: p.displayOrder,
+    city: p.city,
+    sector: p.sector,
+    coverUrl: p.images[0]?.url || null,
+    agentName: p.agent?.name || "Inmobiliaria Los Andes",
+    createdAt: p.createdAt.toISOString(),
+  }));
+
+  const serializedAgents = allAgents.map((a) => ({
+    id: a.id,
+    name: a.name,
+    position: a.position,
+    avatarUrl: a.avatarUrl,
+    phone: a.phone,
+    featured: a.featured,
+    displayOrder: a.displayOrder,
+    propertiesCount: a._count.properties,
+  }));
 
   return (
-    <div className="space-y-8">
-      {/* Encabezado */}
+    <div className="space-y-8 max-w-7xl pb-10">
+      {/* Encabezado Ejecutivo con diseño andino */}
       <AdminPageHeader
         icon={LayoutDashboard}
         title="Panel de"
         titleHighlight="Control General"
-        description="Visión consolidada del catálogo inmobiliario, actividad comercial y rendimiento del inventario."
-      >
-        <Link
-          href="/admin/propiedades?nuevo=true"
-          className="inline-flex items-center gap-2 bg-brand-accent hover:bg-[#c94b21] text-white text-sm font-bold px-5 py-2.5 rounded-xl shadow-md transition-all active:scale-95 shrink-0"
-        >
-          <PlusCircle className="w-4 h-4" />
-          <span>Nueva Propiedad</span>
-        </Link>
-      </AdminPageHeader>
+        description="Supervisa el rendimiento de tu inventario inmobiliario y administra los elementos destacados del catálogo."
+      />
 
-      {/* Tarjetas de Metricas */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div className="bg-ui-surface p-6 rounded-2xl border border-neutral-200/80 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-brand-primary/10 flex items-center justify-center text-brand-primary shrink-0">
-            <Home className="w-6 h-6" />
-          </div>
-          <div>
-            <span className="text-xs uppercase font-bold text-text-secondary tracking-wider block">
-              Total Inmuebles
-            </span>
-            <span className="text-2xl font-extrabold text-brand-primary font-heading">{totalProperties}</span>
-          </div>
-        </div>
-
-        <div className="bg-ui-surface p-6 rounded-2xl border border-neutral-200/80 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 shrink-0">
-            <Tag className="w-6 h-6" />
-          </div>
-          <div>
-            <span className="text-xs uppercase font-bold text-text-secondary tracking-wider block">
-              En Venta
-            </span>
-            <span className="text-2xl font-extrabold text-text-primary font-heading">{saleProperties}</span>
-          </div>
-        </div>
-
-        <div className="bg-ui-surface p-6 rounded-2xl border border-neutral-200/80 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-600 shrink-0">
-            <Key className="w-6 h-6" />
-          </div>
-          <div>
-            <span className="text-xs uppercase font-bold text-text-secondary tracking-wider block">
-              En Alquiler
-            </span>
-            <span className="text-2xl font-extrabold text-text-primary font-heading">{rentProperties}</span>
-          </div>
-        </div>
-
-        <div className="bg-ui-surface p-6 rounded-2xl border border-neutral-200/80 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-600 shrink-0">
-            <Users className="w-6 h-6" />
-          </div>
-          <div>
-            <span className="text-xs uppercase font-bold text-text-secondary tracking-wider block">
-              Asesores Activos
-            </span>
-            <span className="text-2xl font-extrabold text-text-primary font-heading">{totalAgents}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Listado de Ultimas Propiedades Publicadas */}
-      <div className="bg-ui-surface rounded-2xl border border-neutral-200 shadow-sm overflow-hidden space-y-4">
-        <div className="p-6 border-b border-neutral-100 flex items-center justify-between">
-          <div>
-            <h2 className="text-base font-bold text-brand-primary">Últimas Publicaciones Cargadas</h2>
-            <p className="text-xs text-text-secondary">Inmuebles registrados recientemente en el sistema.</p>
-          </div>
-          <Link
-            href="/admin/propiedades"
-            className="text-xs font-bold text-brand-accent hover:underline flex items-center gap-1"
-          >
-            <span>Ver todas</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
-
-        <div className="divide-y divide-neutral-100">
-          {recentProperties.map((p) => (
-            <div key={p.id} className="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-neutral-50/50 transition-colors">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-neutral-100 text-neutral-700">
-                    {p.operationType === "SALE" ? "Venta" : "Alquiler"}
-                  </span>
-                  <span className="text-xs font-bold text-brand-accent">
-                    {formatCurrency(p.price.toString(), p.currency)}
-                  </span>
-                </div>
-                <h3 className="font-bold text-text-primary text-sm sm:text-base">{p.title}</h3>
-                <p className="text-xs text-text-secondary">
-                  Asesor: {p.agent.name} • {p.city}
-                </p>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <Link
-                  href={`/propiedades/${p.slug}`}
-                  target="_blank"
-                  className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-neutral-200 hover:bg-neutral-100 text-text-secondary transition-colors"
-                >
-                  Ver Ficha
-                </Link>
-                <Link
-                  href={`/admin/propiedades/${p.id}/editar`}
-                  className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-brand-primary text-white hover:bg-opacity-90 transition-colors"
-                >
-                  Editar
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* Gestor Interactivo del Dashboard y Home Showcase */}
+      <DashboardOverview
+        metrics={metrics}
+        properties={serializedProperties}
+        agents={serializedAgents}
+      />
     </div>
   );
 }

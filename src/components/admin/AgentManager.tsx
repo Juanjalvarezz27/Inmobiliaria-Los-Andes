@@ -16,10 +16,9 @@ import {
   ChevronRight,
   Loader2,
   ArrowRightLeft,
-  Star,
   Building2,
 } from "lucide-react";
-import { toggleAgentStatusAction, toggleAgentFeaturedAction, getAgentPropertiesForTransferAction } from "@/app/admin/actions";
+import { toggleAgentStatusAction, getAgentPropertiesForTransferAction } from "@/app/admin/actions";
 import { AgentModal, AgentFormData } from "@/components/admin/AgentModal";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { toast } from "sonner";
@@ -60,7 +59,7 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
   }, [agents]);
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"ALL" | "ACTIVE" | "FEATURED" | "INACTIVE">("ALL");
+  const [statusFilter, setStatusFilter] = useState<"ALL" | "ACTIVE" | "INACTIVE">("ALL");
   const [showModal, setShowModal] = useState(false);
   const [editingAgent, setEditingAgent] = useState<AgentFormData | null>(null);
   const [loadingAgentId, setLoadingAgentId] = useState<string | null>(null);
@@ -101,7 +100,6 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
   // Metricas globales para las tarjetas de resumen
   const totalAgents = agentsList.length;
   const activeAgents = agentsList.filter((a) => a.isActive).length;
-  const featuredAgents = agentsList.filter((a) => a.isActive && a.featured).length;
   const inactiveAgents = totalAgents - activeAgents;
   const totalPropertiesAssigned = agentsList.reduce((sum, a) => sum + a.propertiesCount, 0);
 
@@ -115,60 +113,10 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
     const matchesStatus =
       statusFilter === "ALL" ||
       (statusFilter === "ACTIVE" && agent.isActive) ||
-      (statusFilter === "FEATURED" && agent.isActive && agent.featured) ||
       (statusFilter === "INACTIVE" && !agent.isActive);
 
     return matchesSearch && matchesStatus;
   });
-
-  // Alternar si un asesor esta destacado en el Home con actualizacion optimista instantanea
-  const handleToggleFeatured = async (agent: AgentItem) => {
-    // 1. Validacion reactiva de tope maximo en cliente (8 asesores)
-    const currentFeaturedCount = agentsList.filter((a) => a.isActive && a.featured).length;
-    if (!agent.featured && currentFeaturedCount >= 8) {
-      toast.warning("Máximo 8 en el Home", {
-        description: "Desmarca un asesor antes de agregar otro.",
-        duration: 3500,
-      });
-      return;
-    }
-
-    const nextFeatured = !agent.featured;
-
-    // 2. Actualizacion optimista inmediata (0ms percibidos en interfaz)
-    setAgentsList((prev) =>
-      prev.map((a) => (a.id === agent.id ? { ...a, featured: nextFeatured } : a))
-    );
-
-    toast.success(
-      nextFeatured
-        ? `${agent.name} agregado al Home`
-        : `${agent.name} retirado del Home`,
-      { duration: 2500 }
-    );
-
-    // 3. Sincronizacion en segundo plano con la base de datos
-    try {
-      const res = await toggleAgentFeaturedAction(agent.id);
-      if (!res.success && res.error) {
-        // Revertir estado si el servidor rechaza
-        setAgentsList((prev) =>
-          prev.map((a) => (a.id === agent.id ? { ...a, featured: !nextFeatured } : a))
-        );
-        toast.warning("Máximo 8 en el Home", {
-          description: res.error,
-          duration: 4000,
-        });
-      }
-    } catch (err: unknown) {
-      // Revertir estado ante error de red
-      setAgentsList((prev) =>
-        prev.map((a) => (a.id === agent.id ? { ...a, featured: !nextFeatured } : a))
-      );
-      const msg = err instanceof Error ? err.message : "Error al actualizar estado destacado.";
-      toast.error("Error al actualizar", { description: msg, duration: 4000 });
-    }
-  };
 
   // Paginacion reactiva de asesores (15 tarjetas por pagina)
   const [currentPage, setCurrentPage] = useState(1);
@@ -376,17 +324,6 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
               Activos ({activeAgents})
             </button>
             <button
-              onClick={() => setStatusFilter("FEATURED")}
-              className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                statusFilter === "FEATURED"
-                  ? "bg-white text-amber-700 shadow-xs"
-                  : "text-text-secondary hover:text-text-primary"
-              }`}
-            >
-              <Star className={`w-3.5 h-3.5 ${statusFilter === "FEATURED" ? "fill-amber-500 text-amber-600" : "text-amber-500"}`} />
-              <span>Destacados ({featuredAgents}/8)</span>
-            </button>
-            <button
               onClick={() => setStatusFilter("INACTIVE")}
               className={`px-3 py-1.5 rounded-xl transition-all ${
                 statusFilter === "INACTIVE"
@@ -478,41 +415,9 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
                           />
                           {agent.isActive ? "Activo" : "Inactivo"}
                         </span>
-
-                        {agent.isActive && agent.featured && (
-                          <span className="text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 bg-amber-500 text-white border border-amber-400 shadow-xs">
-                            <Star className="w-2.5 h-2.5 fill-white text-white" />
-                            <span>Home</span>
-                          </span>
-                        )}
                       </div>
 
                       <div className="flex items-center gap-1.5">
-                        {/* Boton para alternar destacado en el Home (maximo 8) */}
-                        {agent.isActive && (
-                          <button
-                            type="button"
-                            onClick={() => handleToggleFeatured(agent)}
-                            title={
-                              agent.featured
-                                ? "Quitar de destacados en el Home"
-                                : featuredAgents >= 8
-                                ? "Límite de 8 asesores alcanzado en el Home"
-                                : "Destacar en el carrusel del Home"
-                            }
-                            className={`p-1.5 rounded-xl border transition-all active:scale-90 cursor-pointer shadow-xs ${
-                              agent.featured
-                                ? "bg-amber-500 hover:bg-amber-600 border-amber-400 text-white"
-                                : "bg-white/95 hover:bg-white border-white/80 text-neutral-700 hover:text-amber-600"
-                            }`}
-                          >
-                            <Star
-                              className={`w-3.5 h-3.5 transition-transform duration-150 ${
-                                agent.featured ? "fill-white text-white scale-110" : "scale-100"
-                              }`}
-                            />
-                          </button>
-                        )}
 
                         {/* Boton para transferir cartera comercial si tiene inmuebles asignados */}
                         {agent.propertiesCount > 0 && (

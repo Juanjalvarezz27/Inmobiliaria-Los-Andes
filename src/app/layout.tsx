@@ -17,11 +17,20 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ||
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://inmobiliarialosandes.com")
+  ),
   title: {
     default: COMPANY_CONFIG.tradeName,
     template: `%s | ${COMPANY_CONFIG.tradeName}`,
   },
-  description: `Plataforma oficial de ${COMPANY_CONFIG.legalName}. Venta y alquiler de propiedades.`,
+  description: `Plataforma oficial de ${COMPANY_CONFIG.legalName}. Venta y alquiler de propiedades en Trujillo y toda Venezuela.`,
+  openGraph: {
+    type: "website",
+    locale: "es_VE",
+    siteName: COMPANY_CONFIG.tradeName,
+  },
 };
 
 export default function RootLayout({
@@ -32,6 +41,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
+      data-scroll-behavior="smooth"
       className={`${plusJakartaSans.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans bg-ui-background text-text-primary">

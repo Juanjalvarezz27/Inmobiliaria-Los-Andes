@@ -12,9 +12,10 @@ import { FilterX } from "lucide-react";
 import Link from "next/link";
 import type { Prisma, OperationType, PropertyType } from "@/generated/prisma/client";
 
-export const dynamic = "force-dynamic";
+// ISR: Cachea la portada en el Edge CDN de Vercel por 60s y se revalida al instante con revalidatePath al editar en /admin
+export const revalidate = 60;
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 16;
 
 interface PageProps {
   searchParams: Promise<{
@@ -59,12 +60,14 @@ export default async function HomePage({ searchParams }: PageProps) {
   }
 
   // Ordenamiento dinamico
-  const orderByClause: Prisma.PropertyOrderByWithRelationInput[] = [{ featured: "desc" }];
+  const orderByClause: Prisma.PropertyOrderByWithRelationInput[] = [];
   if (sortOrder === "menor-precio") {
     orderByClause.push({ price: "asc" });
   } else if (sortOrder === "mayor-precio") {
     orderByClause.push({ price: "desc" });
   } else {
+    // Orden visual personalizado determinado por el administrador
+    orderByClause.push({ displayOrder: "asc" });
     orderByClause.push({ createdAt: "desc" });
   }
 
@@ -80,8 +83,22 @@ export default async function HomePage({ searchParams }: PageProps) {
     prisma.user.count({ where: { role: "AGENT", isActive: true } }),
     prisma.property.findMany({
       where: whereClause,
-      include: {
-        // Carga estricta de unicamente 1 imagen de portada para maximo ahorro de recursos
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        operationType: true,
+        propertyType: true,
+        customPropertyType: true,
+        status: true,
+        price: true,
+        currency: true,
+        bedrooms: true,
+        bathrooms: true,
+        parkingSpots: true,
+        areaSquareMeters: true,
+        city: true,
+        sector: true,
         images: {
           orderBy: [{ isMain: "desc" }, { order: "asc" }],
           take: 1,
@@ -120,7 +137,7 @@ export default async function HomePage({ searchParams }: PageProps) {
         },
       },
       orderBy: [
-        { properties: { _count: "desc" } },
+        { displayOrder: "asc" },
         { createdAt: "desc" },
       ],
       take: 8,
@@ -193,19 +210,27 @@ export default async function HomePage({ searchParams }: PageProps) {
           },
         ];
 
-  return (
-    <div className="min-h-screen flex flex-col bg-[#f8faf8]">
-      {/* Navegacion Superior */}
-      <Navbar />
-
-      {/* Hero Principal con Buscador y Fondo Dinamico */}
-      <HeroSearch slides={heroBackgroundSlides} availableLocations={availableLocations} />
-
-      {/* Franja destacada del catalogo (ancho completo) */}
-      <CatalogBanner totalProperties={totalPropertiesCount} totalAgents={totalAgentsCount} />
-
-      {/* Seccion Principal del Catalogo */}
-      <main className="relative isolate z-10 flex-1 w-full overflow-hidden bg-gradient-to-b from-[#FAF7F2] via-[#F3ECE0] to-[#EBE0D2]">
+  const sectionComponents: Record<string, React.ReactNode> = {
+    hero: (
+      <HeroSearch
+        key="hero"
+        slides={heroBackgroundSlides}
+        availableLocations={availableLocations}
+      />
+    ),
+    banner: (
+      <CatalogBanner
+        key="banner"
+        totalProperties={totalPropertiesCount}
+        totalAgents={totalAgentsCount}
+      />
+    ),
+    catalog: (
+      <main
+        key="catalog"
+        id="catalogo"
+        className="relative isolate z-10 flex-1 w-full overflow-hidden bg-gradient-to-b from-[#FAF7F2] via-[#F3ECE0] to-[#EBE0D2]"
+      >
         {/* Capa decorativa: relieve topografico andino refinado con iluminacion calida */}
         <div
           aria-hidden="true"
@@ -347,12 +372,36 @@ export default async function HomePage({ searchParams }: PageProps) {
           )}
         </div>
       </main>
+    ),
+    agents: (
+      <FeaturedAgentsSection
+        key="agents"
+        agents={featuredAgents}
+        totalAgents={totalAgentsCount}
+      />
+    ),
+    trust: <TrustSection key="trust" />,
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col bg-[#f8faf8]">
+      {/* Navegacion Superior */}
+      <Navbar />
+
+      {/* Hero Principal con Buscador y Fondo Dinamico */}
+      <HeroSearch slides={heroBackgroundSlides} availableLocations={availableLocations} />
+
+      {/* Franja destacada del catalogo (ancho completo) */}
+      <CatalogBanner totalProperties={totalPropertiesCount} totalAgents={totalAgentsCount} />
+
+      {/* Seccion Principal del Catalogo */}
+      {sectionComponents.catalog}
 
       {/* Seccion Destacada de Asesores Inmobiliarios */}
-      <FeaturedAgentsSection agents={featuredAgents} totalAgents={totalAgentsCount} />
+      {sectionComponents.agents}
 
       {/* Pilares Institucionales de Confianza */}
-      <TrustSection />
+      {sectionComponents.trust}
 
       {/* Pie de Pagina */}
       <Footer />

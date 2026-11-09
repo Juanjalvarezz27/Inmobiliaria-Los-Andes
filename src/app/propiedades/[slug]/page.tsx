@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -34,12 +35,96 @@ import {
 } from "lucide-react";
 import { InstagramIcon } from "@/components/icons/InstagramIcon";
 
-export const dynamic = "force-dynamic";
+// ISR: Cachea la ficha de propiedad en Edge CDN por 120s o se revalida al instante con revalidatePath
+export const revalidate = 120;
+
+// Pre-renderiza en tiempo de compilación las propiedades disponibles más destacadas
+export async function generateStaticParams() {
+  try {
+    const properties = await prisma.property.findMany({
+      where: { status: "AVAILABLE" },
+      select: { slug: true },
+      take: 16,
+    });
+    return properties.map((p) => ({ slug: p.slug }));
+  } catch {
+    return [];
+  }
+}
 
 interface PageProps {
   params: Promise<{
     slug: string;
   }>;
+}
+
+// Metadatos dinámicos Open Graph optimizados para previsualización en WhatsApp y redes sociales
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const property = await prisma.property.findUnique({
+    where: { slug },
+    select: {
+      title: true,
+      description: true,
+      operationType: true,
+      price: true,
+      currency: true,
+      city: true,
+      sector: true,
+      images: {
+        orderBy: [{ isMain: "desc" }, { order: "asc" }],
+        take: 1,
+        select: { url: true },
+      },
+    },
+  });
+
+  if (!property) {
+    return {
+      title: "Inmueble no disponible",
+      description: "La propiedad solicitada no se encuentra disponible actualmente.",
+    };
+  }
+
+  const opLabel = property.operationType === "SALE" ? "En Venta" : "En Alquiler";
+  const formattedPrice = formatCurrency(property.price.toString(), property.currency);
+  const location = property.sector ? `${property.sector}, ${property.city}` : property.city;
+  const pageTitle = `${property.title} | ${opLabel} ${formattedPrice}`;
+  const pageDescription = property.description
+    ? property.description.slice(0, 155).replace(/\s+/g, " ").trim() + "..."
+    : `${property.title} ubicado en ${location}. Conoce características, precio y agenda tu visita.`;
+  const mainImage = property.images[0]?.url;
+
+  return {
+    title: pageTitle,
+    description: pageDescription,
+    openGraph: {
+      title: pageTitle,
+      description: pageDescription,
+      url: `/propiedades/${slug}`,
+      type: "article",
+      locale: "es_VE",
+      siteName: COMPANY_CONFIG.tradeName,
+      ...(mainImage
+        ? {
+            images: [
+              {
+                url: mainImage,
+                width: 1200,
+                height: 630,
+                alt: property.title,
+              },
+            ],
+          }
+        : {}),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: pageTitle,
+      description: pageDescription,
+      ...(mainImage ? { images: [mainImage] } : {}),
+    },
+  };
 }
 
 // Generador de iniciales en texto para avatar del asesor
@@ -82,36 +167,56 @@ export default async function PropertyDetailPage({ params }: PageProps) {
 
   const isUnavailable = property.status === "SOLD" || property.status === "RENTED";
 
-  // Obtencion de hasta 4 inmuebles aleatorios disponibles excluyendo el actual
-  const allAvailableIds = await prisma.property.findMany({
+  // Obtención optimizada de hasta 4 inmuebles similares en una sola consulta
+  const similarProperties = await prisma.property.findMany({
     where: {
       status: "AVAILABLE",
       id: { not: property.id },
+      OR: [
+        { propertyType: property.propertyType },
+        { city: property.city },
+      ],
     },
-    select: { id: true },
-  });
-
-  const candidateIds = allAvailableIds.map((item) => item.id);
-
-  // Barajado aleatorio en memoria de IDs para seleccion no determinista
-  const shuffledIds = candidateIds
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 4);
-
-  const similarProperties = shuffledIds.length > 0
-    ? await prisma.property.findMany({
-        where: { id: { in: shuffledIds } },
-        include: {
-          images: {
-            orderBy: [{ isMain: "desc" }, { order: "asc" }],
-          },
-          agent: true,
-          _count: {
-            select: { images: true },
-          },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      operationType: true,
+      propertyType: true,
+      customPropertyType: true,
+      status: true,
+      price: true,
+      currency: true,
+      bedrooms: true,
+      bathrooms: true,
+      parkingSpots: true,
+      areaSquareMeters: true,
+      city: true,
+      sector: true,
+      images: {
+        orderBy: [{ isMain: "desc" }, { order: "asc" }],
+        take: 1,
+        select: {
+          url: true,
+          caption: true,
+          isMain: true,
         },
-      })
-    : [];
+      },
+      _count: {
+        select: { images: true },
+      },
+      agent: {
+        select: {
+          name: true,
+          phone: true,
+          avatarUrl: true,
+          isActive: true,
+        },
+      },
+    },
+    take: 4,
+    orderBy: { createdAt: "desc" },
+  });
 
   // Determina si el asesor asignado esta activo para derivar atencion a Central si esta pausado
   const isAgentActive = Boolean(property.agent?.isActive);

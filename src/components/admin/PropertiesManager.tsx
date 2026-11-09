@@ -335,9 +335,9 @@ export function PropertiesManager({
     });
   }, [propertiesList, searchQuery, operationFilter, statusFilter, typeFilter, agentFilter]);
 
-  // Paginacion reactiva de inmuebles (9 tarjetas por pagina para matriz 3x3)
+  // Paginacion reactiva de inmuebles (16 tarjetas por pagina)
   const [currentPage, setCurrentPage] = useState(1);
-  const PROPERTIES_PER_PAGE = 9;
+  const PROPERTIES_PER_PAGE = 16;
 
   // Reset de pagina al alterar cualquier criterio de filtrado
   useEffect(() => {

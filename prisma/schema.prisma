@@ -57,10 +57,12 @@ model User {
   role         Role       @default(AGENT)
   isActive     Boolean    @default(true)
   featured     Boolean    @default(false)
+  displayOrder Int        @default(0)
   properties   Property[]
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
+  @@index([role, isActive, displayOrder])
   @@map("users")
 }
 
@@ -77,6 +79,7 @@ model Property {
   price            Decimal         @db.Decimal(12, 2)
   currency         String          @default("USD")
   featured         Boolean         @default(false)
+  displayOrder     Int             @default(0)
   bedrooms         Int?
   bathrooms        Int?
   parkingSpots     Int?
@@ -101,6 +104,7 @@ model Property {
   @@index([status, operationType])
   @@index([propertyType])
   @@index([city, sector])
+  @@index([displayOrder])
   @@map("properties")
 }
 
@@ -135,4 +139,13 @@ model Inquiry {
 
   @@index([status])
   @@map("inquiries")
+}
+
+// Configuraciones globales del sistema
+model SiteSetting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("site_settings")
 }

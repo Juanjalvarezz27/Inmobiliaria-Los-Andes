@@ -157,52 +157,52 @@ export function FeaturedAgentsSection({ agents, totalAgents }: FeaturedAgentsSec
             className="object-cover object-[center_30%] scale-105"
             priority={false}
           />
-          {/* Velo botánico translúcido: preserva la nitidez del paisaje andino con tono esmeralda natural */}
-          <div className="absolute inset-0 bg-gradient-to-b from-white/35 via-emerald-900/15 to-[#082a19]/35" />
-          {/* Destellos ambientales esmeralda profundo integrados al parallax */}
-          <div className="absolute top-1/4 left-1/4 h-[32rem] w-[32rem] rounded-full bg-[radial-gradient(circle,rgba(16,185,129,0.12),transparent_70%)]" />
-          <div className="absolute bottom-1/4 right-1/4 h-[32rem] w-[32rem] rounded-full bg-[radial-gradient(circle,rgba(5,150,105,0.10),transparent_70%)]" />
+          {/* Velo traslucido: preserva la nitidez del paisaje andino con tono calido natural */}
+          <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-stone-900/15 to-[#160f0b]/40" />
+          {/* Destellos ambientales calidos integrados al parallax */}
+          <div className="absolute top-1/4 left-1/4 h-[32rem] w-[32rem] rounded-full bg-[radial-gradient(circle,rgba(194,82,39,0.08),transparent_70%)]" />
+          <div className="absolute bottom-1/4 right-1/4 h-[32rem] w-[32rem] rounded-full bg-[radial-gradient(circle,rgba(223,100,53,0.06),transparent_70%)]" />
         </div>
       </div>
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Cabecera monumental con sistema de iluminacion bilateral verde esmeralda */}
+        {/* Cabecera monumental con sistema de iluminacion bilateral calida */}
         <div className="relative mx-auto max-w-5xl text-center pb-2 sm:pb-4">
-          {/* Sistema de luces bilateral verde: destellos esmeralda a los lados y centro limpio */}
+          {/* Sistema de luces bilateral: destellos calidos a los lados y centro luminoso */}
           <div aria-hidden className="pointer-events-none absolute inset-0 overflow-visible">
-            {/* Flanco lateral izquierdo: Destello esmeralda vivo expandido */}
+            {/* Flanco lateral izquierdo: Destello terracota expandido */}
             <div
               className="absolute top-1/2 -left-12 sm:left-[-2rem] md:left-[2%] -translate-y-1/2 h-52 w-80 sm:h-64 sm:w-[26rem] lg:w-[32rem] rounded-full
-                bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.15),rgba(5,150,105,0.06),transparent_70%)]"
+                bg-[radial-gradient(circle_at_center,rgba(194,82,39,0.14),rgba(245,158,11,0.05),transparent_70%)]"
             />
 
-            {/* Flanco lateral derecho: Resplandor menta y teal expandido */}
+            {/* Flanco lateral derecho: Resplandor ladrillo claro expandido */}
             <div
               className="absolute top-1/2 -right-12 sm:right-[-2rem] md:right-[2%] -translate-y-1/2 h-52 w-80 sm:h-64 sm:w-[26rem] lg:w-[32rem] rounded-full
-                bg-[radial-gradient(circle_at_center,rgba(20,184,166,0.12),rgba(16,185,129,0.06),transparent_70%)]"
+                bg-[radial-gradient(circle_at_center,rgba(223,100,53,0.12),rgba(194,82,39,0.05),transparent_70%)]"
             />
 
             {/* Extremo exterior izquierdo: Halo sutil que abraza la cabecera */}
             <div
               className="absolute -top-10 left-[8%] h-40 w-72 rounded-full
-                bg-[radial-gradient(circle_at_center,rgba(52,211,153,0.10),transparent_70%)]"
+                bg-[radial-gradient(circle_at_center,rgba(254,215,170,0.12),transparent_70%)]"
             />
 
             {/* Extremo exterior derecho: Halo sutil que abraza el extremo derecho */}
             <div
               className="absolute -bottom-8 right-[8%] h-40 w-72 rounded-full
-                bg-[radial-gradient(circle_at_center,rgba(45,212,191,0.10),transparent_70%)]"
+                bg-[radial-gradient(circle_at_center,rgba(249,115,22,0.10),transparent_70%)]"
             />
 
-            {/* Halo difusor de contraste: resalta el texto sin opacar el paisaje andino */}
+            {/* Halo difusor de contraste: resalta el texto con nitidez sobre el paisaje andino */}
             <div
               className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-36 w-full max-w-3xl rounded-full
-                bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.65)_0%,rgba(240,253,244,0.30)_55%,transparent_75%)]"
+                bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.70)_0%,rgba(254,243,199,0.20)_55%,transparent_75%)]"
             />
           </div>
 
-          <h2 className="relative z-10 font-heading text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-[-0.05em] leading-[1.02] drop-shadow-[0_2px_12px_rgba(255,255,255,0.7)]">
-            <span className="relative inline-block text-white whitespace-nowrap">
+          <h2 className="relative z-10 font-heading text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-[-0.05em] leading-[1.02] drop-shadow-[0_2px_12px_rgba(255,255,255,0.85)]">
+            <span className="relative inline-block text-brand-primary whitespace-nowrap">
               Nuestros
               {/* Trazo organico artesanal debajo de Nuestros */}
               <svg
@@ -391,7 +391,7 @@ export function FeaturedAgentsSection({ agents, totalAgents }: FeaturedAgentsSec
                             goToSlide(idx);
                           }
                         }}
-                        className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-accent hover:bg-[#c94b21] py-2.5 px-3 text-xs font-bold text-white shadow-sm shadow-brand-accent/20 hover:shadow-md transition-all duration-300 active:scale-95 cursor-pointer"
+                        className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-accent hover:bg-brand-accent-hover py-2.5 px-3 text-xs font-bold text-white shadow-sm shadow-brand-accent/20 hover:shadow-md transition-all duration-300 active:scale-95 cursor-pointer"
                       >
                         <MessageCircle className="w-3.5 h-3.5" />
                         <span>Contactar Asesor</span>

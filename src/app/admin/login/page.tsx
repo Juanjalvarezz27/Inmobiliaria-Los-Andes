@@ -91,7 +91,7 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={isPending}
-              className="w-full py-3.5 px-4 bg-brand-primary hover:bg-brand-primary-hover text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 disabled:opacity-50 cursor-pointer"
+              className="w-full py-3.5 px-4 bg-brand-accent hover:bg-brand-accent-hover text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-brand-accent/20 active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               <span>{isPending ? "Validando credenciales..." : "Iniciar Sesión"}</span>
               <ArrowRight className="w-4 h-4 text-orange-200" />

@@ -163,7 +163,7 @@ function AgentFormContent({
             <h2 className="text-base sm:text-xl font-bold text-white font-heading tracking-tight leading-tight">
               {agent ? "Editar Datos del Asesor" : "Registrar Nuevo Asesor"}
             </h2>
-            <p className="text-[11px] sm:text-xs text-emerald-100/80 mt-0.5">
+            <p className="text-[11px] sm:text-xs text-neutral-300 mt-0.5">
               {agent
                 ? "Actualiza la fotografía, canales de contacto y disponibilidad."
                 : "Agrega un nuevo asesor inmobiliario al equipo comercial."}
@@ -412,7 +412,7 @@ function AgentFormContent({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-brand-accent hover:bg-[#c94b21] text-white text-xs sm:text-sm font-bold px-5 sm:px-7 py-2.5 rounded-xl shadow-md shadow-brand-accent/25 transition-all active:scale-95 disabled:opacity-50 text-center"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-brand-accent hover:bg-brand-accent-hover text-white text-xs sm:text-sm font-bold px-5 sm:px-7 py-2.5 rounded-xl shadow-md shadow-brand-accent/25 transition-all active:scale-95 disabled:opacity-50 text-center"
           >
             {isSubmitting ? (
               <>

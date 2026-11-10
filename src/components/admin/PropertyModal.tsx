@@ -125,8 +125,8 @@ export function PropertyModal({
         {/* Cabecera terracota ladrillo andino */}
         <div className="bg-gradient-to-r from-brand-header-from via-brand-header-via to-brand-header-to text-white p-3.5 sm:p-6 flex items-center justify-between shrink-0 z-20 shadow-md">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-white/10 flex items-center justify-center text-emerald-400 border border-white/10 shrink-0">
-              {isEditing ? <Edit3 className="w-4 h-4 sm:w-5 sm:h-5 text-brand-accent" /> : <Building2 className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400" />}
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-white/10 flex items-center justify-center text-brand-accent border border-white/10 shrink-0">
+              {isEditing ? <Edit3 className="w-4 h-4 sm:w-5 sm:h-5 text-brand-accent" /> : <Building2 className="w-4 h-4 sm:w-5 sm:h-5 text-brand-accent" />}
             </div>
             <div className="min-w-0">
               <h2 className="text-sm sm:text-xl font-black text-white font-heading tracking-tight truncate">

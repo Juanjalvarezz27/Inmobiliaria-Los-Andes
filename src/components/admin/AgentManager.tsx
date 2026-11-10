@@ -280,7 +280,7 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
               </span>
             </div>
 
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#e85d30] via-brand-accent to-[#c4441b] text-white border border-orange-300/35 flex items-center justify-center shadow-md shadow-brand-accent/25 group-hover:scale-105 transition-transform duration-150 shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-brick-light via-brand-accent to-brand-brick-dark text-white border border-brand-brick-border flex items-center justify-center shadow-md shadow-brand-accent/25 group-hover:scale-105 transition-transform duration-150 shrink-0">
               <Home className="w-6 h-6 text-white drop-shadow-sm" />
             </div>
           </div>
@@ -339,7 +339,7 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
           {/* Boton Agregar */}
           <button
             onClick={openCreateModal}
-            className="inline-flex items-center gap-2 bg-brand-accent hover:bg-[#c94b21] text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-2xl shadow-md transition-all active:scale-95"
+            className="inline-flex items-center gap-2 bg-brand-accent hover:bg-brand-accent-hover text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-2xl shadow-md transition-all active:scale-95"
           >
             <UserPlus className="w-4 h-4" />
             <span>Registrar Nuevo Asesor</span>
@@ -533,7 +533,7 @@ export function AgentManager({ agents }: { agents: AgentItem[] }) {
                     href={`/admin/asesores/${agent.id}`}
                     className={`inline-flex items-center gap-1 font-bold transition-colors py-1 group/btn ${
                       agent.isActive
-                        ? "text-brand-accent hover:text-[#c94b21]"
+                        ? "text-brand-accent hover:text-brand-accent-hover"
                         : "text-neutral-500 hover:text-neutral-700"
                     }`}
                   >

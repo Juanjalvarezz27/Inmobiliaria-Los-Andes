@@ -364,7 +364,7 @@ export function PropertiesManager({
         <button
           type="button"
           onClick={handleNew}
-          className="inline-flex items-center gap-2 bg-gradient-to-r from-[#e85d30] via-brand-accent to-[#c4441b] hover:shadow-lg hover:shadow-brand-accent/30 text-white text-sm font-bold px-5 py-2.5 rounded-xl shadow-md transition-all active:scale-95 shrink-0 cursor-pointer"
+          className="inline-flex items-center gap-2 bg-gradient-to-r from-brand-brick-light via-brand-accent to-brand-brick-dark hover:shadow-lg hover:shadow-brand-accent/30 text-white text-sm font-bold px-5 py-2.5 rounded-xl shadow-md transition-all active:scale-95 shrink-0 cursor-pointer"
         >
           <PlusCircle className="w-4 h-4" />
           <span>Cargar Propiedad</span>
@@ -463,7 +463,7 @@ export function PropertiesManager({
               </span>
             </div>
 
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#e85d30] via-brand-accent to-[#c4441b] text-white border border-orange-300/35 flex items-center justify-center shadow-md shadow-brand-accent/25 group-hover:scale-105 transition-transform duration-150 shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-brick-light via-brand-accent to-brand-brick-dark text-white border border-brand-brick-border flex items-center justify-center shadow-md shadow-brand-accent/25 group-hover:scale-105 transition-transform duration-150 shrink-0">
               <CheckCircle2 className="w-6 h-6 text-white drop-shadow-sm" />
             </div>
           </div>
@@ -623,7 +623,7 @@ export function PropertiesManager({
               <button
                 type="button"
                 onClick={handleNew}
-                className="px-5 py-2.5 bg-brand-accent hover:bg-[#c94b21] text-white font-bold text-xs rounded-xl shadow-md transition-all active:scale-95 cursor-pointer"
+                className="px-5 py-2.5 bg-brand-accent hover:bg-brand-accent-hover text-white font-bold text-xs rounded-xl shadow-md transition-all active:scale-95 cursor-pointer"
               >
                 Cargar Primer Inmueble
               </button>

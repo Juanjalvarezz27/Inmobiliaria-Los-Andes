@@ -126,59 +126,25 @@ export function TrustSection() {
     <section
       ref={sectionRef}
       id="nosotros"
-      className="relative isolate overflow-hidden border-t border-b border-neutral-300/80 bg-gradient-to-b from-[#faf7f3] via-[#faede4] to-[#f6e5d8] py-16 sm:py-20 lg:py-24"
+      className="relative isolate overflow-hidden border-t border-b border-stone-200/80 bg-gradient-to-b from-[#faf8f5] via-[#f7f2ea] to-[#f3ece2] py-16 sm:py-20 lg:py-24"
     >
-      {/* Atmosfera luminica calida de atardecer: orbes ambar y coral sin tonos marrones */}
+      {/* Iluminación ambiental limpia y difusa (100% nativa por GPU, 0 filtros blur, 60fps) */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 overflow-hidden"
       >
-        {/* Luz calida dorada superior */}
-        <div className="absolute -top-32 left-1/2 -translate-x-1/2 h-[36rem] w-[60rem] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(222,88,42,0.12),rgba(245,158,11,0.06),transparent_70%)] opacity-85" />
-        {/* Resplandor ambiental inferior calido que abraza la base con luz limpia */}
-        <div className="absolute -bottom-24 left-1/2 -translate-x-1/2 h-64 w-[64rem] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(249,115,22,0.10),rgba(222,88,42,0.05),transparent_70%)]" />
-        <div className="absolute -bottom-24 -left-20 h-96 w-96 rounded-full bg-brand-primary/[0.04]" />
-        <div className="absolute -top-24 -right-20 h-96 w-96 rounded-full bg-brand-accent/[0.08]" />
+        {/* Baño cenital amplio y suave que baña la cabecera sin cortes ni manchas */}
+        <div className="absolute inset-x-0 -top-32 h-[34rem] bg-[radial-gradient(ellipse_80%_65%_at_50%_0%,rgba(194,82,39,0.08)_0%,rgba(245,158,11,0.03)_55%,transparent_100%)]" />
+
+        {/* Resplandor ambiental suave en la base del carrusel */}
+        <div className="absolute inset-x-0 bottom-0 h-64 bg-[radial-gradient(ellipse_90%_50%_at_50%_100%,rgba(194,82,39,0.05)_0%,transparent_100%)]" />
       </div>
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Cabecera monumental con iluminacion volumetrica calida naranja en capas traseras */}
+        {/* Cabecera monumental limpia con tipografía de alto impacto */}
         <div className="relative mx-auto max-w-5xl text-center py-4 sm:py-6">
-          {/* Sistema de luces bilateral: expandido hacia los lados y suave en el centro */}
-          <div aria-hidden className="pointer-events-none absolute inset-0 overflow-visible">
-            {/* Flanco lateral izquierdo: Destello calido ambar y naranja expandido */}
-            <div
-              className="absolute top-1/2 -left-12 sm:left-[-2rem] md:left-[2%] -translate-y-1/2 h-52 w-80 sm:h-64 sm:w-[26rem] lg:w-[32rem] rounded-full
-                bg-[radial-gradient(circle_at_center,rgba(245,158,11,0.20),rgba(222,88,42,0.10),transparent_70%)]"
-            />
-
-            {/* Flanco lateral derecho: Resplandor calido terracota y coral expandido */}
-            <div
-              className="absolute top-1/2 -right-12 sm:right-[-2rem] md:right-[2%] -translate-y-1/2 h-52 w-80 sm:h-64 sm:w-[26rem] lg:w-[32rem] rounded-full
-                bg-[radial-gradient(circle_at_center,rgba(222,88,42,0.22),rgba(249,115,22,0.12),transparent_70%)]"
-            />
-
-            {/* Extremo exterior izquierdo: Halo sutil que abraza la cabecera */}
-            <div
-              className="absolute -top-10 left-[8%] h-40 w-72 rounded-full
-                bg-[radial-gradient(circle_at_center,rgba(254,215,170,0.22),rgba(245,158,11,0.08),transparent_70%)]"
-            />
-
-            {/* Extremo exterior derecho: Halo sutil que abraza el signo final */}
-            <div
-              className="absolute -bottom-8 right-[8%] h-40 w-72 rounded-full
-                bg-[radial-gradient(circle_at_center,rgba(249,115,22,0.18),rgba(222,88,42,0.08),transparent_70%)]"
-            />
-
-            {/* Centro atenuado: Bruma suave de baja opacidad para no formar mancha concentrada */}
-            <div
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-36 w-72 sm:w-96 rounded-full
-                bg-[radial-gradient(ellipse_at_center,rgba(222,88,42,0.06),transparent_70%)]"
-            />
-          </div>
-
-          {/* Titular unico monumental a gran escala con alto contraste */}
-          <h2 className="relative z-10 font-heading text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight text-brand-primary leading-[1.06] drop-shadow-sm">
+          {/* Titular monumental a gran escala con alto contraste */}
+          <h2 className="relative z-10 font-heading text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight text-brand-primary leading-[1.06] drop-shadow-xs">
             ¿Por qué{" "}
             <span className="relative inline-block text-brand-accent whitespace-nowrap">
               elegirnos
@@ -187,7 +153,7 @@ export function TrustSection() {
                 aria-hidden
                 viewBox="0 0 240 14"
                 preserveAspectRatio="none"
-                className="absolute -bottom-2 sm:-bottom-3.5 left-0 h-3 sm:h-4 w-full text-brand-accent/60"
+                className="absolute -bottom-2 sm:-bottom-3.5 left-0 h-3 sm:h-4 w-full text-brand-accent/70"
               >
                 <path
                   d="M2 9C55 3 130 3 238 8"

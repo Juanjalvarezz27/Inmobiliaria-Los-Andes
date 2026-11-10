@@ -606,7 +606,7 @@ export function TransferPropertiesModal({
               type="button"
               onClick={handleTransfer}
               disabled={!canSubmit}
-              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-gradient-to-r from-brand-accent to-[#c94b21] hover:shadow-lg hover:shadow-brand-accent/25 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-md transition-all active:scale-95 disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-gradient-to-r from-brand-accent to-brand-brick-dark hover:shadow-lg hover:shadow-brand-accent/25 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-md transition-all active:scale-95 disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
             >
               {isLoading ? (
                 <>

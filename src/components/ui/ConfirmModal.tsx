@@ -62,7 +62,7 @@ export function ConfirmModal({
     warning: {
       icon: AlertTriangle,
       iconContainer: "bg-amber-50 text-amber-600 border-amber-200/80 shadow-amber-500/10",
-      button: "bg-brand-accent hover:bg-[#c94b21] text-white shadow-brand-accent/25",
+      button: "bg-brand-accent hover:bg-brand-accent-hover text-white shadow-brand-accent/25",
     },
     info: {
       icon: HelpCircle,

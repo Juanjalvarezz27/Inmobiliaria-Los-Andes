@@ -22,12 +22,19 @@
   --brand-forest-light: #285839;       /* Verde bosque medio */
   --brand-forest-soft: #edf5f0;        /* Verde menta tenue */
 
-  /* 🎨 MAPEO SEMÁNTICO (El Naranja Ladrillo asume el protagonismo total) */
-  --color-brand-primary: var(--brand-brick);
-  --color-brand-primary-hover: var(--brand-brick-dark);
-  --color-brand-primary-deep: var(--brand-brick-deep);
-  --color-brand-primary-light: var(--brand-brick-light);
-  --color-brand-primary-soft: var(--brand-brick-soft);
+  /* 🏛️ COLOR ESTRUCTURAL PRIMARIO: Oscuro Noble de Alto Contraste */
+  /* Otorga jerarquía tipográfica, máxima legibilidad y permite que el Ladrillo resalte */
+  --brand-dark: #19201a;               /* Grafito andino profundo para lectura y solidez */
+  --brand-dark-hover: #0f1410;         /* Grafito intenso para interacciones */
+  --brand-dark-soft: #2d382e;          /* Grafito suave para bordes sutiles y textos */
+  --brand-dark-subtle: #f4f6f4;        /* Tono base claro complementario */
+
+  /* 🎨 MAPEO SEMÁNTICO (El Naranja Ladrillo asume el protagonismo visual como acento) */
+  --color-brand-primary: var(--brand-dark);
+  --color-brand-primary-hover: var(--brand-dark-hover);
+  --color-brand-primary-deep: var(--brand-dark);
+  --color-brand-primary-light: var(--brand-dark-soft);
+  --color-brand-primary-soft: var(--brand-dark-subtle);
 
   --color-brand-accent: var(--brand-brick);
   --color-brand-accent-hover: var(--brand-brick-dark);
@@ -37,10 +44,10 @@
   --color-brand-secondary: var(--brand-forest);
   --color-brand-secondary-hover: var(--brand-forest-dark);
 
-  /* 🏛️ BARRAS SUPERIORES Y SIDEBAR (Degradado Ladrillo Andino) */
-  --color-brand-header-from: #872e0e;  /* Ladrillo profundo */
-  --color-brand-header-via: #c25227;   /* Ladrillo terracota medio */
-  --color-brand-header-to: #6e240a;    /* Ladrillo tostado base */
+  /* 🏛️ BARRAS SUPERIORES Y SIDEBAR (Ladrillo Andino Cálido y Luminoso) */
+  --color-brand-header-from: #c75429;  /* Terracota andino luminoso superior */
+  --color-brand-header-via: #ba4a1f;   /* Terracota andino medio */
+  --color-brand-header-to: #ad4118;    /* Terracota andino cálido base */
 
   /* 🏢 SUPERFICIES Y FONDOS */
   --color-ui-background: #faf7f2;
@@ -75,6 +82,10 @@
   --color-brand-forest-dark: var(--brand-forest-dark);
   --color-brand-forest-light: var(--brand-forest-light);
   --color-brand-forest-soft: var(--brand-forest-soft);
+
+  --color-brand-dark: var(--brand-dark);
+  --color-brand-dark-hover: var(--brand-dark-hover);
+  --color-brand-dark-soft: var(--brand-dark-soft);
 
   --color-brand-header-from: var(--color-brand-header-from);
   --color-brand-header-via: var(--color-brand-header-via);
@@ -243,12 +254,12 @@ h6 {
 /* Variantes refinadas con bordes de acento de marca */
 [data-sonner-toast][data-type="warning"] {
   background: #ffffff !important;
-  border-color: rgba(222, 88, 42, 0.35) !important;
-  border-left: 5px solid #de582a !important;
+  border-color: rgba(194, 82, 39, 0.35) !important;
+  border-left: 5px solid var(--brand-brick) !important;
 }
 
 [data-sonner-toast][data-type="warning"] [data-icon] {
-  color: #de582a !important;
+  color: var(--brand-brick) !important;
 }
 
 [data-sonner-toast][data-type="success"] {

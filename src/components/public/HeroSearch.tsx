@@ -263,7 +263,7 @@ export function HeroSearch({ slides, availableLocations }: HeroSearchProps) {
         {/* Titular Principal con Sombra de Alto Contraste */}
         <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.15] font-heading drop-shadow-[0_4px_18px_rgba(0,0,0,0.8)]">
           Encuentra tu próximo hogar o{" "}
-          <span className="bg-gradient-to-r from-orange-400 via-brand-accent to-[#ff8555] bg-clip-text text-transparent drop-shadow-none">
+          <span className="bg-gradient-to-r from-brand-brick-light via-brand-accent to-brand-brick-dark bg-clip-text text-transparent drop-shadow-none">
             inversión ideal
           </span>
         </h1>
@@ -282,7 +282,7 @@ export function HeroSearch({ slides, availableLocations }: HeroSearchProps) {
               onClick={() => setOperation("ALL")}
               className={`relative z-10 w-full h-11 sm:h-12 px-2 sm:px-4 rounded-xl text-xs sm:text-[13px] font-bold whitespace-nowrap transition-all duration-300 ease-out flex items-center justify-center cursor-pointer transform hover:scale-[1.04] hover:z-20 active:scale-95 ${
                 operation === "ALL"
-                  ? "bg-gradient-to-r from-brand-accent to-[#d24b1d] text-white shadow-lg shadow-brand-accent/30 font-black scale-[1.02]"
+                  ? "bg-gradient-to-r from-brand-accent to-brand-brick-dark text-white shadow-lg shadow-brand-accent/25 font-black scale-[1.02]"
                   : "text-neutral-300 hover:text-white hover:bg-white/15 hover:shadow-md"
               }`}
             >
@@ -294,7 +294,7 @@ export function HeroSearch({ slides, availableLocations }: HeroSearchProps) {
               onClick={() => setOperation("SALE")}
               className={`relative z-10 w-full h-11 sm:h-12 px-2 sm:px-4 rounded-xl text-xs sm:text-[13px] font-bold whitespace-nowrap transition-all duration-300 ease-out flex items-center justify-center cursor-pointer transform hover:scale-[1.04] hover:z-20 active:scale-95 ${
                 operation === "SALE"
-                  ? "bg-gradient-to-r from-brand-accent to-[#d24b1d] text-white shadow-lg shadow-brand-accent/30 font-black scale-[1.02]"
+                  ? "bg-gradient-to-r from-brand-accent to-brand-brick-dark text-white shadow-lg shadow-brand-accent/25 font-black scale-[1.02]"
                   : "text-neutral-300 hover:text-white hover:bg-white/15 hover:shadow-md"
               }`}
             >
@@ -306,7 +306,7 @@ export function HeroSearch({ slides, availableLocations }: HeroSearchProps) {
               onClick={() => setOperation("RENT")}
               className={`relative z-10 w-full h-11 sm:h-12 px-2 sm:px-4 rounded-xl text-xs sm:text-[13px] font-bold whitespace-nowrap transition-all duration-300 ease-out flex items-center justify-center cursor-pointer transform hover:scale-[1.04] hover:z-20 active:scale-95 ${
                 operation === "RENT"
-                  ? "bg-gradient-to-r from-brand-accent to-[#d24b1d] text-white shadow-lg shadow-brand-accent/30 font-black scale-[1.02]"
+                  ? "bg-gradient-to-r from-brand-accent to-brand-brick-dark text-white shadow-lg shadow-brand-accent/25 font-black scale-[1.02]"
                   : "text-neutral-300 hover:text-white hover:bg-white/15 hover:shadow-md"
               }`}
             >
@@ -322,10 +322,10 @@ export function HeroSearch({ slides, availableLocations }: HeroSearchProps) {
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-black/80 hover:bg-black text-orange-200 hover:text-white border border-white/20 hover:border-orange-400/50 text-[11px] sm:text-xs font-bold rounded-full shadow-lg transition-all cursor-pointer transform hover:scale-105 active:scale-95 group"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-black/80 hover:bg-black text-brand-brick-soft hover:text-white border border-white/20 hover:border-brand-accent/50 text-[11px] sm:text-xs font-bold rounded-full shadow-lg transition-all cursor-pointer transform hover:scale-105 active:scale-95 group"
                   title="Restablecer todos los filtros"
                 >
-                  <RotateCcw className="w-3 h-3 text-orange-400 group-hover:-rotate-90 transition-transform duration-300" />
+                  <RotateCcw className="w-3 h-3 text-brand-accent group-hover:-rotate-90 transition-transform duration-300" />
                   <span>Limpiar filtros</span>
                   <span className="w-1.5 h-1.5 rounded-full bg-brand-accent animate-pulse" />
                 </button>
@@ -471,7 +471,7 @@ export function HeroSearch({ slides, availableLocations }: HeroSearchProps) {
                         onClick={() => handleSelectLocation(loc)}
                         className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer text-left ${
                           isSelected
-                            ? "bg-orange-50 text-brand-accent font-black border border-orange-200/80"
+                            ? "bg-brand-brick-soft text-brand-accent font-black border border-brand-brick-border"
                             : "text-neutral-800 hover:bg-neutral-50 hover:text-brand-primary"
                         }`}
                       >
@@ -501,7 +501,7 @@ export function HeroSearch({ slides, availableLocations }: HeroSearchProps) {
             <div className="sm:col-span-4 lg:col-span-3">
               <button
                 type="submit"
-                className="w-full h-[52px] bg-gradient-to-r from-brand-accent to-[#c94b21] hover:from-[#d64a1a] hover:to-[#b83e16] hover:shadow-xl hover:shadow-brand-accent/35 text-white text-xs sm:text-sm font-black rounded-2xl flex items-center justify-center gap-2.5 transition-all shadow-md active:scale-95 cursor-pointer"
+                className="w-full h-[52px] bg-gradient-to-r from-brand-accent to-brand-brick-dark hover:from-brand-brick-dark hover:to-brand-brick-deep hover:shadow-xl hover:shadow-brand-accent/30 text-white text-xs sm:text-sm font-black rounded-2xl flex items-center justify-center gap-2.5 transition-all shadow-md active:scale-95 cursor-pointer"
               >
                 <Search className="w-4 h-4 shrink-0 stroke-[2.5]" />
                 <span className="whitespace-nowrap tracking-wide">Buscar Inmuebles</span>

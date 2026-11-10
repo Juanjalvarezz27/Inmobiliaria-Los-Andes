@@ -41,7 +41,7 @@ export default function NotFound() {
           <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3">
             <Link
               href="/"
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-brand-accent hover:bg-[#c94b21] text-white text-xs sm:text-sm font-bold shadow-md shadow-brand-accent/25 transition-all active:scale-95"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-brand-accent hover:bg-brand-accent-hover text-white text-xs sm:text-sm font-bold shadow-md shadow-brand-accent/25 transition-all active:scale-95"
             >
               <Home className="w-4 h-4" />
               <span>Ver Catálogo de Inmuebles</span>

@@ -467,7 +467,7 @@ export function PropertyForm({
           <button
             type="submit"
             disabled={isSubmitting || isUploading}
-            className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#e85d30] via-brand-accent to-[#c4441b] hover:shadow-lg hover:shadow-brand-accent/30 text-white text-sm font-bold px-6 py-2.5 rounded-xl shadow-md shadow-brand-accent/20 transition-all active:scale-95 disabled:opacity-50 self-start sm:self-auto"
+            className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-brand-brick-light via-brand-accent to-brand-brick-dark hover:shadow-lg hover:shadow-brand-accent/30 text-white text-sm font-bold px-6 py-2.5 rounded-xl shadow-md shadow-brand-accent/20 transition-all active:scale-95 disabled:opacity-50 self-start sm:self-auto"
           >
             {isSubmitting ? (
               <>
@@ -1296,7 +1296,7 @@ export function PropertyForm({
           <button
             type="submit"
             disabled={isSubmitting || isUploading}
-            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#e85d30] via-brand-accent to-[#c4441b] hover:shadow-lg hover:shadow-brand-accent/30 text-white font-bold px-5 sm:px-7 py-2.5 rounded-xl shadow-md shadow-brand-accent/20 transition-all active:scale-95 text-xs sm:text-sm disabled:opacity-50 text-center"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-gradient-to-r from-brand-brick-light via-brand-accent to-brand-brick-dark hover:shadow-lg hover:shadow-brand-accent/30 text-white font-bold px-5 sm:px-7 py-2.5 rounded-xl shadow-md shadow-brand-accent/20 transition-all active:scale-95 text-xs sm:text-sm disabled:opacity-50 text-center"
           >
             {isSubmitting ? (
               <>

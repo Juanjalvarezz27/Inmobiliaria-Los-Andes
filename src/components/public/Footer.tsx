@@ -24,7 +24,7 @@ export function Footer() {
               href={`https://wa.me/${COMPANY_CONFIG.contact.phoneRaw}?text=${encodeURIComponent("Hola, deseo asesoría inmobiliaria")}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex w-full sm:inline-flex sm:w-auto items-center justify-center gap-2 rounded-full bg-brand-primary px-7 py-3.5 sm:py-3 text-sm sm:text-base font-bold text-white transition-all duration-300 hover:bg-brand-accent active:scale-95 shadow-md shadow-brand-primary/10"
+              className="group flex w-full sm:inline-flex sm:w-auto items-center justify-center gap-2 rounded-full bg-brand-accent px-7 py-3.5 sm:py-3 text-sm sm:text-base font-bold text-white transition-all duration-300 hover:bg-brand-accent-hover active:scale-95 shadow-md shadow-brand-accent/20"
             >
               <span>Contacto</span>
               <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
@@ -122,7 +122,7 @@ export function Footer() {
                 <li>
                   <a
                     href={`mailto:${COMPANY_CONFIG.contact.email}`}
-                    className="inline-flex items-center gap-2 text-neutral-600 hover:text-brand-primary transition-colors"
+                    className="inline-flex items-center gap-2 text-neutral-600 hover:text-brand-accent transition-colors"
                   >
                     <Mail className="h-4 w-4 text-neutral-500 shrink-0" />
                     <span className="truncate max-w-[130px] sm:max-w-none" title={COMPANY_CONFIG.contact.email}>
@@ -165,10 +165,10 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Tipografía Monumental Gigante Naranja con efecto arquitectónico de corte */}
-      <div className="relative overflow-hidden select-none pointer-events-none mt-2 sm:mt-4">
+      {/* Firma monumental arquitectonica en la base del pie de pagina */}
+      <div className="relative overflow-hidden select-none pointer-events-none mt-6 sm:mt-10 pt-2">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex justify-center sm:justify-start">
-          <span className="font-heading text-[20.6vw] sm:text-[21.2vw] font-black leading-[0.74] tracking-[-0.05em] text-brand-accent block whitespace-nowrap translate-y-[8%]">
+          <span className="font-heading text-[16vw] sm:text-[17.5vw] lg:text-[18vw] font-black leading-[0.74] tracking-[-0.05em] text-brand-accent block whitespace-nowrap translate-y-[4%]">
             los andes
           </span>
         </div>

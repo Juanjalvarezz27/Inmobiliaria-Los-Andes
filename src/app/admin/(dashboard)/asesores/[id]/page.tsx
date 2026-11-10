@@ -122,16 +122,13 @@ export default async function AgentDetailPage({ params }: PageProps) {
         </Link>
       </div>
 
-      {/* Tarjeta Ejecutiva Hero del Asesor con la paleta de marca */}
-      <div className="relative bg-gradient-to-br from-brand-header-from via-brand-header-via to-brand-header-to text-white rounded-3xl border border-white/20 shadow-xl p-6 sm:p-7 overflow-hidden">
-        {/* Sutil resalte de cabecera */}
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/30 to-transparent pointer-events-none" />
-
+      {/* Tarjeta Ejecutiva Hero del Asesor en diseño limpio de alto contraste */}
+      <div className="relative bg-white rounded-3xl border border-neutral-200/80 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.06),0_2px_8px_-2px_rgba(0,0,0,0.02)] p-6 sm:p-7 overflow-hidden">
         <div className="relative z-10 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-6 sm:gap-8">
           {/* Bloque Izquierdo: Avatar e Informacion */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-6 flex-1 min-w-0">
-            {/* Avatar enmarcado con aro de alto contraste */}
-            <div className="relative w-22 h-22 sm:w-24 sm:h-24 rounded-2xl overflow-hidden ring-4 ring-white/20 shadow-xl bg-neutral-900 shrink-0">
+            {/* Avatar enmarcado con relieve sutil */}
+            <div className="relative w-22 h-22 sm:w-24 sm:h-24 rounded-2xl overflow-hidden ring-2 ring-brand-accent/30 shadow-md bg-neutral-100 shrink-0">
               <Image
                 src={
                   agent.avatarUrl ||
@@ -148,19 +145,19 @@ export default async function AgentDetailPage({ params }: PageProps) {
             <div className="space-y-3 flex-1 min-w-0">
               {/* Nombre y Estado */}
               <div className="flex flex-wrap items-center gap-3">
-                <h1 className="text-2xl sm:text-3xl font-black text-white font-heading tracking-tight truncate">
+                <h1 className="text-2xl sm:text-3xl font-black text-brand-primary font-heading tracking-tight truncate">
                   {agent.name}
                 </h1>
                 <span
-                  className={`text-[11px] font-black px-3 py-1 rounded-full flex items-center gap-1.5 shrink-0 shadow-md uppercase tracking-wider ${
+                  className={`text-[11px] font-black px-3 py-1 rounded-full flex items-center gap-1.5 shrink-0 shadow-xs uppercase tracking-wider ${
                     agent.isActive
-                      ? "bg-emerald-500/20 text-emerald-200 border border-emerald-400/30"
-                      : "bg-red-600 text-white border border-red-400 ring-2 ring-red-500/30 shadow-red-950/20"
+                      ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                      : "bg-red-50 text-red-700 border border-red-200"
                   }`}
                 >
                   <span
                     className={`w-2 h-2 rounded-full ${
-                      agent.isActive ? "bg-emerald-400 animate-pulse" : "bg-white animate-pulse"
+                      agent.isActive ? "bg-emerald-500 animate-pulse" : "bg-red-500"
                     }`}
                   />
                   {agent.isActive ? "Asesor Activo" : "Inactivo (Pausado)"}
@@ -168,33 +165,33 @@ export default async function AgentDetailPage({ params }: PageProps) {
               </div>
 
               {!agent.isActive && (
-                <div className="p-2.5 rounded-xl bg-red-950/60 border border-red-500/40 text-red-200 text-xs font-semibold flex items-center gap-2 w-fit">
-                  <Building2 className="w-4 h-4 text-red-400 shrink-0" />
+                <div className="p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold flex items-center gap-2 w-fit">
+                  <Building2 className="w-4 h-4 text-red-500 shrink-0" />
                   <span>Asesor pausado • Inmuebles derivados a Central Los Andes</span>
                 </div>
               )}
 
-              {/* Canales de Contacto con solidez y contraste */}
+              {/* Canales de Contacto con pastillas limpias y legibles */}
               <div className="flex flex-wrap items-center gap-2.5 pt-0.5">
                 {whatsappUrl && (
                   <a
                     href={whatsappUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#0e2115]/90 hover:bg-[#09170e] border border-emerald-500/30 hover:border-emerald-400 text-xs font-semibold text-white transition-all shadow-xs group"
+                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-neutral-50 hover:bg-emerald-50/80 border border-neutral-200/80 hover:border-emerald-300 text-xs font-semibold text-neutral-700 hover:text-emerald-800 transition-all shadow-xs group"
                     title="Chatear por WhatsApp"
                   >
-                    <Phone className="w-3.5 h-3.5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                    <Phone className="w-3.5 h-3.5 text-emerald-600 group-hover:scale-110 transition-transform" />
                     <span>{agent.phone}</span>
                   </a>
                 )}
 
                 <a
                   href={`mailto:${agent.email}`}
-                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#0e2115]/90 hover:bg-[#09170e] border border-emerald-500/30 hover:border-emerald-400 text-xs font-semibold text-white transition-all shadow-xs group"
+                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-neutral-50 hover:bg-orange-50/80 border border-neutral-200/80 hover:border-orange-300 text-xs font-semibold text-neutral-700 hover:text-orange-900 transition-all shadow-xs group"
                   title="Enviar correo electrónico"
                 >
-                  <Mail className="w-3.5 h-3.5 text-emerald-200 group-hover:scale-110 transition-transform" />
+                  <Mail className="w-3.5 h-3.5 text-brand-accent group-hover:scale-110 transition-transform" />
                   <span>{agent.email}</span>
                 </a>
 
@@ -203,10 +200,10 @@ export default async function AgentDetailPage({ params }: PageProps) {
                     href={`https://instagram.com/${agent.instagram.replace("@", "")}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#0e2115]/90 hover:bg-[#09170e] border border-emerald-500/30 hover:border-pink-400 text-xs font-semibold text-white transition-all shadow-xs group"
+                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-neutral-50 hover:bg-pink-50/80 border border-neutral-200/80 hover:border-pink-300 text-xs font-semibold text-neutral-700 hover:text-pink-900 transition-all shadow-xs group"
                     title="Ver perfil de Instagram"
                   >
-                    <InstagramIcon className="w-3.5 h-3.5 text-pink-400 group-hover:scale-110 transition-transform" />
+                    <InstagramIcon className="w-3.5 h-3.5 text-pink-600 group-hover:scale-110 transition-transform" />
                     <span>@{agent.instagram.replace("@", "")}</span>
                   </a>
                 )}
@@ -258,16 +255,16 @@ export default async function AgentDetailPage({ params }: PageProps) {
 
           <div className="flex items-start justify-between gap-3 relative z-10">
             <div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-brand-primary/80 flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-brand-primary/70" />
+              <span className="text-[11px] font-bold uppercase tracking-wider text-brand-accent flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-accent" />
                 Inmuebles Asignados
               </span>
-              <span className="text-3xl sm:text-4xl lg:text-5xl font-black text-brand-primary font-heading tracking-tight block mt-1.5">
+              <span className="text-3xl sm:text-4xl lg:text-5xl font-black text-brand-accent font-heading tracking-tight block mt-1.5">
                 {totalProperties}
               </span>
             </div>
 
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#122b1c] via-[#1a3b26] to-[#0d1f14] text-white border border-emerald-500/25 flex items-center justify-center shadow-md shadow-brand-primary/20 group-hover:scale-105 transition-transform duration-150 shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#c25227] via-brand-accent to-[#9c3e1b] text-white border border-orange-300/35 flex items-center justify-center shadow-md shadow-brand-accent/25 group-hover:scale-105 transition-transform duration-150 shrink-0">
               <Home className="w-6 h-6 text-white drop-shadow-sm" />
             </div>
           </div>

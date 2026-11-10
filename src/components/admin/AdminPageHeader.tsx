@@ -26,7 +26,7 @@ export function AdminPageHeader({
       <div className="flex items-start sm:items-center gap-4 sm:gap-5">
         {/* Contenedor del Icono con Relieve e Iluminación de Marca (Fondo Naranja Terracota con Icono Blanco Nítido) */}
         <div className="relative group shrink-0">
-          <div className="relative w-13 h-13 sm:w-15 sm:h-15 rounded-2xl bg-gradient-to-br from-[#e85d30] via-brand-accent to-[#c4441b] border border-orange-300/40 flex items-center justify-center shadow-lg shadow-brand-accent/25 transition-transform group-hover:scale-[1.02]">
+          <div className="relative w-13 h-13 sm:w-15 sm:h-15 rounded-2xl bg-gradient-to-br from-brand-brick-light via-brand-accent to-brand-brick-dark border border-brand-brick-border flex items-center justify-center shadow-lg shadow-brand-accent/25 transition-transform group-hover:scale-[1.02]">
             <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-white drop-shadow-sm" strokeWidth={2.4} />
           </div>
         </div>
@@ -51,7 +51,7 @@ export function AdminPageHeader({
           <h1 className="text-2xl sm:text-3xl lg:text-[32px] font-black text-brand-primary font-heading tracking-tight leading-tight">
             {title}{" "}
             {titleHighlight && (
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-accent to-[#c94b21]">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-accent to-brand-brick-dark">
                 {titleHighlight}
               </span>
             )}

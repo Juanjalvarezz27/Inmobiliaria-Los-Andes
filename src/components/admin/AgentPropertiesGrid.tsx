@@ -130,7 +130,7 @@ export function AgentPropertiesGrid({
       <div className="space-y-6 pt-6 border-t border-neutral-200/80">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <span className="w-1.5 h-6 sm:h-7 rounded-full bg-gradient-to-b from-[#e85d30] via-brand-accent to-[#c4441b] shrink-0" />
+            <span className="w-1.5 h-6 sm:h-7 rounded-full bg-gradient-to-b from-brand-brick-light via-brand-accent to-brand-brick-dark shrink-0" />
             <h2 className="text-xl sm:text-2xl font-black text-brand-primary font-heading tracking-tight">
               Cartera de Inmuebles a Cargo
             </h2>
@@ -139,7 +139,7 @@ export function AgentPropertiesGrid({
           <button
             type="button"
             onClick={handleNew}
-            className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#e85d30] via-brand-accent to-[#c4441b] hover:shadow-lg hover:shadow-brand-accent/30 hover:-translate-y-0.5 text-white text-xs sm:text-sm font-bold px-4 sm:px-5 py-2.5 rounded-xl shadow-md shadow-brand-accent/20 transition-all self-start sm:self-auto active:scale-95"
+            className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-brand-brick-light via-brand-accent to-brand-brick-dark hover:shadow-lg hover:shadow-brand-accent/30 hover:-translate-y-0.5 text-white text-xs sm:text-sm font-bold px-4 sm:px-5 py-2.5 rounded-xl shadow-md shadow-brand-accent/20 transition-all self-start sm:self-auto active:scale-95"
           >
             <PlusCircle className="w-4 h-4 shrink-0" />
             <span>Asignar Nuevo Inmueble</span>
@@ -162,7 +162,7 @@ export function AgentPropertiesGrid({
             <button
               type="button"
               onClick={handleNew}
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-brand-accent to-[#c94b21] hover:shadow-lg hover:shadow-brand-accent/25 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-md transition-all active:scale-95"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-brand-accent to-brand-brick-dark hover:shadow-lg hover:shadow-brand-accent/25 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-md transition-all active:scale-95"
             >
               <PlusCircle className="w-4 h-4" />
               <span>Asignar Primera Propiedad</span>

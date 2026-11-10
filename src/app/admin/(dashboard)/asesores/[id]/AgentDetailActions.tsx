@@ -44,22 +44,22 @@ export function AgentDetailActions({ agent, agents, properties = [] }: AgentDeta
 
   return (
     <>
-      <div className="flex flex-col gap-2 w-full sm:w-56 shrink-0 lg:border-l lg:border-emerald-500/20 lg:pl-6 justify-center">
+      <div className="flex flex-col gap-2 w-full sm:w-56 shrink-0 lg:border-l lg:border-neutral-200/80 lg:pl-6 justify-center">
         {/* Asignar nueva propiedad mediante modal integrado */}
         <button
           type="button"
           onClick={() => setShowPropertyModal(true)}
-          className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#e85d30] via-brand-accent to-[#c4441b] hover:shadow-lg hover:shadow-brand-accent/30 hover:-translate-y-0.5 text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow-md shadow-brand-accent/20 transition-all active:scale-95 cursor-pointer"
+          className="w-full inline-flex items-center justify-center gap-2 bg-brand-accent hover:bg-brand-accent-hover text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow-md shadow-brand-accent/20 transition-all active:scale-95 cursor-pointer"
         >
           <PlusCircle className="w-4 h-4 shrink-0" />
           <span>Asignar Propiedad</span>
         </button>
 
-        {/* Abrir modal de edicion (Secundaria Solida Blanca de Alto Contraste) */}
+        {/* Abrir modal de edicion */}
         <button
           type="button"
           onClick={() => setShowEditModal(true)}
-          className="w-full inline-flex items-center justify-center gap-2 bg-white hover:bg-neutral-100 text-brand-primary text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow-sm hover:shadow-md transition-all active:scale-95 cursor-pointer"
+          className="w-full inline-flex items-center justify-center gap-2 bg-neutral-50 hover:bg-neutral-100 text-neutral-800 border border-neutral-200/80 text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow-xs hover:shadow-sm transition-all active:scale-95 cursor-pointer"
         >
           <Edit2 className="w-4 h-4 text-brand-accent shrink-0" />
           <span>Editar Datos</span>
@@ -70,7 +70,7 @@ export function AgentDetailActions({ agent, agents, properties = [] }: AgentDeta
           <button
             type="button"
             onClick={() => setShowTransferModal(true)}
-            className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow-md shadow-amber-950/20 hover:shadow-lg transition-all active:scale-95 cursor-pointer whitespace-nowrap"
+            className="w-full inline-flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow-sm hover:shadow-md transition-all active:scale-95 cursor-pointer whitespace-nowrap"
             title="Transferir cartera a otro asesor"
           >
             <ArrowRightLeft className="w-4 h-4 text-white shrink-0" />
@@ -89,14 +89,14 @@ export function AgentDetailActions({ agent, agents, properties = [] }: AgentDeta
           title={isActive ? "Pausar actividad del asesor" : "Reactivar asesor en el equipo"}
           className={`w-full group inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-xs active:scale-95 border ${
             isActive
-              ? "bg-white/15 hover:bg-white/25 text-white border-white/20 hover:border-white/35"
+              ? "bg-neutral-50 hover:bg-red-50 text-neutral-600 hover:text-red-700 border-neutral-200/80 hover:border-red-200"
               : "bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-500 shadow-md shadow-emerald-950/40"
           }`}
         >
           {isLoading ? (
             <Loader2 className="w-4 h-4 animate-spin shrink-0" />
           ) : (
-            <Power className="w-4 h-4 shrink-0 text-white/80 group-hover:text-white transition-colors" />
+            <Power className="w-4 h-4 shrink-0 text-neutral-500 group-hover:text-red-600 transition-colors" />
           )}
           <span>{isActive ? "Inactivar Asesor" : "Reactivar Asesor"}</span>
         </button>

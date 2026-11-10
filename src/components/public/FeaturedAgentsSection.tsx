@@ -403,22 +403,24 @@ export function FeaturedAgentsSection({ agents, totalAgents }: FeaturedAgentsSec
             </div>
           </div>
 
-          {/* Indicador de puntos interactivo con píldora animada */}
-          <div className="flex items-center justify-center gap-2 pt-4">
-            {agents.map((agent, idx) => (
-              <button
-                key={agent.id}
-                type="button"
-                onClick={() => goToSlide(idx)}
-                aria-label={`Ver asesor ${agent.name}`}
-                className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                  activeIndex === idx
-                    ? "w-8 bg-brand-accent shadow-sm shadow-brand-accent/40"
-                    : "w-2 bg-white/40 hover:bg-white/70"
-                }`}
-              />
-            ))}
-          </div>
+          {/* Indicador de puntos interactivo con píldora animada (solo si hay multiples asesores) */}
+          {total > 1 && (
+            <div className="flex items-center justify-center gap-2 pt-4">
+              {agents.map((agent, idx) => (
+                <button
+                  key={agent.id}
+                  type="button"
+                  onClick={() => goToSlide(idx)}
+                  aria-label={`Ver asesor ${agent.name}`}
+                  className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                    activeIndex === idx
+                      ? "w-8 bg-brand-accent shadow-sm shadow-brand-accent/40"
+                      : "w-2 bg-white/40 hover:bg-white/70"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </section>
